@@ -8,10 +8,12 @@ import { Module, Global, OnModuleDestroy, Inject } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { Redis } from 'ioredis';
 import { Queue } from 'bullmq';
+import { PrismaService } from './prisma.service';
 
 @Global()
 @Module({
   providers: [
+    PrismaService,
     {
       provide: 'PRISMA_CLIENT',
       useFactory: () => {
@@ -52,7 +54,7 @@ import { Queue } from 'bullmq';
       },
     },
   ],
-  exports: ['PRISMA_CLIENT', 'REDIS_CLIENT', 'FEEDBACK_QUEUE'],
+  exports: [PrismaService, 'PRISMA_CLIENT', 'REDIS_CLIENT', 'FEEDBACK_QUEUE'],
 })
 export class DatabaseModule implements OnModuleDestroy {
   constructor(

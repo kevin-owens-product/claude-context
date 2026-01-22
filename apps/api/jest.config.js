@@ -7,7 +7,7 @@ module.exports = {
     '^.+\\.ts$': 'ts-jest',
   },
   transformIgnorePatterns: [
-    '/node_modules/',
+    '/node_modules/(?!(uuid|date-fns)/)',
     '/packages/context/dist/',
   ],
   collectCoverageFrom: ['**/*.(t|j)s', '!**/*.spec.ts', '!**/index.ts'],
@@ -15,5 +15,6 @@ module.exports = {
   testEnvironment: 'node',
   moduleNameMapper: {
     '^@forge/context$': '<rootDir>/../../../packages/context/dist',
+    '^uuid$': '<rootDir>/../__mocks__/uuid.ts',
   },
 };

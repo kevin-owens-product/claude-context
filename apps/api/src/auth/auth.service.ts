@@ -12,6 +12,7 @@ import * as crypto from 'crypto';
 
 export interface TokenPayload {
   sub: string; // userId
+  userId?: string; // alias for sub
   tenantId: string;
   email: string;
   role: string;
@@ -85,10 +86,22 @@ export class AuthService {
   ) {}
 
   /**
+   * Verify and decode JWT token
+   */
+  async verifyToken(token: string): Promise<TokenPayload> {
+    try {
+      const payload = this.jwtService.verify<TokenPayload>(token);
+      return payload;
+    } catch {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+
+  /**
    * Authenticate user with email and password
    */
   async validateUser(email: string, password: string): Promise<AuthResult> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findFirst({
       where: { email },
       include: { tenant: true },
     });
@@ -134,6 +147,7 @@ export class AuthService {
 
     return {
       sub: key.user.id,
+      userId: key.user.id,
       tenantId: key.user.tenantId,
       email: key.user.email,
       role: key.user.role,
