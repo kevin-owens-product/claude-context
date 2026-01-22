@@ -74,6 +74,47 @@ const RecordFeedbackSchema = z.object({
   notes: z.string().optional().describe('Additional feedback notes'),
 });
 
+// CoWork-specific schemas (Tier 3: File Operations)
+const ExportContextSchema = z.object({
+  outputPath: z.string().describe('Local folder path for export'),
+  graphId: z.string().optional().describe('Specific graph to export'),
+  nodeTypes: z
+    .array(z.enum(['DOCUMENT', 'DECISION', 'PATTERN', 'EXTERNAL_LINK']))
+    .optional()
+    .describe('Filter by node types'),
+  format: z.enum(['markdown', 'json', 'yaml']).default('markdown').describe('Export format'),
+});
+
+const ExportSlicePackageSchema = z.object({
+  sliceId: z.string().describe('ID of the slice to export'),
+  outputPath: z.string().describe('Local folder path for export'),
+  includeHistory: z.boolean().default(false).describe('Include state transition history'),
+  includeContext: z.boolean().default(true).describe('Include linked context nodes'),
+});
+
+const GenerateReportSchema = z.object({
+  reportType: z
+    .enum(['weekly_summary', 'slice_status', 'context_health', 'team_activity', 'audit_export'])
+    .describe('Type of report to generate'),
+  outputPath: z.string().describe('Local file path for the report'),
+  dateRange: z
+    .object({
+      start: z.string().describe('Start date (ISO format)'),
+      end: z.string().describe('End date (ISO format)'),
+    })
+    .optional()
+    .describe('Date range for the report'),
+  format: z.enum(['markdown', 'html', 'json']).default('markdown').describe('Output format'),
+});
+
+const CreateDocumentFromTemplateSchema = z.object({
+  templateType: z
+    .enum(['adr', 'slice_brief', 'onboarding_guide', 'review_checklist', 'meeting_agenda'])
+    .describe('Type of document template'),
+  outputPath: z.string().describe('Local file path for the document'),
+  variables: z.record(z.string()).optional().describe('Template variables to fill in'),
+});
+
 // Server configuration
 interface ServerConfig {
   apiBaseUrl: string;
@@ -413,6 +454,123 @@ export function createMcpServer(config: ServerConfig) {
             },
           },
         },
+        // ============================================
+        // CoWork-specific tools (Tier 3: File Operations)
+        // ============================================
+        {
+          name: 'export_context_to_files',
+          description:
+            'Export context nodes to local markdown/json files organized by category. Ideal for CoWork file-based workflows.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              outputPath: {
+                type: 'string',
+                description: 'Local folder path for export',
+              },
+              graphId: {
+                type: 'string',
+                description: 'Specific graph to export (defaults to workspace default)',
+              },
+              nodeTypes: {
+                type: 'array',
+                items: { type: 'string', enum: ['DOCUMENT', 'DECISION', 'PATTERN', 'EXTERNAL_LINK'] },
+                description: 'Filter by node types',
+              },
+              format: {
+                type: 'string',
+                enum: ['markdown', 'json', 'yaml'],
+                description: 'Export format (default: markdown)',
+              },
+            },
+            required: ['outputPath'],
+          },
+        },
+        {
+          name: 'export_slice_package',
+          description:
+            'Export a complete slice with all context, constraints, and criteria as a folder structure.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              sliceId: {
+                type: 'string',
+                description: 'ID of the slice to export',
+              },
+              outputPath: {
+                type: 'string',
+                description: 'Local folder path for export',
+              },
+              includeHistory: {
+                type: 'boolean',
+                description: 'Include state transition history (default: false)',
+              },
+              includeContext: {
+                type: 'boolean',
+                description: 'Include linked context nodes (default: true)',
+              },
+            },
+            required: ['sliceId', 'outputPath'],
+          },
+        },
+        {
+          name: 'generate_report',
+          description:
+            'Generate a formatted report from context and analytics data. Supports weekly summaries, slice status, and audit exports.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              reportType: {
+                type: 'string',
+                enum: ['weekly_summary', 'slice_status', 'context_health', 'team_activity', 'audit_export'],
+                description: 'Type of report to generate',
+              },
+              outputPath: {
+                type: 'string',
+                description: 'Local file path for the report',
+              },
+              dateRange: {
+                type: 'object',
+                properties: {
+                  start: { type: 'string', description: 'Start date (ISO format)' },
+                  end: { type: 'string', description: 'End date (ISO format)' },
+                },
+                description: 'Date range for the report',
+              },
+              format: {
+                type: 'string',
+                enum: ['markdown', 'html', 'json'],
+                description: 'Output format (default: markdown)',
+              },
+            },
+            required: ['reportType', 'outputPath'],
+          },
+        },
+        {
+          name: 'create_document_from_template',
+          description:
+            'Generate a document using context-aware templates (ADR, slice brief, onboarding guide, etc.).',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              templateType: {
+                type: 'string',
+                enum: ['adr', 'slice_brief', 'onboarding_guide', 'review_checklist', 'meeting_agenda'],
+                description: 'Type of document template',
+              },
+              outputPath: {
+                type: 'string',
+                description: 'Local file path for the document',
+              },
+              variables: {
+                type: 'object',
+                additionalProperties: { type: 'string' },
+                description: 'Template variables to fill in',
+              },
+            },
+            required: ['templateType', 'outputPath'],
+          },
+        },
       ],
     };
   });
@@ -546,6 +704,370 @@ export function createMcpServer(config: ServerConfig) {
         };
       }
 
+      // ============================================
+      // CoWork-specific tools (Tier 3: File Operations)
+      // ============================================
+
+      case 'export_context_to_files': {
+        const input = ExportContextSchema.parse(args);
+
+        // Get nodes from API
+        const graphId = input.graphId || 'default';
+        const nodes = await apiCall<Array<{
+          id: string;
+          name: string;
+          type: string;
+          layer: string;
+          content: string;
+          freshness: string;
+          tokenCount: number;
+          updatedAt: string;
+        }>>('GET', `/api/v1/context/graphs/${graphId}/nodes`);
+
+        // Filter by type if specified
+        const filteredNodes = input.nodeTypes
+          ? nodes.filter((n) => input.nodeTypes!.includes(n.type as any))
+          : nodes;
+
+        // Generate export structure description
+        const exportStructure = filteredNodes.map((node) => {
+          const filename = `${node.name.toLowerCase().replace(/\s+/g, '-')}.${input.format === 'markdown' ? 'md' : input.format}`;
+          const folder = node.layer.toLowerCase();
+          return {
+            path: `${input.outputPath}/${folder}/${filename}`,
+            node: {
+              id: node.id,
+              name: node.name,
+              type: node.type,
+              layer: node.layer,
+              freshness: node.freshness,
+              tokens: node.tokenCount,
+            },
+          };
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Export plan for ${filteredNodes.length} context nodes:\n\n${JSON.stringify(exportStructure, null, 2)}\n\nTo complete the export, create these files with the node content. Each file should include YAML frontmatter with the node metadata.`,
+            },
+          ],
+        };
+      }
+
+      case 'export_slice_package': {
+        const input = ExportSlicePackageSchema.parse(args);
+
+        // Get slice details
+        const slice = await apiCall<{
+          id: string;
+          shortId: string;
+          name: string;
+          outcome: string;
+          antiScope: string[];
+          status: string;
+          constraints: { content: string; orderIndex: number }[];
+          acceptanceCriteria: { content: string; isCompleted: boolean; orderIndex: number }[];
+          transitions?: { fromStatus: string; toStatus: string; event: string; createdAt: string; comment?: string }[];
+        }>('GET', `/api/v1/slices/${input.sliceId}`);
+
+        // Build package structure
+        const packageStructure = {
+          basePath: `${input.outputPath}/${slice.shortId}-${slice.name.toLowerCase().replace(/\s+/g, '-')}`,
+          files: [
+            {
+              path: 'README.md',
+              description: 'Slice overview with outcome and status',
+            },
+            {
+              path: 'OUTCOME.md',
+              content: slice.outcome,
+            },
+            {
+              path: 'CONSTRAINTS.md',
+              content: slice.constraints.map((c, i) => `${i + 1}. ${c.content}`).join('\n'),
+            },
+            {
+              path: 'ACCEPTANCE_CRITERIA.md',
+              content: slice.acceptanceCriteria
+                .map((ac) => `- [${ac.isCompleted ? 'x' : ' '}] ${ac.content}`)
+                .join('\n'),
+            },
+            {
+              path: 'metadata.json',
+              content: JSON.stringify({ id: slice.id, shortId: slice.shortId, status: slice.status }, null, 2),
+            },
+          ],
+        };
+
+        if (input.includeHistory && slice.transitions) {
+          packageStructure.files.push({
+            path: 'history/transitions.json',
+            content: JSON.stringify(slice.transitions, null, 2),
+          });
+        }
+
+        if (input.includeContext) {
+          packageStructure.files.push({
+            path: 'context/',
+            description: 'Folder for linked context nodes (fetch separately)',
+          });
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Slice package export plan:\n\nBase path: ${packageStructure.basePath}\n\nFiles to create:\n${packageStructure.files.map((f) => `- ${f.path}`).join('\n')}\n\nDetailed structure:\n${JSON.stringify(packageStructure, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case 'generate_report': {
+        const input = GenerateReportSchema.parse(args);
+
+        // Get analytics data
+        const endDate = input.dateRange?.end || new Date().toISOString().split('T')[0];
+        const startDate = input.dateRange?.start || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        const analytics = await apiCall<{
+          totalSessions: number;
+          positiveRatings: number;
+          negativeRatings: number;
+          satisfactionRate: number;
+          topContextNodes: { name: string; usageCount: number }[];
+        }>('GET', `/api/v1/workspaces/${config.workspaceId}/analytics?startDate=${startDate}&endDate=${endDate}`);
+
+        const slices = await apiCall<Array<{
+          shortId: string;
+          name: string;
+          status: string;
+          outcome: string;
+        }>>('GET', `/api/v1/slices?workspaceId=${config.workspaceId}`);
+
+        // Generate report content based on type
+        let reportContent = '';
+
+        switch (input.reportType) {
+          case 'weekly_summary':
+            reportContent = `# Weekly Summary Report\n\n**Period:** ${startDate} to ${endDate}\n\n## AI Session Metrics\n- Total Sessions: ${analytics.totalSessions}\n- Satisfaction Rate: ${(analytics.satisfactionRate * 100).toFixed(1)}%\n- Positive Ratings: ${analytics.positiveRatings}\n- Negative Ratings: ${analytics.negativeRatings}\n\n## Slice Activity\n${slices.map((s) => `- [${s.status}] ${s.shortId}: ${s.name}`).join('\n')}\n\n## Top Context Nodes\n${analytics.topContextNodes?.map((n, i) => `${i + 1}. ${n.name} (${n.usageCount} uses)`).join('\n') || 'No data available'}`;
+            break;
+          case 'slice_status':
+            const byStatus = slices.reduce((acc, s) => {
+              acc[s.status] = acc[s.status] || [];
+              acc[s.status].push(s);
+              return acc;
+            }, {} as Record<string, typeof slices>);
+            reportContent = `# Slice Status Report\n\n**Generated:** ${new Date().toISOString()}\n\n${Object.entries(byStatus).map(([status, items]) => `## ${status}\n${items.map((s) => `- **${s.shortId}**: ${s.name}\n  ${s.outcome.substring(0, 100)}...`).join('\n\n')}`).join('\n\n')}`;
+            break;
+          case 'audit_export':
+            reportContent = `# Audit Export\n\n**Period:** ${startDate} to ${endDate}\n**Workspace:** ${config.workspaceId}\n**Tenant:** ${config.tenantId}\n\n## Summary\n- Total AI Sessions: ${analytics.totalSessions}\n- Active Slices: ${slices.filter((s) => s.status === 'ACTIVE').length}\n- Completed Slices: ${slices.filter((s) => s.status === 'COMPLETED').length}\n\n## Compliance Notes\n- All sessions tracked with context snapshots\n- Feedback collected for quality assurance\n- Full audit log available via /audit/export endpoint`;
+            break;
+          default:
+            reportContent = `# ${input.reportType} Report\n\nGenerated: ${new Date().toISOString()}\n\nData: ${JSON.stringify({ analytics, sliceCount: slices.length }, null, 2)}`;
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Report generated for ${input.outputPath}:\n\n${reportContent}`,
+            },
+          ],
+        };
+      }
+
+      case 'create_document_from_template': {
+        const input = CreateDocumentFromTemplateSchema.parse(args);
+
+        // Compile context for template
+        const contextResponse = await apiCall<{ text: string }>(
+          'POST',
+          `/api/v1/context/compile`,
+          { workspaceId: config.workspaceId, tokenBudget: 2000 }
+        );
+
+        let template = '';
+        const vars = input.variables || {};
+
+        switch (input.templateType) {
+          case 'adr':
+            template = `# ADR-XXX: ${vars.title || '[Title]'}
+
+**Status:** ${vars.status || 'Proposed'}
+**Date:** ${new Date().toISOString().split('T')[0]}
+**Deciders:** ${vars.deciders || '[Team]'}
+**Categories:** ${vars.categories || '[Categories]'}
+
+## Context
+
+${vars.context || '[Describe the context and problem]'}
+
+### Options Considered
+
+#### Option A: ${vars.optionA || '[Option A]'}
+
+**Pros:**
+-
+
+**Cons:**
+-
+
+#### Option B: ${vars.optionB || '[Option B]'}
+
+**Pros:**
+-
+
+**Cons:**
+-
+
+## Decision
+
+**We will implement Option [X].**
+
+Rationale:
+1.
+
+## Consequences
+
+### Positive
+
+-
+
+### Negative
+
+-
+
+### Mitigations
+
+1.
+
+## References
+
+- `;
+            break;
+
+          case 'slice_brief':
+            template = `# Slice Brief: ${vars.name || '[Slice Name]'}
+
+## Outcome
+
+${vars.outcome || '[What will this slice accomplish?]'}
+
+## Anti-Scope
+
+${vars.antiScope || '[What is explicitly OUT of scope?]'}
+
+## Constraints
+
+1. ${vars.constraint1 || '[Technical or business constraint]'}
+2.
+3.
+
+## Acceptance Criteria
+
+- [ ] ${vars.criterion1 || '[Measurable criterion]'}
+- [ ]
+- [ ]
+
+## Context References
+
+${contextResponse.text.substring(0, 500)}...
+
+## Notes
+
+`;
+            break;
+
+          case 'onboarding_guide':
+            template = `# Onboarding Guide: ${vars.role || '[Role]'}
+
+Welcome to the team! This guide will help you get started.
+
+## Team Overview
+
+${vars.teamDescription || '[Team description]'}
+
+## Key Systems
+
+${contextResponse.text.substring(0, 1000)}
+
+## Getting Started
+
+### Day 1
+- [ ] Set up development environment
+- [ ] Review organizational context
+- [ ] Meet with buddy
+
+### Week 1
+- [ ] Complete codebase walkthrough
+- [ ] Shadow team members
+- [ ] Pick up first slice
+
+## Key Contacts
+
+- Manager: ${vars.manager || '[Name]'}
+- Buddy: ${vars.buddy || '[Name]'}
+
+## Resources
+
+- Context Platform: [Claude Context URL]
+- Documentation: [Wiki URL]
+`;
+            break;
+
+          case 'meeting_agenda':
+            template = `# Meeting: ${vars.title || '[Meeting Title]'}
+
+**Date:** ${vars.date || new Date().toISOString().split('T')[0]}
+**Attendees:** ${vars.attendees || '[Names]'}
+**Duration:** ${vars.duration || '30 min'}
+
+## Objectives
+
+1. ${vars.objective1 || '[Primary objective]'}
+2.
+3.
+
+## Agenda
+
+| Time | Topic | Owner |
+|------|-------|-------|
+| 5 min | Opening & context | ${vars.facilitator || '[Facilitator]'} |
+| 15 min | Main discussion | |
+| 5 min | Action items | |
+| 5 min | Wrap-up | |
+
+## Pre-read Materials
+
+${contextResponse.text.substring(0, 300)}...
+
+## Notes
+
+[To be filled during meeting]
+
+## Action Items
+
+- [ ]
+`;
+            break;
+
+          default:
+            template = `# ${input.templateType}\n\nGenerated: ${new Date().toISOString()}\n\nVariables: ${JSON.stringify(vars, null, 2)}`;
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Document template for ${input.outputPath}:\n\n${template}`,
+            },
+          ],
+        };
+      }
+
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -599,6 +1121,78 @@ export function createMcpServer(config: ServerConfig) {
             {
               name: 'error',
               description: 'The error message or issue description',
+              required: true,
+            },
+          ],
+        },
+        // ============================================
+        // CoWork-specific prompts (Tier 3)
+        // ============================================
+        {
+          name: 'prepare_meeting',
+          description: 'Compile relevant context and create meeting preparation documents',
+          arguments: [
+            {
+              name: 'topic',
+              description: 'Meeting topic or agenda',
+              required: true,
+            },
+            {
+              name: 'participants',
+              description: 'List of participants',
+              required: false,
+            },
+            {
+              name: 'outputFolder',
+              description: 'Folder to save meeting materials',
+              required: true,
+            },
+          ],
+        },
+        {
+          name: 'onboard_team_member',
+          description: 'Generate onboarding documentation package for a new team member',
+          arguments: [
+            {
+              name: 'role',
+              description: 'Role of the new team member',
+              required: true,
+            },
+            {
+              name: 'team',
+              description: 'Team they are joining',
+              required: true,
+            },
+            {
+              name: 'outputFolder',
+              description: 'Folder to save onboarding materials',
+              required: true,
+            },
+          ],
+        },
+        {
+          name: 'audit_preparation',
+          description: 'Export and organize all compliance-relevant documentation for audits',
+          arguments: [
+            {
+              name: 'auditType',
+              description: 'Type of audit (soc2, gdpr, hipaa, or custom)',
+              required: true,
+            },
+            {
+              name: 'outputFolder',
+              description: 'Folder to save audit materials',
+              required: true,
+            },
+          ],
+        },
+        {
+          name: 'weekly_digest',
+          description: 'Generate a weekly summary of context changes, slice progress, and team activity',
+          arguments: [
+            {
+              name: 'outputFolder',
+              description: 'Folder to save the digest',
               required: true,
             },
           ],
@@ -772,6 +1366,270 @@ Please help me debug this issue by:
 4. Providing potential fixes with code examples
 
 Let's solve this step by step.`,
+              },
+            },
+          ],
+        };
+      }
+
+      // ============================================
+      // CoWork-specific prompts (Tier 3)
+      // ============================================
+
+      case 'prepare_meeting': {
+        const topic = args?.topic;
+        const participants = args?.participants || 'team members';
+        const outputFolder = args?.outputFolder;
+
+        if (!topic || !outputFolder) {
+          throw new Error('topic and outputFolder are required');
+        }
+
+        return {
+          description: `Preparing meeting materials for: ${topic}`,
+          messages: [
+            {
+              role: 'user',
+              content: {
+                type: 'text',
+                text: `I need to prepare materials for an upcoming meeting.
+
+## Meeting Details
+- **Topic:** ${topic}
+- **Participants:** ${participants}
+- **Output Folder:** ${outputFolder}
+
+## Organizational Context
+<context>
+${context}
+</context>
+
+Please help me prepare for this meeting by:
+
+1. **Create a meeting agenda** (${outputFolder}/agenda.md)
+   - Include relevant context from our organizational knowledge
+   - Suggest discussion points based on the topic
+   - Allocate time for each item
+
+2. **Compile relevant context** (${outputFolder}/context/)
+   - Export related decisions and patterns
+   - Include any relevant slice information
+   - Add background documents participants should review
+
+3. **Create a pre-read summary** (${outputFolder}/pre-read.md)
+   - Summarize key points participants need to know
+   - Highlight any decisions that need to be made
+   - List open questions
+
+4. **Prepare a notes template** (${outputFolder}/notes.md)
+   - Structure for capturing discussion points
+   - Action item tracking section
+   - Decision log
+
+Please generate these materials with content appropriate for the meeting topic and participants.`,
+              },
+            },
+          ],
+        };
+      }
+
+      case 'onboard_team_member': {
+        const role = args?.role;
+        const team = args?.team;
+        const outputFolder = args?.outputFolder;
+
+        if (!role || !team || !outputFolder) {
+          throw new Error('role, team, and outputFolder are required');
+        }
+
+        return {
+          description: `Creating onboarding package for ${role} on ${team}`,
+          messages: [
+            {
+              role: 'user',
+              content: {
+                type: 'text',
+                text: `I need to create an onboarding documentation package for a new team member.
+
+## New Hire Details
+- **Role:** ${role}
+- **Team:** ${team}
+- **Output Folder:** ${outputFolder}
+
+## Organizational Context
+<context>
+${context}
+</context>
+
+Please create a comprehensive onboarding package:
+
+1. **Welcome Guide** (${outputFolder}/welcome.md)
+   - Team overview and mission
+   - Key contacts and communication channels
+   - First week checklist
+
+2. **Technical Overview** (${outputFolder}/technical/)
+   - Architecture decisions relevant to their role
+   - Key patterns and conventions they need to know
+   - Development environment setup guide
+
+3. **Context Export** (${outputFolder}/context/)
+   - Export organizational context relevant to their role
+   - Include key decisions they should understand
+   - Add patterns they'll work with frequently
+
+4. **Learning Path** (${outputFolder}/learning-path.md)
+   - Suggested order for reviewing documentation
+   - Key slices to study for examples
+   - Recommended pairing sessions
+
+5. **Quick Reference** (${outputFolder}/quick-reference.md)
+   - Common commands and workflows
+   - Links to important resources
+   - FAQ for common questions
+
+Please tailor all materials to be appropriate for a ${role} joining the ${team} team.`,
+              },
+            },
+          ],
+        };
+      }
+
+      case 'audit_preparation': {
+        const auditType = args?.auditType;
+        const outputFolder = args?.outputFolder;
+
+        if (!auditType || !outputFolder) {
+          throw new Error('auditType and outputFolder are required');
+        }
+
+        const auditRequirements: Record<string, string> = {
+          soc2: 'SOC 2 Type II - Security, Availability, Confidentiality',
+          gdpr: 'GDPR - Data Protection and Privacy',
+          hipaa: 'HIPAA - Health Information Privacy',
+          custom: 'Custom Audit Requirements',
+        };
+
+        return {
+          description: `Preparing ${auditType.toUpperCase()} audit documentation`,
+          messages: [
+            {
+              role: 'user',
+              content: {
+                type: 'text',
+                text: `I need to prepare documentation for an upcoming compliance audit.
+
+## Audit Details
+- **Type:** ${auditRequirements[auditType] || auditType}
+- **Output Folder:** ${outputFolder}
+
+## Organizational Context
+<context>
+${context}
+</context>
+
+Please prepare a comprehensive audit documentation package:
+
+1. **Executive Summary** (${outputFolder}/executive-summary.md)
+   - Overview of compliance posture
+   - Key controls and measures in place
+   - Summary of evidence collected
+
+2. **Architecture Decisions** (${outputFolder}/decisions/)
+   - Export all ADRs related to security and compliance
+   - Include data handling decisions
+   - Document access control decisions
+
+3. **Security Controls** (${outputFolder}/security/)
+   - Authentication and authorization documentation
+   - Data encryption practices
+   - Access logging and monitoring
+
+4. **Audit Trail Export** (${outputFolder}/audit-logs/)
+   - Export relevant audit logs
+   - Include access patterns
+   - Document any incidents and resolutions
+
+5. **Data Handling** (${outputFolder}/data-handling/)
+   - Data flow documentation
+   - Retention policies
+   - Privacy controls
+
+6. **Compliance Checklist** (${outputFolder}/checklist.md)
+   - ${auditType.toUpperCase()} specific requirements
+   - Evidence mapping for each requirement
+   - Status of each control
+
+Please organize all materials according to ${auditType.toUpperCase()} audit requirements and ensure all sensitive information is properly redacted.`,
+              },
+            },
+          ],
+        };
+      }
+
+      case 'weekly_digest': {
+        const outputFolder = args?.outputFolder;
+
+        if (!outputFolder) {
+          throw new Error('outputFolder is required');
+        }
+
+        // Get current date info for the digest
+        const now = new Date();
+        const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+        return {
+          description: 'Generating weekly digest',
+          messages: [
+            {
+              role: 'user',
+              content: {
+                type: 'text',
+                text: `Please generate a weekly digest of team activity and context changes.
+
+## Digest Period
+- **Start:** ${weekStart.toISOString().split('T')[0]}
+- **End:** ${now.toISOString().split('T')[0]}
+- **Output Folder:** ${outputFolder}
+
+## Organizational Context
+<context>
+${context}
+</context>
+
+Please create the following digest materials:
+
+1. **Weekly Summary** (${outputFolder}/weekly-summary.md)
+   - Highlight key accomplishments
+   - List slices completed or transitioned
+   - Note any important decisions made
+
+2. **Context Changes** (${outputFolder}/context-changes.md)
+   - New context nodes added
+   - Updated documentation
+   - Deprecated or archived content
+
+3. **Slice Progress** (${outputFolder}/slice-progress.md)
+   - Status of active slices
+   - Upcoming work
+   - Blocked items needing attention
+
+4. **AI Usage Analytics** (${outputFolder}/ai-analytics.md)
+   - Session statistics
+   - Feedback summary
+   - Context effectiveness metrics
+
+5. **Team Highlights** (${outputFolder}/highlights.md)
+   - Notable achievements
+   - Learning opportunities
+   - Recognition for team members
+
+6. **Next Week Preview** (${outputFolder}/next-week.md)
+   - Planned work
+   - Key meetings or milestones
+   - Focus areas
+
+Please compile this digest using the available data and context.`,
               },
             },
           ],
