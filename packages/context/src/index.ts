@@ -9,15 +9,15 @@
  */
 
 // Types
-export * from './types/index.js';
+export * from './types';
 
 // Errors
-export * from './errors/index.js';
+export * from './errors';
 
 // Services
-export { ContextService } from './services/context.service.js';
-export { SliceService } from './services/slice.service.js';
-export { FeedbackService } from './services/feedback.service.js';
+export { ContextService } from './services/context.service';
+export { SliceService } from './services/slice.service';
+export { FeedbackService } from './services/feedback.service';
 
 // Utilities
-export { countTokens, truncateToTokenBudget, chunkText } from './utils/tokens.js';
+export { countTokens, truncateToTokenBudget, chunkText } from './utils/tokens';

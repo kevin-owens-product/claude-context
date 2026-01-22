@@ -5,6 +5,7 @@
  */
 
 import { Module } from '@nestjs/common';
+import type { PrismaClient } from '@prisma/client';
 import { SliceController } from './controllers/slice.controller';
 import { SliceService } from '@forge/context';
 
@@ -13,7 +14,7 @@ import { SliceService } from '@forge/context';
   providers: [
     {
       provide: SliceService,
-      useFactory: (prisma: any) => {
+      useFactory: (prisma: PrismaClient) => {
         return new SliceService(prisma);
       },
       inject: ['PRISMA_CLIENT'],

@@ -5,11 +5,11 @@
  */
 
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import type { TenantId, UserId } from '@forge/context';
+import type { TenantId as TenantIdType, UserId as UserIdType } from '@forge/context';
 
 export interface RequestUser {
-  id: UserId;
-  tenantId: TenantId;
+  id: UserIdType;
+  tenantId: TenantIdType;
   email: string;
   role: string;
 }
@@ -28,14 +28,14 @@ export const CurrentUser = createParamDecorator(
 );
 
 export const TenantId = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext): TenantId => {
+  (_data: unknown, ctx: ExecutionContext): TenantIdType => {
     const request = ctx.switchToHttp().getRequest();
     return request.user?.tenantId;
   },
 );
 
 export const UserId = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext): UserId => {
+  (_data: unknown, ctx: ExecutionContext): UserIdType => {
     const request = ctx.switchToHttp().getRequest();
     return request.user?.id;
   },

@@ -24,13 +24,13 @@ import {
   type PaginatedResult,
   ContextLayer,
   Freshness,
-} from '../types/index.js';
+} from '../types';
 import {
   GraphNotFoundError,
   NodeNotFoundError,
   NoContextAvailableError,
-} from '../errors/index.js';
-import { countTokens } from '../utils/tokens.js';
+} from '../errors';
+import { countTokens } from '../utils/tokens';
 
 const CACHE_TTL = 300; // 5 minutes
 const MAX_SEMANTIC_RESULTS = 50;
@@ -132,9 +132,9 @@ export class ContextService {
     const where = {
       graphId,
       tenantId,
-      ...(type && { type }),
-      ...(layer && { layer }),
-      ...(freshness && { freshness }),
+      ...(type && { type: type as any }),
+      ...(layer && { layer: layer as any }),
+      ...(freshness && { freshness: freshness as any }),
     };
 
     const [data, total] = await Promise.all([
@@ -165,14 +165,14 @@ export class ContextService {
       data: {
         tenantId,
         graphId: request.graphId,
-        type: request.type,
-        layer: request.layer,
+        type: request.type as any,
+        layer: request.layer as any,
         name: request.name,
         content: request.content,
-        metadata: request.metadata ?? {},
+        metadata: (request.metadata ?? {}) as any,
         externalUrl: request.externalUrl,
         tokenCount,
-        freshness: Freshness.CURRENT,
+        freshness: Freshness.CURRENT as any,
       },
     });
 
@@ -198,8 +198,8 @@ export class ContextService {
       data: {
         ...(request.name && { name: request.name }),
         ...(request.content !== undefined && { content: request.content }),
-        ...(request.metadata && { metadata: request.metadata }),
-        ...(request.freshness && { freshness: request.freshness }),
+        ...(request.metadata && { metadata: request.metadata as any }),
+        ...(request.freshness && { freshness: request.freshness as any }),
         tokenCount,
         updatedAt: new Date(),
       },

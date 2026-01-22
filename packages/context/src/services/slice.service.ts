@@ -19,7 +19,7 @@ import {
   type PaginationOptions,
   type PaginatedResult,
   SliceStatus,
-} from '../types/index.js';
+} from '../types';
 import {
   SliceNotFoundError,
   InvalidSliceTransitionError,
@@ -27,7 +27,7 @@ import {
   AcceptanceCriteriaIncompleteError,
   SelfApprovalNotAllowedError,
   SliceReopenWindowExpiredError,
-} from '../errors/index.js';
+} from '../errors';
 
 const REOPEN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 

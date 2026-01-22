@@ -35,7 +35,7 @@ export function createGraph(
   workspaceId: string,
   data: { name: string; description?: string; isDefault?: boolean },
 ): Promise<ContextGraph> {
-  return api.post('/context/graphs', data);
+  return api.post(`/context/graphs?workspaceId=${workspaceId}`, data);
 }
 
 // ============================================================================

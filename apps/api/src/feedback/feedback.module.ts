@@ -4,7 +4,10 @@
  * @model claude-opus-4-5
  */
 
-import { Module } from '@nestjs/common';
+import { Module, Optional, Inject } from '@nestjs/common';
+import type { PrismaClient } from '@prisma/client';
+import type { Redis } from 'ioredis';
+import type { Queue } from 'bullmq';
 import { FeedbackController } from './controllers/feedback.controller';
 import { FeedbackService } from '@forge/context';
 
@@ -13,10 +16,10 @@ import { FeedbackService } from '@forge/context';
   providers: [
     {
       provide: FeedbackService,
-      useFactory: (prisma: any, redis: any, queue?: any) => {
-        return new FeedbackService(prisma, redis, queue);
+      useFactory: (prisma: PrismaClient, redis: Redis, queue: Queue | null) => {
+        return new FeedbackService(prisma, redis, queue ?? undefined);
       },
-      inject: ['PRISMA_CLIENT', 'REDIS_CLIENT', { token: 'FEEDBACK_QUEUE', optional: true }],
+      inject: ['PRISMA_CLIENT', 'REDIS_CLIENT', 'FEEDBACK_QUEUE'],
     },
   ],
   exports: [FeedbackService],

@@ -4,7 +4,9 @@
  * @model claude-opus-4-5
  */
 
-import { Module } from '@nestjs/common';
+import { Module, Inject } from '@nestjs/common';
+import type { PrismaClient } from '@prisma/client';
+import type { Redis } from 'ioredis';
 import { ContextController } from './controllers/context.controller';
 import { ContextService } from '@forge/context';
 
@@ -13,7 +15,7 @@ import { ContextService } from '@forge/context';
   providers: [
     {
       provide: ContextService,
-      useFactory: (prisma: any, redis: any) => {
+      useFactory: (prisma: PrismaClient, redis: Redis) => {
         return new ContextService(prisma, redis);
       },
       inject: ['PRISMA_CLIENT', 'REDIS_CLIENT'],

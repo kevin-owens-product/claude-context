@@ -67,7 +67,14 @@ function createMockPrisma(currentTenantId: TenantId) {
     contextGraph: {
       findFirst: vi.fn().mockImplementation(({ where }) => {
         for (const graph of mockDatabase.graphs.values()) {
-          if (graph.id === where.id && graph.tenantId === where.tenantId) {
+          // Match by id and tenantId
+          if (where.id && graph.id === where.id && graph.tenantId === where.tenantId) {
+            return Promise.resolve(graph);
+          }
+          // Match by workspaceId, tenantId, and isDefault (for compile)
+          if (where.workspaceId && graph.workspaceId === where.workspaceId &&
+              graph.tenantId === where.tenantId &&
+              (where.isDefault === undefined || graph.isDefault === where.isDefault)) {
             return Promise.resolve(graph);
           }
         }

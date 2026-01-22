@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Search, FileText, BookOpen, Code, Zap } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useNodes, useSearchNodes, useCompileContext } from '../../hooks';
-import { Card, CardHeader, CardContent } from '../common/Card';
+import { Card, CardContent } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
 import type { ContextNode, ContextLayer, Freshness } from '../../types';

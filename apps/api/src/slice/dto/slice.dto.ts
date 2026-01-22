@@ -10,11 +10,14 @@ import {
   IsUUID,
   IsArray,
   IsEnum,
+  IsIn,
   ArrayMinSize,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { SliceStatus, SliceEvent } from '@forge/context';
+import { SliceStatus, type SliceEvent } from '@forge/context';
+
+const SLICE_EVENTS = ['start', 'submit', 'approve', 'request_changes', 'reopen', 'archive', 'cancel'] as const;
 
 // ============================================================================
 // SLICE DTOs
@@ -123,11 +126,11 @@ export class SliceResponseDto {
   @ApiProperty()
   ownerId!: string;
 
-  @ApiProperty({ type: [SliceConstraintDto] })
-  constraints!: SliceConstraintDto[];
+  @ApiPropertyOptional({ type: [SliceConstraintDto] })
+  constraints?: SliceConstraintDto[];
 
-  @ApiProperty({ type: [AcceptanceCriterionDto] })
-  acceptanceCriteria!: AcceptanceCriterionDto[];
+  @ApiPropertyOptional({ type: [AcceptanceCriterionDto] })
+  acceptanceCriteria?: AcceptanceCriterionDto[];
 
   @ApiPropertyOptional()
   startedAt?: Date;
@@ -153,8 +156,8 @@ export class SliceResponseDto {
 // ============================================================================
 
 export class TransitionSliceDto {
-  @ApiProperty({ enum: SliceEvent, description: 'Event to trigger the transition' })
-  @IsEnum(SliceEvent)
+  @ApiProperty({ enum: SLICE_EVENTS, description: 'Event to trigger the transition' })
+  @IsIn(SLICE_EVENTS)
   event!: SliceEvent;
 
   @ApiPropertyOptional({ description: 'Comment for the transition (required for request_changes)' })

@@ -163,7 +163,10 @@ export class FeedbackResponseDto {
   styleMatchScore?: number;
 
   @ApiProperty()
-  createdAt!: Date;
+  submittedAt!: Date;
+
+  @ApiProperty()
+  submittedById!: string;
 }
 
 // ============================================================================

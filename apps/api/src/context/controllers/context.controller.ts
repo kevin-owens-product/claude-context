@@ -32,6 +32,7 @@ import {
   type GraphId,
   type NodeId,
   type WorkspaceId,
+  type SliceId,
 } from '@forge/context';
 import {
   CreateGraphDto,
@@ -206,7 +207,7 @@ export class ContextController {
   ): Promise<CompiledContextResponseDto> {
     return this.contextService.compile(tenantId, {
       workspaceId: dto.workspaceId as WorkspaceId,
-      sliceId: dto.sliceId,
+      sliceId: dto.sliceId as SliceId | undefined,
       query: dto.query,
       tokenBudget: dto.tokenBudget,
     });

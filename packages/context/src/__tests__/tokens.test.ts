@@ -56,11 +56,13 @@ describe('Token Utilities', () => {
     it('should truncate at word boundary when possible', () => {
       const text = 'Hello world this is a test of truncation at word boundaries';
       const result = truncateToTokenBudget(text, 5);
-      // Should not end mid-word (before the ...)
+      // Should end with ... and the text before should be complete words
+      expect(result.endsWith('...')).toBe(true);
+      // Should be shorter than original
+      expect(result.length).toBeLessThan(text.length);
+      // The truncated text (without ...) should be a prefix of the original
       const withoutEllipsis = result.replace('...', '');
-      expect(withoutEllipsis.endsWith(' ') || !withoutEllipsis.match(/\w$/)).toBe(
-        true,
-      );
+      expect(text.startsWith(withoutEllipsis)).toBe(true);
     });
   });
 

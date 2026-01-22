@@ -20,11 +20,11 @@ import {
   type FeedbackMetrics,
   FeedbackRating,
   FeedbackErrorCategory,
-} from '../types/index.js';
+} from '../types';
 import {
   SessionNotFoundError,
   FeedbackAlreadySubmittedError,
-} from '../errors/index.js';
+} from '../errors';
 
 export class FeedbackService {
   constructor(
@@ -352,8 +352,8 @@ export class FeedbackService {
     return new Date().toISOString().split('T')[0];
   }
 
-  private average(values: number[]): number | null {
-    if (values.length === 0) return null;
+  private average(values: number[]): number | undefined {
+    if (values.length === 0) return undefined;
     return values.reduce((a, b) => a + b, 0) / values.length;
   }
 

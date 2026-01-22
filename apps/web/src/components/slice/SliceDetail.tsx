@@ -13,7 +13,6 @@ import {
   X,
   RotateCcw,
   Archive,
-  Plus,
   CheckCircle2,
   Circle,
 } from 'lucide-react';
@@ -22,7 +21,7 @@ import { useSlice, useTransitionSlice, useToggleCriterion } from '../../hooks';
 import { Card, CardHeader, CardContent } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
-import { SliceStatus, SliceEvent, type Slice } from '../../types';
+import { SliceStatus, SliceEvent } from '../../types';
 
 interface SliceDetailProps {
   sliceId: string;
