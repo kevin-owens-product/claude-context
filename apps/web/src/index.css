@@ -1,43 +1,355 @@
 /**
- * @prompt-id forge-v4.1:web:styles:001
+ * @prompt-id forge-v4.1:web:styles:002
  * @generated-at 2026-01-22T00:00:00Z
  * @model claude-opus-4-5
+ * @refined-by claude-integration-redesign
  */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Claude Design System - CSS Variables */
+:root {
+  /* Claude Brand Colors */
+  --claude-terracotta: #ae5630;
+  --claude-terracotta-light: #eb8f6a;
+  --claude-terracotta-dark: #7d3c21;
+  --claude-cream: #fdfaf6;
+  --claude-cream-dark: #f5ede0;
+
+  /* Typography */
+  --font-serif: 'Tiempos Text', Georgia, Cambria, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  /* Spacing */
+  --space-unit: 4px;
+
+  /* Transitions */
+  --transition-fast: 150ms;
+  --transition-normal: 250ms;
+  --transition-slow: 400ms;
+  --ease-claude: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index layers */
+  --z-dropdown: 100;
+  --z-modal: 200;
+  --z-popover: 300;
+  --z-toast: 400;
+  --z-tooltip: 500;
+}
+
+/* Dark mode variables */
+.dark {
+  --claude-cream: #1c1917;
+  --claude-cream-dark: #292524;
+}
+
 /* Base styles */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-claude-cream-100 text-claude-neutral-800;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+  }
+
+  .dark body {
+    @apply bg-claude-neutral-900 text-claude-neutral-100;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    @apply font-medium tracking-tight;
+  }
+
+  h1 {
+    @apply text-heading-1;
+  }
+
+  h2 {
+    @apply text-heading-2;
+  }
+
+  h3 {
+    @apply text-heading-3;
+  }
+
+  /* Links */
+  a {
+    @apply text-claude-primary-500 hover:text-claude-primary-600 transition-colors duration-150;
+  }
+
+  /* Focus states - accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-claude-primary-500 ring-offset-2 ring-offset-claude-cream-100;
+  }
+
+  .dark :focus-visible {
+    @apply ring-offset-claude-neutral-900;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-claude-primary-200 text-claude-primary-900;
+  }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Component layer */
+@layer components {
+  /* Card styles */
+  .claude-card {
+    @apply bg-white rounded-claude border border-claude-cream-400 shadow-claude;
+    @apply transition-all duration-200 ease-claude;
+  }
+
+  .claude-card:hover {
+    @apply shadow-claude-lg border-claude-cream-500;
+  }
+
+  .dark .claude-card {
+    @apply bg-claude-neutral-800 border-claude-neutral-700;
+  }
+
+  /* Input styles */
+  .claude-input {
+    @apply w-full px-4 py-3 rounded-claude-sm;
+    @apply bg-white border border-claude-cream-400;
+    @apply text-claude-neutral-800 placeholder-claude-neutral-400;
+    @apply transition-all duration-150 ease-claude;
+    @apply focus:border-claude-primary-500 focus:ring-2 focus:ring-claude-primary-500/20;
+  }
+
+  .dark .claude-input {
+    @apply bg-claude-neutral-800 border-claude-neutral-600 text-claude-neutral-100;
+  }
+
+  /* Button base */
+  .claude-btn {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply px-4 py-2.5 rounded-claude-sm font-medium;
+    @apply transition-all duration-150 ease-claude;
+    @apply focus-visible:ring-2 focus-visible:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .claude-btn-primary {
+    @apply claude-btn;
+    @apply bg-claude-primary-500 text-white;
+    @apply hover:bg-claude-primary-600 active:bg-claude-primary-700;
+    @apply shadow-claude-primary hover:shadow-claude-primary-lg;
+    @apply focus-visible:ring-claude-primary-500;
+  }
+
+  .claude-btn-secondary {
+    @apply claude-btn;
+    @apply bg-claude-cream-200 text-claude-neutral-700;
+    @apply hover:bg-claude-cream-300 active:bg-claude-cream-400;
+    @apply focus-visible:ring-claude-neutral-500;
+  }
+
+  .claude-btn-ghost {
+    @apply claude-btn;
+    @apply text-claude-neutral-600;
+    @apply hover:bg-claude-cream-200 active:bg-claude-cream-300;
+    @apply focus-visible:ring-claude-neutral-500;
+  }
+
+  .claude-btn-danger {
+    @apply claude-btn;
+    @apply bg-claude-error text-white;
+    @apply hover:bg-claude-error-dark;
+    @apply focus-visible:ring-claude-error;
+  }
+
+  /* Badge styles */
+  .claude-badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-caption font-medium;
+  }
+
+  .claude-badge-primary {
+    @apply claude-badge bg-claude-primary-100 text-claude-primary-700;
+  }
+
+  .claude-badge-success {
+    @apply claude-badge bg-claude-success-light text-claude-success-dark;
+  }
+
+  .claude-badge-warning {
+    @apply claude-badge bg-claude-warning-light text-claude-warning-dark;
+  }
+
+  .claude-badge-error {
+    @apply claude-badge bg-claude-error-light text-claude-error-dark;
+  }
+
+  .claude-badge-neutral {
+    @apply claude-badge bg-claude-neutral-100 text-claude-neutral-600;
+  }
+
+  /* Sidebar navigation */
+  .claude-nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-claude-sm;
+    @apply text-claude-neutral-600 font-medium;
+    @apply transition-all duration-150 ease-claude;
+    @apply hover:bg-claude-cream-200 hover:text-claude-neutral-800;
+  }
+
+  .claude-nav-item.active {
+    @apply bg-claude-primary-50 text-claude-primary-600;
+    @apply hover:bg-claude-primary-100;
+  }
+
+  /* Skeleton loading */
+  .claude-skeleton {
+    @apply bg-claude-cream-300 animate-pulse rounded-claude-sm;
+  }
+
+  /* Toast notifications */
+  .claude-toast {
+    @apply flex items-start gap-3 p-4 rounded-claude shadow-claude-lg;
+    @apply border border-claude-cream-400 bg-white;
+    @apply animate-slide-up;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
+/* Utility layer */
+@layer utilities {
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-claude-primary-500 to-claude-primary-700;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Backdrop blur */
+  .backdrop-claude {
+    @apply backdrop-blur-xl bg-white/80;
+  }
+
+  .dark .backdrop-claude {
+    @apply bg-claude-neutral-900/80;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom scrollbar */
+  .scrollbar-claude {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.claude.cream.500') transparent;
+  }
+
+  .scrollbar-claude::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-claude::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .scrollbar-claude::-webkit-scrollbar-thumb {
+    @apply bg-claude-cream-500 rounded-full;
+    @apply hover:bg-claude-cream-600;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Prose for content areas */
+  .prose-claude {
+    @apply text-claude-neutral-700 leading-relaxed;
+  }
+
+  .prose-claude h1,
+  .prose-claude h2,
+  .prose-claude h3 {
+    @apply text-claude-neutral-900 font-serif;
+  }
+
+  .prose-claude code {
+    @apply font-mono text-claude-primary-600 bg-claude-cream-200 px-1.5 py-0.5 rounded;
+  }
+
+  .prose-claude pre {
+    @apply bg-claude-neutral-900 text-claude-neutral-100 p-4 rounded-claude overflow-x-auto;
+  }
+
+  .prose-claude pre code {
+    @apply bg-transparent text-inherit p-0;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+/* Fonts - Inter from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Animation utilities */
+@keyframes enter-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+@keyframes enter-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-/* Line clamp utility */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.animate-enter-right {
+  animation: enter-from-right 0.3s ease-out;
+}
+
+.animate-enter-left {
+  animation: enter-from-left 0.3s ease-out;
 }
