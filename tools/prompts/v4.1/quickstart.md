@@ -31,36 +31,78 @@ claude
 
 ## Step 3: Kickoff Autonomous Development
 
-### Option A: Full Sequential Build (Recommended for Fresh Start)
+### Option A: ADR-First Build (Recommended - Follows Forge Method)
 
-Copy and paste this into Claude Code to start the complete build process:
+**The Forge Method requires ADRs before any implementation.** Start here:
 
 ```
-Read AUTONOMOUS.md, the-forge-method.md, and CLAUDE.md to understand the project conventions. Then execute the following phases in order:
+Execute Phase 0 - ADR Generation following the Forge Method:
+
+1. Read the-forge-method.md completely
+2. Create tools/adrs/ directory structure
+3. Generate Core Platform ADRs (001-013) with full content:
+   - ADR-001: Vertical Slice Architecture
+   - ADR-002: API Strategy (REST + tRPC)
+   - ADR-003: Tenant Isolation
+   - ADR-004: Caching Strategy
+   - ADR-005: Deployment Strategy
+   - ADR-006: Multi-Region Architecture
+   - ADR-007: i18n Strategy
+   - ADR-008: SSO Architecture
+   - ADR-009: Connection Pooling (PgBouncer)
+   - ADR-010: Custom Roles & Permissions
+   - ADR-011: Approval Workflows
+   - ADR-012: Sandbox Environments
+   - ADR-013: SIEM Integration
+
+4. Read claude-context-pitch.md and claude-context-ux-spec.md
+5. Generate Claude Context ADRs (014-020):
+   - ADR-014: Context Graph Storage Strategy
+   - ADR-015: Slice State Machine
+   - ADR-016: Feedback Collection Pipeline
+   - ADR-017: MCP Server Architecture
+   - ADR-018: Context Compilation Algorithm
+   - ADR-019: Token Budget Management
+   - ADR-020: External Integration Sync
+
+6. Create tools/adrs/README.md as master index with status table
+7. Create tools/adrs/review-queue.md for 30-day review tracking (Law #29)
+
+Each ADR must include: Status, Context, Decision, Consequences (positive/negative/risks), Alternatives Considered, Implementation Notes.
+
+Track progress with todos. Commit after core ADRs, then after product ADRs.
+```
+
+### Option B: Full Sequential Build (After ADRs Complete)
+
+Once ADRs are done, run the full build:
+
+```
+Read AUTONOMOUS.md, the-forge-method.md, and CLAUDE.md. Execute phases in order:
 
 PHASE 1 - REQUIREMENTS:
 1. Generate PRD from claude-context-pitch.md → tools/docs/PRD-claude-context.md
 2. Extract user stories from claude-context-ux-spec.md → tools/docs/user-stories.md
-3. Create missing ADRs for Context Graph, Slice State Machine, Feedback Pipeline → tools/adrs/
+3. Create gap analysis mapping stories to ADRs → tools/docs/gap-analysis.md
 
 PHASE 2 - DESIGN:
-4. Create C4 architecture diagrams (Mermaid) → tools/diagrams/
-5. Design Prisma schema for Context entities → packages/prisma/
-6. Design OpenAPI spec for Context API → tools/docs/openapi-context.yaml
+4. Create C4 architecture diagrams (reflecting ADR-002, ADR-003, ADR-006) → tools/diagrams/
+5. Design Prisma schema (reflecting ADR-003, ADR-014) → packages/prisma/
+6. Design OpenAPI spec (reflecting ADR-002, ADR-017) → tools/docs/openapi-context.yaml
 
 PHASE 3 - IMPLEMENTATION:
 7. Scaffold @forge/context package with service, repository, types, errors
 8. Implement ContextService with compile, search, add, remove methods
-9. Implement SliceService with state machine and context compilation
+9. Implement SliceService with state machine (per ADR-015) and context compilation (per ADR-018)
 10. Create NestJS ContextModule with REST endpoints
 11. Create React components: ContextPanel, SliceList, SliceDetail
 
 PHASE 4 - QUALITY:
 12. Generate unit tests (target 80%+ coverage)
-13. Generate integration tests for multi-tenant isolation
+13. Generate integration tests for multi-tenant isolation (verifying ADR-003)
 14. Create E2E test for create-slice-compile-feedback journey
 
-Track progress with the todo list. Commit after each major phase. Report blockers immediately.
+Track progress with todos. Commit after each phase. Reference ADRs in code comments.
 ```
 
 ### Option B: Phase-by-Phase (More Control)
