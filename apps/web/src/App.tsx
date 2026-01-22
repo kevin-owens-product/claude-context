@@ -429,7 +429,13 @@ function QuickActionCard({
 
 // Integrations Page
 function IntegrationsPage() {
-  const integrations = [
+  const integrations: Array<{
+    name: string;
+    description: string;
+    icon: React.ReactNode;
+    status: 'connected' | 'available';
+    action: string;
+  }> = [
     {
       name: 'Claude Chat',
       description: 'Access context directly in Claude.ai conversations',

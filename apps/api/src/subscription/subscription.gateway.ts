@@ -375,7 +375,7 @@ export class SubscriptionGateway
           return {
             valid: true,
             tenantId: result.tenantId,
-            userId: result.userId,
+            userId: result.sub,
           };
         }
       }

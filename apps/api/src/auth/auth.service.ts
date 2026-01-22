@@ -12,7 +12,6 @@ import * as crypto from 'crypto';
 
 export interface TokenPayload {
   sub: string; // userId
-  userId?: string; // alias for sub
   tenantId: string;
   email: string;
   role: string;
@@ -86,12 +85,11 @@ export class AuthService {
   ) {}
 
   /**
-   * Verify and decode JWT token
+   * Verify JWT token
    */
   async verifyToken(token: string): Promise<TokenPayload> {
     try {
-      const payload = this.jwtService.verify<TokenPayload>(token);
-      return payload;
+      return this.jwtService.verify<TokenPayload>(token);
     } catch {
       throw new UnauthorizedException('Invalid token');
     }
@@ -147,7 +145,6 @@ export class AuthService {
 
     return {
       sub: key.user.id,
-      userId: key.user.id,
       tenantId: key.user.tenantId,
       email: key.user.email,
       role: key.user.role,

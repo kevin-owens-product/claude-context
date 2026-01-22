@@ -54,7 +54,7 @@ export class ContextService {
       throw new GraphNotFoundError(graphId);
     }
 
-    return graph as ContextGraph;
+    return graph as unknown as ContextGraph;
   }
 
   async listGraphs(
@@ -77,7 +77,7 @@ export class ContextService {
     ]);
 
     return {
-      data: data as ContextGraph[],
+      data: data as unknown as ContextGraph[],
       total,
       limit,
       offset,
@@ -99,7 +99,7 @@ export class ContextService {
       },
     });
 
-    return graph as ContextGraph;
+    return graph as unknown as ContextGraph;
   }
 
   // ============================================================================

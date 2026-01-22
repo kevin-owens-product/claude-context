@@ -5,17 +5,14 @@
  */
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { EventPublisher, ContextEventData } from './event-publisher.service';
+import { EventPublisher } from './event-publisher.service';
 import { PrismaService } from '../database/prisma.service';
-
-// Mock EventEmitter2 since it may not be installed
-const mockEventEmitter = {
-  emit: jest.fn(),
-};
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 describe('EventPublisher', () => {
   let service: EventPublisher;
-  let prisma: any;
+  let prisma: jest.Mocked<PrismaService>;
+  let eventEmitter: jest.Mocked<EventEmitter2>;
 
   const mockEvent = {
     id: 'event-123',
@@ -26,13 +23,15 @@ describe('EventPublisher', () => {
     entityId: 'node-123',
     version: 1,
     globalVersion: BigInt(42),
+    actorId: 'user-123',
+    actorType: 'user',
     payload: { name: 'Test Node' },
     metadata: {},
     timestamp: new Date(),
   };
 
   beforeEach(async () => {
-    const mockPrisma = {
+    const mockPrisma: any = {
       contextEvent: {
         create: jest.fn(),
         findMany: jest.fn(),
@@ -41,10 +40,12 @@ describe('EventPublisher', () => {
         upsert: jest.fn(),
         findUnique: jest.fn(),
       },
+      $transaction: jest.fn((fn: (p: any) => any) => fn(mockPrisma)),
     };
 
-    // Import the actual class for proper provider token
-    const { EventEmitter2 } = await import('@nestjs/event-emitter');
+    const mockEventEmitter = {
+      emit: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -56,6 +57,7 @@ describe('EventPublisher', () => {
 
     service = module.get<EventPublisher>(EventPublisher);
     prisma = module.get(PrismaService);
+    eventEmitter = module.get(EventEmitter2);
   });
 
   it('should be defined', () => {
@@ -64,48 +66,47 @@ describe('EventPublisher', () => {
 
   describe('publish', () => {
     it('should publish event and emit to subscribers', async () => {
-      prisma.tenantVersion.upsert.mockResolvedValue({
+      (prisma.tenantVersion.upsert as jest.Mock).mockResolvedValue({
         globalVersion: BigInt(43),
       });
-      prisma.contextEvent.create.mockResolvedValue(mockEvent);
+      (prisma.contextEvent.create as jest.Mock).mockResolvedValue(mockEvent);
 
-      const eventData: ContextEventData = {
+      const eventData = {
         tenantId: 'tenant-123',
         graphId: 'graph-123',
         eventType: 'node.created',
-        entityType: 'node',
+        entityType: 'node' as const,
         entityId: 'node-123',
         version: 1,
         actorId: 'user-123',
-        actorType: 'user',
+        actorType: 'user' as const,
         payload: { name: 'Test Node' },
       };
 
       const result = await service.publish(eventData);
 
       expect(prisma.contextEvent.create).toHaveBeenCalled();
+      expect(eventEmitter.emit).toHaveBeenCalledWith('context.event', expect.any(Object));
       expect(result).toBeDefined();
     });
 
     it('should increment global version atomically', async () => {
-      prisma.tenantVersion.upsert.mockResolvedValue({
+      (prisma.tenantVersion.upsert as jest.Mock).mockResolvedValue({
         globalVersion: BigInt(100),
       });
-      prisma.contextEvent.create.mockResolvedValue(mockEvent);
+      (prisma.contextEvent.create as jest.Mock).mockResolvedValue(mockEvent);
 
-      const eventData: ContextEventData = {
+      await service.publish({
         tenantId: 'tenant-123',
         graphId: 'graph-123',
         eventType: 'node.created',
-        entityType: 'node',
+        entityType: 'node' as const,
         entityId: 'node-123',
         version: 1,
         actorId: 'user-123',
-        actorType: 'user',
+        actorType: 'user' as const,
         payload: {},
-      };
-
-      await service.publish(eventData);
+      });
 
       expect(prisma.tenantVersion.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -124,7 +125,7 @@ describe('EventPublisher', () => {
         { ...mockEvent, globalVersion: BigInt(43) },
         { ...mockEvent, globalVersion: BigInt(44) },
       ];
-      prisma.contextEvent.findMany.mockResolvedValue(events);
+      (prisma.contextEvent.findMany as jest.Mock).mockResolvedValue(events);
 
       const result = await service.getEventsSince('tenant-123', BigInt(42));
 
@@ -140,7 +141,7 @@ describe('EventPublisher', () => {
     });
 
     it('should apply filters', async () => {
-      prisma.contextEvent.findMany.mockResolvedValue([]);
+      (prisma.contextEvent.findMany as jest.Mock).mockResolvedValue([]);
 
       await service.getEventsSince('tenant-123', BigInt(0), {
         graphId: 'graph-123',
@@ -164,7 +165,7 @@ describe('EventPublisher', () => {
   describe('getLatestEvents', () => {
     it('should return latest events with limit', async () => {
       const events = [mockEvent];
-      prisma.contextEvent.findMany.mockResolvedValue(events);
+      (prisma.contextEvent.findMany as jest.Mock).mockResolvedValue(events);
 
       const result = await service.getLatestEvents('tenant-123', 'graph-123', 10);
 
@@ -179,7 +180,7 @@ describe('EventPublisher', () => {
 
   describe('getCurrentVersion', () => {
     it('should return current global version', async () => {
-      prisma.tenantVersion.findUnique.mockResolvedValue({
+      (prisma.tenantVersion.findUnique as jest.Mock).mockResolvedValue({
         globalVersion: BigInt(100),
       });
 
@@ -189,7 +190,7 @@ describe('EventPublisher', () => {
     });
 
     it('should return 0 if no version exists', async () => {
-      prisma.tenantVersion.findUnique.mockResolvedValue(null);
+      (prisma.tenantVersion.findUnique as jest.Mock).mockResolvedValue(null);
 
       const result = await service.getCurrentVersion('tenant-123');
 

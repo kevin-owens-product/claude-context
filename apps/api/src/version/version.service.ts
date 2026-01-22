@@ -6,9 +6,10 @@
 
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
-import { ChangeType, Prisma } from '@prisma/client';
+import { ChangeType } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
-import { isEqual } from 'lodash';
+import * as _ from 'lodash';
+const isEqual = _.isEqual;
 
 export interface Actor {
   id: string;
@@ -64,7 +65,7 @@ export class VersionService {
 
     const previousValues = previousEntity
       ? this.extractValues(previousEntity, changedFields)
-      : null;
+      : undefined;
 
     const newValues = this.extractValues(entity, changedFields);
 
@@ -78,7 +79,7 @@ export class VersionService {
         previousVersion: previousEntity?.version ?? null,
         changeType: previousEntity ? ChangeType.UPDATE : ChangeType.CREATE,
         changedFields,
-        previousValues: previousValues ?? Prisma.JsonNull,
+        previousValues,
         newValues,
         actorId: actor.id,
         actorType: actor.type,
