@@ -57,6 +57,11 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  // Auth fields
+  passwordHash String?  @map("password_hash") @db.VarChar(255)
+  mfaEnabled   Boolean  @default(false) @map("mfa_enabled")
+  mfaSecret    String?  @map("mfa_secret") @db.VarChar(255)
+
   // Relations
   tenant               Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   workspaceMembers     WorkspaceMember[]
@@ -66,6 +71,7 @@ model User {
   aiSessions           AISession[]
   sessionFeedback      SessionFeedback[]
   createdContextNodes  ContextNode[]
+  apiKeys              ApiKey[]
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -591,4 +597,68 @@ enum SyncJobStatus {
   RUNNING
   COMPLETED
   FAILED
+}
+
+// ============================================================================
+// AUTHENTICATION & SECURITY
+// ============================================================================
+
+model ApiKey {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  name        String    @db.VarChar(255)
+  keyHash     String    @unique @map("key_hash") @db.VarChar(64)
+  keyPrefix   String    @map("key_prefix") @db.VarChar(10) // For display (e.g., "cc_abc123...")
+  permissions String[]  // Specific permissions for this key
+  isActive    Boolean   @default(true) @map("is_active")
+  expiresAt   DateTime? @map("expires_at")
+  lastUsedAt  DateTime? @map("last_used_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([keyHash])
+  @@map("api_keys")
+}
+
+// ============================================================================
+// AUDIT LOGGING
+// ============================================================================
+
+model AuditLog {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId     String   @map("tenant_id") @db.Uuid
+  timestamp    DateTime @default(now())
+
+  // Actor
+  actorId      String   @map("actor_id") @db.VarChar(255)
+  actorType    String   @map("actor_type") @db.VarChar(50) // 'user', 'api_key', 'system'
+
+  // Action
+  action       String   @db.VarChar(100) // e.g., 'auth.login.success'
+
+  // Resource
+  resourceType String?  @map("resource_type") @db.VarChar(100)
+  resourceId   String?  @map("resource_id") @db.VarChar(255)
+
+  // Details
+  metadata     Json     @default("{}")
+
+  // Outcome
+  outcome      String   @db.VarChar(20) // 'success', 'failure', 'denied'
+  errorCode    String?  @map("error_code") @db.VarChar(50)
+  errorMessage String?  @map("error_message") @db.Text
+
+  // Request context
+  ipAddress    String?  @map("ip_address") @db.VarChar(45) // IPv6 max length
+  userAgent    String?  @map("user_agent") @db.VarChar(500)
+
+  @@index([tenantId])
+  @@index([timestamp])
+  @@index([actorId])
+  @@index([action])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
 }
