@@ -6,9 +6,9 @@
 
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
-import { ChangeType } from '@prisma/client';
+import { ChangeType, Prisma } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 export interface Actor {
   id: string;
@@ -78,7 +78,7 @@ export class VersionService {
         previousVersion: previousEntity?.version ?? null,
         changeType: previousEntity ? ChangeType.UPDATE : ChangeType.CREATE,
         changedFields,
-        previousValues,
+        previousValues: previousValues ?? Prisma.JsonNull,
         newValues,
         actorId: actor.id,
         actorType: actor.type,
@@ -98,17 +98,20 @@ export class VersionService {
     entityId: string,
     options?: HistoryOptions,
   ): Promise<any[]> {
+    const versionFilter: { gte?: number; lte?: number } = {};
+    if (options?.fromVersion !== undefined) {
+      versionFilter.gte = options.fromVersion;
+    }
+    if (options?.toVersion !== undefined) {
+      versionFilter.lte = options.toVersion;
+    }
+
     return this.prisma.entityChange.findMany({
       where: {
         tenantId,
         entityType,
         entityId,
-        ...(options?.fromVersion !== undefined && {
-          version: { gte: options.fromVersion },
-        }),
-        ...(options?.toVersion !== undefined && {
-          version: { lte: options.toVersion },
-        }),
+        ...(Object.keys(versionFilter).length > 0 && { version: versionFilter }),
       },
       orderBy: { version: 'desc' },
       take: options?.limit ?? 50,
