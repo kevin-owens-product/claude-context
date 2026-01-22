@@ -1,0 +1,309 @@
+/**
+ * @prompt-id forge-v4.1:web:components:analytics:001
+ * @generated-at 2026-01-22T00:00:00Z
+ * @model claude-opus-4-5
+ */
+
+import { useState } from 'react';
+import { format, subDays } from 'date-fns';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
+import { TrendingUp, TrendingDown, Activity, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useAnalytics, useRealTimeMetrics } from '../../hooks';
+import { Card, CardHeader, CardContent } from '../common/Card';
+
+interface AnalyticsDashboardProps {
+  workspaceId: string;
+}
+
+const COLORS = ['#10B981', '#EF4444', '#6B7280'];
+
+export function AnalyticsDashboard({ workspaceId }: AnalyticsDashboardProps) {
+  const [dateRange, setDateRange] = useState(30);
+
+  const endDate = new Date();
+  const startDate = subDays(endDate, dateRange);
+
+  const { data: analytics, isLoading } = useAnalytics(workspaceId, startDate, endDate);
+  const { data: realtime } = useRealTimeMetrics(workspaceId);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64 text-gray-500">
+        Loading analytics...
+      </div>
+    );
+  }
+
+  if (!analytics) {
+    return (
+      <div className="flex items-center justify-center h-64 text-gray-500">
+        No analytics data available
+      </div>
+    );
+  }
+
+  const { summary, trends, topContext, commonErrors } = analytics;
+
+  const satisfactionRate =
+    summary.positiveRatings + summary.negativeRatings > 0
+      ? (summary.positiveRatings / (summary.positiveRatings + summary.negativeRatings)) * 100
+      : 0;
+
+  const ratingData = [
+    { name: 'Positive', value: summary.positiveRatings },
+    { name: 'Negative', value: summary.negativeRatings },
+    { name: 'Skipped', value: summary.skippedRatings },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Date Range Selector */}
+      <div className="flex justify-end">
+        <select
+          value={dateRange}
+          onChange={(e) => setDateRange(Number(e.target.value))}
+          className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+        >
+          <option value={7}>Last 7 days</option>
+          <option value={14}>Last 14 days</option>
+          <option value={30}>Last 30 days</option>
+          <option value={90}>Last 90 days</option>
+        </select>
+      </div>
+
+      {/* Real-time Metrics */}
+      {realtime && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Activity className="w-5 h-5 text-green-500" />
+              <h3 className="font-medium text-gray-900">Today&apos;s Activity</h3>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">{realtime.sessions}</div>
+                <div className="text-sm text-gray-600">Sessions</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{realtime.positive}</div>
+                <div className="text-sm text-gray-600">Positive</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600">{realtime.negative}</div>
+                <div className="text-sm text-gray-600">Negative</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <MetricCard
+          title="Total Sessions"
+          value={summary.totalSessions}
+          icon={<Activity className="w-5 h-5 text-blue-500" />}
+        />
+        <MetricCard
+          title="Satisfaction Rate"
+          value={`${satisfactionRate.toFixed(1)}%`}
+          icon={
+            satisfactionRate >= 70 ? (
+              <TrendingUp className="w-5 h-5 text-green-500" />
+            ) : (
+              <TrendingDown className="w-5 h-5 text-red-500" />
+            )
+          }
+        />
+        <MetricCard
+          title="Positive Ratings"
+          value={summary.positiveRatings}
+          icon={<ThumbsUp className="w-5 h-5 text-green-500" />}
+        />
+        <MetricCard
+          title="Negative Ratings"
+          value={summary.negativeRatings}
+          icon={<ThumbsDown className="w-5 h-5 text-red-500" />}
+        />
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Trends Chart */}
+        <Card>
+          <CardHeader>
+            <h3 className="font-medium text-gray-900">Session Trends</h3>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={trends}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(value) => format(new Date(value), 'MMM d')}
+                    fontSize={12}
+                  />
+                  <YAxis fontSize={12} />
+                  <Tooltip
+                    labelFormatter={(value) => format(new Date(value), 'MMM d, yyyy')}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="sessions"
+                    stroke="#3B82F6"
+                    strokeWidth={2}
+                    name="Sessions"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="positiveRatings"
+                    stroke="#10B981"
+                    strokeWidth={2}
+                    name="Positive"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="negativeRatings"
+                    stroke="#EF4444"
+                    strokeWidth={2}
+                    name="Negative"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Rating Distribution */}
+        <Card>
+          <CardHeader>
+            <h3 className="font-medium text-gray-900">Rating Distribution</h3>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64 flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={ratingData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, percent }) =>
+                      `${name} ${(percent * 100).toFixed(0)}%`
+                    }
+                  >
+                    {ratingData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Top Context Documents */}
+      {topContext.length > 0 && (
+        <Card>
+          <CardHeader>
+            <h3 className="font-medium text-gray-900">Most Used Context Documents</h3>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {topContext.slice(0, 5).map((doc) => (
+                <div key={doc.nodeId} className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-gray-900">{doc.name}</div>
+                    <div className="text-sm text-gray-500">
+                      Used {doc.usageCount} times
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium text-gray-900">
+                      {doc.effectivenessScore.toFixed(1)}%
+                    </div>
+                    <div className="text-sm text-gray-500">Effectiveness</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Common Errors */}
+      {commonErrors.length > 0 && (
+        <Card>
+          <CardHeader>
+            <h3 className="font-medium text-gray-900">Common Issues</h3>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {commonErrors.map((error) => (
+                <div key={error.category} className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700">
+                        {error.category.replace('_', ' ')}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {error.count} ({error.percentage.toFixed(1)}%)
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-red-500 h-2 rounded-full"
+                        style={{ width: `${error.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+interface MetricCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+}
+
+function MetricCard({ title, value, icon }: MetricCardProps) {
+  return (
+    <Card>
+      <CardContent>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm text-gray-600">{title}</div>
+            <div className="text-2xl font-bold text-gray-900">{value}</div>
+          </div>
+          {icon}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

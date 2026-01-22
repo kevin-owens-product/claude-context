@@ -1,0 +1,594 @@
+// Claude Context - Prisma Schema
+// @prompt-id forge-v4.1:schema:context:001
+// @generated-at 2026-01-22T00:00:00Z
+// @model claude-opus-4-5
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DATABASE_DIRECT_URL")
+  extensions = [pgvector(map: "vector"), uuid_ossp(map: "uuid-ossp")]
+}
+
+// ============================================================================
+// CORE ENTITIES
+// ============================================================================
+
+model Tenant {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name      String   @db.VarChar(255)
+  slug      String   @unique @db.VarChar(100)
+  plan      Plan     @default(FREE)
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  users          User[]
+  workspaces     Workspace[]
+  contextGraphs  ContextGraph[]
+  slices         Slice[]
+  aiSessions     AISession[]
+  integrations   Integration[]
+
+  @@map("tenants")
+}
+
+enum Plan {
+  FREE
+  PRO
+  TEAM
+  ENTERPRISE
+}
+
+model User {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  email     String   @db.VarChar(255)
+  name      String   @db.VarChar(255)
+  avatarUrl String?  @map("avatar_url") @db.VarChar(500)
+  role      UserRole @default(MEMBER)
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  tenant               Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workspaceMembers     WorkspaceMember[]
+  createdSlices        Slice[]            @relation("SliceCreator")
+  ownedSlices          Slice[]            @relation("SliceOwner")
+  sliceReviews         SliceReview[]
+  aiSessions           AISession[]
+  sessionFeedback      SessionFeedback[]
+  createdContextNodes  ContextNode[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@map("users")
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+// ============================================================================
+// WORKSPACE
+// ============================================================================
+
+model Workspace {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  name        String   @db.VarChar(255)
+  slug        String   @db.VarChar(100)
+  description String?  @db.Text
+  settings    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  tenant        Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  members       WorkspaceMember[]
+  contextGraphs ContextGraph[]
+  slices        Slice[]
+  aiSessions    AISession[]
+  integrations  Integration[]
+  metrics       FeedbackMetrics[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspaceId String              @map("workspace_id") @db.Uuid
+  userId      String              @map("user_id") @db.Uuid
+  role        WorkspaceMemberRole @default(MEMBER)
+  createdAt   DateTime            @default(now()) @map("created_at")
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+enum WorkspaceMemberRole {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+// ============================================================================
+// CONTEXT GRAPH
+// ============================================================================
+
+model ContextGraph {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  workspaceId String   @map("workspace_id") @db.Uuid
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  tenant    Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workspace Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  nodes     ContextNode[]
+  edges     ContextEdge[]
+
+  @@index([tenantId])
+  @@index([workspaceId])
+  @@map("context_graphs")
+}
+
+model ContextNode {
+  id          String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String           @map("tenant_id") @db.Uuid
+  graphId     String           @map("graph_id") @db.Uuid
+  type        ContextNodeType
+  layer       ContextLayer
+  name        String           @db.VarChar(255)
+  content     String?          @db.Text
+  /// @pii - May contain user-generated content
+  metadata    Json             @default("{}")
+
+  // Vector embedding for semantic search (1536 dimensions for OpenAI ada-002)
+  embedding   Unsupported("vector(1536)")?
+
+  // Freshness tracking
+  freshness   Freshness        @default(CURRENT)
+  validatedAt DateTime?        @map("validated_at")
+
+  // External source tracking
+  externalUrl    String?   @map("external_url") @db.VarChar(2000)
+  externalId     String?   @map("external_id") @db.VarChar(255)
+  externalSyncAt DateTime? @map("external_sync_at")
+
+  // Token count for budget optimization
+  tokenCount Int @default(0) @map("token_count")
+
+  // Audit
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id") @db.Uuid
+
+  // Relations
+  graph         ContextGraph  @relation(fields: [graphId], references: [id], onDelete: Cascade)
+  createdBy     User?         @relation(fields: [createdById], references: [id])
+  outgoingEdges ContextEdge[] @relation("SourceNode")
+  incomingEdges ContextEdge[] @relation("TargetNode")
+  sliceContexts SliceContext[]
+
+  @@index([tenantId])
+  @@index([graphId])
+  @@index([type])
+  @@index([layer])
+  @@index([freshness])
+  @@map("context_nodes")
+}
+
+enum ContextNodeType {
+  DOCUMENT
+  DECISION
+  PATTERN
+  EXTERNAL_LINK
+}
+
+enum ContextLayer {
+  ORGANIZATIONAL
+  WORKSPACE
+  SLICE
+}
+
+enum Freshness {
+  CURRENT
+  STALE
+  ARCHIVED
+}
+
+model ContextEdge {
+  id               String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId         String       @map("tenant_id") @db.Uuid
+  graphId          String       @map("graph_id") @db.Uuid
+  sourceNodeId     String       @map("source_node_id") @db.Uuid
+  targetNodeId     String       @map("target_node_id") @db.Uuid
+  relationshipType EdgeType     @map("relationship_type")
+  metadata         Json         @default("{}")
+  createdAt        DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  graph      ContextGraph @relation(fields: [graphId], references: [id], onDelete: Cascade)
+  sourceNode ContextNode  @relation("SourceNode", fields: [sourceNodeId], references: [id], onDelete: Cascade)
+  targetNode ContextNode  @relation("TargetNode", fields: [targetNodeId], references: [id], onDelete: Cascade)
+
+  @@index([graphId])
+  @@index([sourceNodeId])
+  @@index([targetNodeId])
+  @@map("context_edges")
+}
+
+enum EdgeType {
+  REFERENCES
+  IMPLEMENTS
+  CONSTRAINS
+  DEPENDS_ON
+  SUPERSEDES
+}
+
+// ============================================================================
+// SLICES (Work Units)
+// ============================================================================
+
+model Slice {
+  id          String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String      @map("tenant_id") @db.Uuid
+  workspaceId String      @map("workspace_id") @db.Uuid
+
+  // Identifiers
+  shortId     String      @map("short_id") @db.VarChar(20) // e.g., "SL-2847"
+  name        String      @db.VarChar(255)
+
+  // Core content
+  outcome     String      @db.Text // Outcome statement
+  antiScope   String[]    @map("anti_scope") // Explicitly excluded items
+
+  // State machine
+  status      SliceStatus @default(PENDING)
+
+  // Ownership
+  ownerId     String      @map("owner_id") @db.Uuid
+  createdById String      @map("created_by_id") @db.Uuid
+
+  // Timestamps
+  startedAt   DateTime?   @map("started_at")
+  submittedAt DateTime?   @map("submitted_at")
+  completedAt DateTime?   @map("completed_at")
+  archivedAt  DateTime?   @map("archived_at")
+
+  // Audit
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  tenant             Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workspace          Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  owner              User                 @relation("SliceOwner", fields: [ownerId], references: [id])
+  createdBy          User                 @relation("SliceCreator", fields: [createdById], references: [id])
+  constraints        SliceConstraint[]
+  acceptanceCriteria AcceptanceCriterion[]
+  contextPackage     SliceContext[]
+  transitions        SliceTransition[]
+  reviews            SliceReview[]
+  aiSessions         AISession[]
+
+  @@unique([tenantId, shortId])
+  @@index([tenantId])
+  @@index([workspaceId])
+  @@index([status])
+  @@index([ownerId])
+  @@map("slices")
+}
+
+enum SliceStatus {
+  PENDING
+  ACTIVE
+  IN_REVIEW
+  COMPLETED
+  ARCHIVED
+}
+
+model SliceConstraint {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sliceId   String   @map("slice_id") @db.Uuid
+  content   String   @db.Text
+  orderIndex Int     @default(0) @map("order_index")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  slice Slice @relation(fields: [sliceId], references: [id], onDelete: Cascade)
+
+  @@index([sliceId])
+  @@map("slice_constraints")
+}
+
+model AcceptanceCriterion {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sliceId     String   @map("slice_id") @db.Uuid
+  content     String   @db.Text
+  isCompleted Boolean  @default(false) @map("is_completed")
+  completedAt DateTime? @map("completed_at")
+  orderIndex  Int      @default(0) @map("order_index")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  slice Slice @relation(fields: [sliceId], references: [id], onDelete: Cascade)
+
+  @@index([sliceId])
+  @@map("acceptance_criteria")
+}
+
+model SliceContext {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sliceId   String   @map("slice_id") @db.Uuid
+  nodeId    String   @map("node_id") @db.Uuid
+  isPinned  Boolean  @default(false) @map("is_pinned")
+  addedAt   DateTime @default(now()) @map("added_at")
+
+  // Relations
+  slice Slice       @relation(fields: [sliceId], references: [id], onDelete: Cascade)
+  node  ContextNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  @@unique([sliceId, nodeId])
+  @@map("slice_context")
+}
+
+model SliceTransition {
+  id         String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId   String       @map("tenant_id") @db.Uuid
+  sliceId    String       @map("slice_id") @db.Uuid
+  fromStatus SliceStatus? @map("from_status")
+  toStatus   SliceStatus  @map("to_status")
+  event      String       @db.VarChar(50)
+  actorId    String       @map("actor_id") @db.Uuid
+  comment    String?      @db.Text
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  slice Slice @relation(fields: [sliceId], references: [id], onDelete: Cascade)
+
+  @@index([sliceId])
+  @@index([tenantId])
+  @@map("slice_transitions")
+}
+
+model SliceReview {
+  id         String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sliceId    String        @map("slice_id") @db.Uuid
+  reviewerId String        @map("reviewer_id") @db.Uuid
+  verdict    ReviewVerdict
+  comment    String?       @db.Text
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  // Relations
+  slice    Slice @relation(fields: [sliceId], references: [id], onDelete: Cascade)
+  reviewer User  @relation(fields: [reviewerId], references: [id])
+
+  @@index([sliceId])
+  @@map("slice_reviews")
+}
+
+enum ReviewVerdict {
+  APPROVED
+  CHANGES_REQUESTED
+  REJECTED
+}
+
+// ============================================================================
+// AI SESSIONS & FEEDBACK
+// ============================================================================
+
+model AISession {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  workspaceId String   @map("workspace_id") @db.Uuid
+  sliceId     String?  @map("slice_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+
+  // Context snapshot
+  contextNodeIds  String[] @map("context_node_ids") @db.Uuid
+  contextTokenCount Int    @map("context_token_count")
+  contextCompiledAt DateTime @map("context_compiled_at")
+
+  // Session timing
+  startedAt DateTime  @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+
+  // Query hash for privacy
+  queryHash String? @map("query_hash") @db.VarChar(64)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  tenant    Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workspace Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  slice     Slice?            @relation(fields: [sliceId], references: [id])
+  user      User              @relation(fields: [userId], references: [id])
+  feedback  SessionFeedback?
+
+  @@index([tenantId])
+  @@index([workspaceId])
+  @@index([sliceId])
+  @@index([userId])
+  @@index([startedAt])
+  @@map("ai_sessions")
+}
+
+model SessionFeedback {
+  id        String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId  String        @map("tenant_id") @db.Uuid
+  sessionId String        @unique @map("session_id") @db.Uuid
+
+  // Quick rating
+  rating FeedbackRating
+
+  // Detailed feedback
+  errorCategories String[]  @map("error_categories")
+  missingContext  String?   @map("missing_context") @db.Text
+  comment         String?   @db.Text
+
+  // Quality scores (0-100)
+  accuracyScore     Int? @map("accuracy_score")
+  completenessScore Int? @map("completeness_score")
+  styleMatchScore   Int? @map("style_match_score")
+
+  // Output review
+  reviewVerdict ReviewVerdict? @map("review_verdict")
+  editDistance  Int?           @map("edit_distance") // 0-100 percentage
+  outputIssues  String[]       @map("output_issues")
+
+  submittedAt   DateTime @default(now()) @map("submitted_at")
+  submittedById String   @map("submitted_by_id") @db.Uuid
+
+  // Relations
+  session     AISession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  submittedBy User      @relation(fields: [submittedById], references: [id])
+
+  @@index([tenantId])
+  @@index([rating])
+  @@index([submittedAt])
+  @@map("session_feedback")
+}
+
+enum FeedbackRating {
+  POSITIVE
+  NEGATIVE
+  SKIPPED
+}
+
+model FeedbackMetrics {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  workspaceId String   @map("workspace_id") @db.Uuid
+  date        DateTime @db.Date
+
+  // Session counts
+  totalSessions    Int @default(0) @map("total_sessions")
+  positiveRatings  Int @default(0) @map("positive_ratings")
+  negativeRatings  Int @default(0) @map("negative_ratings")
+  skippedRatings   Int @default(0) @map("skipped_ratings")
+
+  // Rates
+  firstPassAcceptanceRate Float? @map("first_pass_acceptance_rate")
+  averageEditDistance     Float? @map("average_edit_distance")
+
+  // Error distribution
+  errorCategoryCounts Json @default("{}") @map("error_category_counts")
+
+  // Quality averages
+  avgAccuracyScore     Float? @map("avg_accuracy_score")
+  avgCompletenessScore Float? @map("avg_completeness_score")
+  avgStyleMatchScore   Float? @map("avg_style_match_score")
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, workspaceId, date])
+  @@index([tenantId])
+  @@index([workspaceId])
+  @@index([date])
+  @@map("feedback_metrics_daily")
+}
+
+// ============================================================================
+// INTEGRATIONS
+// ============================================================================
+
+model Integration {
+  id          String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String          @map("tenant_id") @db.Uuid
+  workspaceId String          @map("workspace_id") @db.Uuid
+  provider    IntegrationProvider
+  name        String          @db.VarChar(255)
+
+  // OAuth credentials (encrypted at rest)
+  /// @pii - Contains OAuth tokens
+  credentials Json            @default("{}")
+
+  // Sync configuration
+  syncConfig  Json            @default("{}") @map("sync_config")
+
+  // Status
+  status      IntegrationStatus @default(PENDING)
+  lastSyncAt  DateTime?       @map("last_sync_at")
+  lastError   String?         @map("last_error") @db.Text
+
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  syncJobs  SyncJob[]
+
+  @@unique([workspaceId, provider])
+  @@index([tenantId])
+  @@map("integrations")
+}
+
+enum IntegrationProvider {
+  GITHUB
+  NOTION
+  FIGMA
+  SLACK
+  CONFLUENCE
+  LINEAR
+}
+
+enum IntegrationStatus {
+  PENDING
+  ACTIVE
+  ERROR
+  DISABLED
+}
+
+model SyncJob {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  integrationId String    @map("integration_id") @db.Uuid
+  status        SyncJobStatus @default(PENDING)
+  syncType      String    @map("sync_type") @db.VarChar(50) // 'full' or 'incremental'
+
+  // Results
+  itemsProcessed Int      @default(0) @map("items_processed")
+  itemsFailed    Int      @default(0) @map("items_failed")
+  errorLog       String?  @map("error_log") @db.Text
+
+  startedAt     DateTime? @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  integration Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId])
+  @@index([status])
+  @@map("sync_jobs")
+}
+
+enum SyncJobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}

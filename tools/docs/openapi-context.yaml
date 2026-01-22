@@ -1,0 +1,1219 @@
+openapi: 3.1.0
+info:
+  title: Claude Context API
+  description: |
+    API for managing organizational context that makes Claude contextually intelligent.
+
+    ## Authentication
+    All endpoints require authentication via one of:
+    - **Bearer Token**: JWT token from Auth0 (`Authorization: Bearer <token>`)
+    - **API Key**: Scoped API key (`X-API-Key: <key>`)
+
+    ## Tenant Isolation
+    All data is isolated by tenant. The tenant is determined from the authenticated user.
+
+    ## Rate Limits
+    - Free: 100 requests/minute
+    - Pro: 500 requests/minute
+    - Team: 1000 requests/minute
+    - Enterprise: Custom
+
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: api-support@claude-context.io
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.claude-context.io/v1
+    description: Production
+  - url: https://api.staging.claude-context.io/v1
+    description: Staging
+
+tags:
+  - name: Context Graphs
+    description: Manage context graphs and nodes
+  - name: Slices
+    description: Manage work slices
+  - name: Compilation
+    description: Compile context for AI sessions
+  - name: Feedback
+    description: Capture and query feedback
+  - name: Integrations
+    description: Manage external integrations
+
+paths:
+  # ============================================================================
+  # CONTEXT GRAPHS
+  # ============================================================================
+  /workspaces/{workspaceId}/graphs:
+    get:
+      tags: [Context Graphs]
+      summary: List context graphs
+      operationId: listContextGraphs
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: List of context graphs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextGraphList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags: [Context Graphs]
+      summary: Create context graph
+      operationId: createContextGraph
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContextGraphRequest'
+      responses:
+        '201':
+          description: Context graph created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextGraph'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /workspaces/{workspaceId}/graphs/{graphId}:
+    get:
+      tags: [Context Graphs]
+      summary: Get context graph
+      operationId: getContextGraph
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/graphId'
+      responses:
+        '200':
+          description: Context graph details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextGraph'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [Context Graphs]
+      summary: Update context graph
+      operationId: updateContextGraph
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/graphId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContextGraphRequest'
+      responses:
+        '200':
+          description: Context graph updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextGraph'
+
+    delete:
+      tags: [Context Graphs]
+      summary: Delete context graph
+      operationId: deleteContextGraph
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/graphId'
+      responses:
+        '204':
+          description: Context graph deleted
+
+  # ============================================================================
+  # CONTEXT NODES
+  # ============================================================================
+  /workspaces/{workspaceId}/graphs/{graphId}/nodes:
+    get:
+      tags: [Context Graphs]
+      summary: List context nodes
+      operationId: listContextNodes
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/graphId'
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/ContextNodeType'
+        - name: layer
+          in: query
+          schema:
+            $ref: '#/components/schemas/ContextLayer'
+        - name: freshness
+          in: query
+          schema:
+            $ref: '#/components/schemas/Freshness'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: List of context nodes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextNodeList'
+
+    post:
+      tags: [Context Graphs]
+      summary: Create context node
+      operationId: createContextNode
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/graphId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContextNodeRequest'
+      responses:
+        '201':
+          description: Context node created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextNode'
+
+  /workspaces/{workspaceId}/graphs/{graphId}/nodes/{nodeId}:
+    get:
+      tags: [Context Graphs]
+      summary: Get context node
+      operationId: getContextNode
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/graphId'
+        - $ref: '#/components/parameters/nodeId'
+      responses:
+        '200':
+          description: Context node details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextNode'
+
+    patch:
+      tags: [Context Graphs]
+      summary: Update context node
+      operationId: updateContextNode
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/graphId'
+        - $ref: '#/components/parameters/nodeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContextNodeRequest'
+      responses:
+        '200':
+          description: Context node updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextNode'
+
+    delete:
+      tags: [Context Graphs]
+      summary: Delete context node
+      operationId: deleteContextNode
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/graphId'
+        - $ref: '#/components/parameters/nodeId'
+      responses:
+        '204':
+          description: Context node deleted
+
+  /workspaces/{workspaceId}/graphs/{graphId}/search:
+    post:
+      tags: [Context Graphs]
+      summary: Semantic search context nodes
+      operationId: searchContextNodes
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/graphId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchContextRequest'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchContextResponse'
+
+  # ============================================================================
+  # SLICES
+  # ============================================================================
+  /workspaces/{workspaceId}/slices:
+    get:
+      tags: [Slices]
+      summary: List slices
+      operationId: listSlices
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/SliceStatus'
+        - name: ownerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: List of slices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SliceList'
+
+    post:
+      tags: [Slices]
+      summary: Create slice
+      operationId: createSlice
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSliceRequest'
+      responses:
+        '201':
+          description: Slice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slice'
+
+  /workspaces/{workspaceId}/slices/{sliceId}:
+    get:
+      tags: [Slices]
+      summary: Get slice
+      operationId: getSlice
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/sliceId'
+      responses:
+        '200':
+          description: Slice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slice'
+
+    patch:
+      tags: [Slices]
+      summary: Update slice
+      operationId: updateSlice
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/sliceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSliceRequest'
+      responses:
+        '200':
+          description: Slice updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slice'
+
+    delete:
+      tags: [Slices]
+      summary: Delete slice
+      operationId: deleteSlice
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/sliceId'
+      responses:
+        '204':
+          description: Slice deleted
+
+  /workspaces/{workspaceId}/slices/{sliceId}/transition:
+    post:
+      tags: [Slices]
+      summary: Transition slice state
+      operationId: transitionSlice
+      description: |
+        Trigger a state transition on the slice.
+        Valid transitions:
+        - `start`: pending → active
+        - `submit`: active → in_review
+        - `approve`: in_review → completed
+        - `request_changes`: in_review → active
+        - `reopen`: completed → active
+        - `archive`: completed → archived
+        - `cancel`: active → pending
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/sliceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SliceTransitionRequest'
+      responses:
+        '200':
+          description: Slice transitioned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slice'
+        '400':
+          description: Invalid transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ============================================================================
+  # CONTEXT COMPILATION
+  # ============================================================================
+  /workspaces/{workspaceId}/compile:
+    post:
+      tags: [Compilation]
+      summary: Compile context for AI session
+      operationId: compileContext
+      description: |
+        Assembles relevant context from organizational, workspace, and slice layers
+        optimized for the specified token budget.
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompileContextRequest'
+      responses:
+        '200':
+          description: Compiled context
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompiledContext'
+
+  # ============================================================================
+  # AI SESSIONS & FEEDBACK
+  # ============================================================================
+  /workspaces/{workspaceId}/sessions:
+    post:
+      tags: [Feedback]
+      summary: Create AI session
+      operationId: createSession
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '201':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AISession'
+
+  /workspaces/{workspaceId}/sessions/{sessionId}:
+    get:
+      tags: [Feedback]
+      summary: Get AI session
+      operationId: getSession
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AISession'
+
+    patch:
+      tags: [Feedback]
+      summary: End AI session
+      operationId: endSession
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/sessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endedAt:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Session ended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AISession'
+
+  /workspaces/{workspaceId}/sessions/{sessionId}/feedback:
+    post:
+      tags: [Feedback]
+      summary: Submit session feedback
+      operationId: submitFeedback
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - $ref: '#/components/parameters/sessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitFeedbackRequest'
+      responses:
+        '201':
+          description: Feedback submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionFeedback'
+
+  /workspaces/{workspaceId}/analytics:
+    get:
+      tags: [Feedback]
+      summary: Get workspace analytics
+      operationId: getWorkspaceAnalytics
+      parameters:
+        - $ref: '#/components/parameters/workspaceId'
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceAnalytics'
+
+components:
+  # ============================================================================
+  # PARAMETERS
+  # ============================================================================
+  parameters:
+    workspaceId:
+      name: workspaceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    graphId:
+      name: graphId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    nodeId:
+      name: nodeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    sliceId:
+      name: sliceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    sessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    offset:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+
+  # ============================================================================
+  # SCHEMAS
+  # ============================================================================
+  schemas:
+    # Enums
+    ContextNodeType:
+      type: string
+      enum: [DOCUMENT, DECISION, PATTERN, EXTERNAL_LINK]
+
+    ContextLayer:
+      type: string
+      enum: [ORGANIZATIONAL, WORKSPACE, SLICE]
+
+    Freshness:
+      type: string
+      enum: [CURRENT, STALE, ARCHIVED]
+
+    EdgeType:
+      type: string
+      enum: [REFERENCES, IMPLEMENTS, CONSTRAINS, DEPENDS_ON, SUPERSEDES]
+
+    SliceStatus:
+      type: string
+      enum: [PENDING, ACTIVE, IN_REVIEW, COMPLETED, ARCHIVED]
+
+    FeedbackRating:
+      type: string
+      enum: [POSITIVE, NEGATIVE, SKIPPED]
+
+    # Context Graph
+    ContextGraph:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        workspaceId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        isDefault:
+          type: boolean
+        nodeCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, workspaceId, name, isDefault, createdAt, updatedAt]
+
+    ContextGraphList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContextGraph'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    CreateContextGraphRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        isDefault:
+          type: boolean
+          default: false
+      required: [name]
+
+    UpdateContextGraphRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+
+    # Context Node
+    ContextNode:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        graphId:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/ContextNodeType'
+        layer:
+          $ref: '#/components/schemas/ContextLayer'
+        name:
+          type: string
+        content:
+          type: string
+        metadata:
+          type: object
+        freshness:
+          $ref: '#/components/schemas/Freshness'
+        validatedAt:
+          type: string
+          format: date-time
+        externalUrl:
+          type: string
+        tokenCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ContextNodeList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContextNode'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    CreateContextNodeRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ContextNodeType'
+        layer:
+          $ref: '#/components/schemas/ContextLayer'
+        name:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        metadata:
+          type: object
+        externalUrl:
+          type: string
+      required: [type, layer, name]
+
+    UpdateContextNodeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        metadata:
+          type: object
+        freshness:
+          $ref: '#/components/schemas/Freshness'
+
+    SearchContextRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Natural language search query
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 20
+        filters:
+          type: object
+          properties:
+            types:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContextNodeType'
+            layers:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContextLayer'
+            freshness:
+              type: array
+              items:
+                $ref: '#/components/schemas/Freshness'
+      required: [query]
+
+    SearchContextResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              node:
+                $ref: '#/components/schemas/ContextNode'
+              similarity:
+                type: number
+                minimum: 0
+                maximum: 1
+        total:
+          type: integer
+
+    # Slice
+    Slice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        shortId:
+          type: string
+          example: "SL-2847"
+        workspaceId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        outcome:
+          type: string
+        antiScope:
+          type: array
+          items:
+            type: string
+        status:
+          $ref: '#/components/schemas/SliceStatus'
+        ownerId:
+          type: string
+          format: uuid
+        constraints:
+          type: array
+          items:
+            $ref: '#/components/schemas/SliceConstraint'
+        acceptanceCriteria:
+          type: array
+          items:
+            $ref: '#/components/schemas/AcceptanceCriterion'
+        completionPercentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SliceConstraint:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        orderIndex:
+          type: integer
+
+    AcceptanceCriterion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        isCompleted:
+          type: boolean
+        completedAt:
+          type: string
+          format: date-time
+        orderIndex:
+          type: integer
+
+    SliceList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slice'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    CreateSliceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        outcome:
+          type: string
+        antiScope:
+          type: array
+          items:
+            type: string
+        constraints:
+          type: array
+          items:
+            type: string
+        acceptanceCriteria:
+          type: array
+          items:
+            type: string
+      required: [name, outcome]
+
+    UpdateSliceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        outcome:
+          type: string
+        antiScope:
+          type: array
+          items:
+            type: string
+
+    SliceTransitionRequest:
+      type: object
+      properties:
+        event:
+          type: string
+          enum: [start, submit, approve, request_changes, reopen, archive, cancel]
+        comment:
+          type: string
+      required: [event]
+
+    # Compilation
+    CompileContextRequest:
+      type: object
+      properties:
+        sliceId:
+          type: string
+          format: uuid
+        query:
+          type: string
+          description: User's query for relevance scoring
+        tokenBudget:
+          type: integer
+          minimum: 1000
+          maximum: 200000
+          default: 100000
+      required: [tokenBudget]
+
+    CompiledContext:
+      type: object
+      properties:
+        compiledText:
+          type: string
+          description: Ready-to-use context string
+        sections:
+          type: array
+          items:
+            type: object
+            properties:
+              layer:
+                $ref: '#/components/schemas/ContextLayer'
+              content:
+                type: string
+              tokenCount:
+                type: integer
+              documentIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+        totalTokens:
+          type: integer
+        budgetUtilization:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    # AI Session
+    AISession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        workspaceId:
+          type: string
+          format: uuid
+        sliceId:
+          type: string
+          format: uuid
+        contextTokenCount:
+          type: integer
+        startedAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+        feedback:
+          $ref: '#/components/schemas/SessionFeedback'
+
+    CreateSessionRequest:
+      type: object
+      properties:
+        sliceId:
+          type: string
+          format: uuid
+        contextNodeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        contextTokenCount:
+          type: integer
+      required: [contextNodeIds, contextTokenCount]
+
+    SessionFeedback:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        rating:
+          $ref: '#/components/schemas/FeedbackRating'
+        errorCategories:
+          type: array
+          items:
+            type: string
+            enum: [missing_context, wrong_context, ignored_constraints, hallucination, style_mismatch, other]
+        missingContext:
+          type: string
+        comment:
+          type: string
+        qualityScores:
+          type: object
+          properties:
+            accuracy:
+              type: integer
+              minimum: 0
+              maximum: 100
+            completeness:
+              type: integer
+              minimum: 0
+              maximum: 100
+            styleMatch:
+              type: integer
+              minimum: 0
+              maximum: 100
+        submittedAt:
+          type: string
+          format: date-time
+
+    SubmitFeedbackRequest:
+      type: object
+      properties:
+        rating:
+          $ref: '#/components/schemas/FeedbackRating'
+        errorCategories:
+          type: array
+          items:
+            type: string
+        missingContext:
+          type: string
+        comment:
+          type: string
+        qualityScores:
+          type: object
+          properties:
+            accuracy:
+              type: integer
+            completeness:
+              type: integer
+            styleMatch:
+              type: integer
+      required: [rating]
+
+    WorkspaceAnalytics:
+      type: object
+      properties:
+        period:
+          type: object
+          properties:
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
+        summary:
+          type: object
+          properties:
+            totalSessions:
+              type: integer
+            firstPassAcceptanceRate:
+              type: number
+            averageFeedbackScore:
+              type: number
+            averageEditDistance:
+              type: number
+        trends:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              sessions:
+                type: integer
+              positiveRatings:
+                type: integer
+              negativeRatings:
+                type: integer
+        topContext:
+          type: array
+          items:
+            type: object
+            properties:
+              nodeId:
+                type: string
+                format: uuid
+              name:
+                type: string
+              usageCount:
+                type: integer
+              effectivenessScore:
+                type: number
+        commonErrors:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              count:
+                type: integer
+              percentage:
+                type: number
+
+    # Errors
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+      required: [code, message]
+
+  # ============================================================================
+  # RESPONSES
+  # ============================================================================
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  # ============================================================================
+  # SECURITY
+  # ============================================================================
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - bearerAuth: []
+  - apiKey: []
