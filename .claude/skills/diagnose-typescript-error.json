@@ -1,0 +1,107 @@
+{
+  "id": "diagnose-typescript-error",
+  "name": "Diagnose TypeScript Error",
+  "description": "Analyzes TypeScript errors and provides solutions",
+  "version": "1.0.0",
+  "category": "debugging",
+  "inputs": {
+    "errorCode": {
+      "type": "string",
+      "description": "TypeScript error code (e.g., 'TS2345')",
+      "required": false
+    },
+    "errorMessage": {
+      "type": "string",
+      "description": "Full error message",
+      "required": true
+    },
+    "file": {
+      "type": "string",
+      "description": "File where error occurred",
+      "required": false
+    },
+    "line": {
+      "type": "number",
+      "description": "Line number",
+      "required": false
+    }
+  },
+  "errorPatterns": {
+    "TS2345": {
+      "pattern": "Argument of type '(.+)' is not assignable to parameter of type '(.+)'",
+      "solutions": [
+        "Check type compatibility between argument and parameter",
+        "Add explicit type assertion if safe",
+        "Update function parameter type to accept both types",
+        "Use union type or generic"
+      ]
+    },
+    "TS2339": {
+      "pattern": "Property '(.+)' does not exist on type '(.+)'",
+      "solutions": [
+        "Add property to interface/type definition",
+        "Check for typos in property name",
+        "Use optional chaining if property might not exist",
+        "Extend the type with additional properties"
+      ]
+    },
+    "TS7006": {
+      "pattern": "Parameter '(.+)' implicitly has an 'any' type",
+      "solutions": [
+        "Add explicit type annotation to parameter",
+        "Enable noImplicitAny in tsconfig for early detection",
+        "Create interface for complex parameter types"
+      ]
+    },
+    "TS2304": {
+      "pattern": "Cannot find name '(.+)'",
+      "solutions": [
+        "Import the missing symbol",
+        "Check for typos in symbol name",
+        "Install missing @types package",
+        "Define the symbol locally"
+      ]
+    },
+    "TS2307": {
+      "pattern": "Cannot find module '(.+)'",
+      "solutions": [
+        "Run npm install for missing package",
+        "Check import path is correct",
+        "Add path mapping in tsconfig.json",
+        "Create missing module file"
+      ]
+    },
+    "TS1005": {
+      "pattern": "'(.+)' expected",
+      "solutions": [
+        "Check for syntax errors",
+        "Ensure proper bracket/parenthesis matching",
+        "Check for missing semicolons or commas"
+      ]
+    },
+    "TS2322": {
+      "pattern": "Type '(.+)' is not assignable to type '(.+)'",
+      "solutions": [
+        "Check type compatibility",
+        "Use type assertion if intentional",
+        "Update variable/property type",
+        "Use type guard for narrowing"
+      ]
+    }
+  },
+  "diagnosticSteps": [
+    "Parse error message to identify error type",
+    "Match against known error patterns",
+    "Analyze surrounding code context",
+    "Check type definitions and imports",
+    "Suggest targeted solutions"
+  ],
+  "autoFix": {
+    "supported": ["TS7006", "TS2304", "TS2307"],
+    "requiresConfirmation": true
+  },
+  "learning": {
+    "trackSuccess": true,
+    "feedbackEnabled": true
+  }
+}

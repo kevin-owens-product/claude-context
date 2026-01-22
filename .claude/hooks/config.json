@@ -1,0 +1,78 @@
+{
+  "$schema": "https://claude.ai/schemas/hooks-config.json",
+  "version": "1.0.0",
+  "description": "Claude Code hooks for autonomous build infrastructure",
+  "hooks": {
+    "pre-commit": {
+      "enabled": true,
+      "script": "./pre-commit.sh",
+      "timeout": 120000,
+      "failOnError": true
+    },
+    "post-edit": {
+      "enabled": true,
+      "script": "./post-edit.sh",
+      "timeout": 30000,
+      "failOnError": false
+    },
+    "on-error": {
+      "enabled": true,
+      "script": "./on-error.sh",
+      "timeout": 60000,
+      "failOnError": false
+    },
+    "pre-build": {
+      "enabled": true,
+      "script": "./pre-build.sh",
+      "timeout": 60000,
+      "failOnError": true
+    },
+    "post-build": {
+      "enabled": true,
+      "script": "./post-build.sh",
+      "timeout": 60000,
+      "failOnError": false
+    },
+    "pre-test": {
+      "enabled": true,
+      "script": "./pre-test.sh",
+      "timeout": 30000,
+      "failOnError": false
+    },
+    "post-test": {
+      "enabled": true,
+      "script": "./post-test.sh",
+      "timeout": 30000,
+      "failOnError": false
+    }
+  },
+  "qualityGates": {
+    "typescript": {
+      "enabled": true,
+      "strict": true,
+      "noImplicitAny": true
+    },
+    "eslint": {
+      "enabled": true,
+      "failOnWarning": false
+    },
+    "tests": {
+      "enabled": true,
+      "coverageThreshold": 80
+    },
+    "security": {
+      "enabled": true,
+      "scanners": ["semgrep", "dependency-check"]
+    },
+    "circularDeps": {
+      "enabled": true,
+      "maxDepth": 3
+    }
+  },
+  "learning": {
+    "enabled": true,
+    "catalogPath": "../learning/error-catalog.json",
+    "solutionsPath": "../learning/solutions-db.json",
+    "autoLearn": true
+  }
+}

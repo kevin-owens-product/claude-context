@@ -1,0 +1,67 @@
+{
+  "id": "generate-service",
+  "name": "Generate NestJS Service",
+  "description": "Generates a complete NestJS service with proper structure and patterns",
+  "version": "1.0.0",
+  "category": "code-generation",
+  "inputs": {
+    "name": {
+      "type": "string",
+      "description": "Service name (e.g., 'user', 'organization')",
+      "required": true
+    },
+    "module": {
+      "type": "string",
+      "description": "Module path (e.g., 'apps/api/src/user')",
+      "required": true
+    },
+    "methods": {
+      "type": "array",
+      "description": "List of methods to generate",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "async": { "type": "boolean", "default": true },
+          "returnType": { "type": "string" },
+          "params": { "type": "array" }
+        }
+      },
+      "required": false
+    },
+    "withPrisma": {
+      "type": "boolean",
+      "description": "Include PrismaService dependency",
+      "default": true
+    },
+    "withTests": {
+      "type": "boolean",
+      "description": "Generate accompanying test file",
+      "default": true
+    }
+  },
+  "template": {
+    "service": "templates/nestjs-service.ts.template",
+    "test": "templates/nestjs-service.spec.ts.template"
+  },
+  "validation": {
+    "namePattern": "^[a-z][a-z0-9-]*$",
+    "moduleExists": true
+  },
+  "postActions": [
+    "update-module-providers",
+    "run-eslint-fix",
+    "generate-tests-if-enabled"
+  ],
+  "examples": [
+    {
+      "description": "Generate a basic CRUD service",
+      "input": {
+        "name": "organization",
+        "module": "apps/api/src/organization",
+        "withPrisma": true,
+        "withTests": true
+      }
+    }
+  ]
+}
