@@ -1,0 +1,126 @@
+{
+  "$schema": "https://claude.ai/schemas/quality-gates.json",
+  "version": "1.0.0",
+  "description": "Quality gates for autonomous build validation",
+  "gates": {
+    "typescript": {
+      "name": "TypeScript Compilation",
+      "description": "Validates TypeScript code compiles without errors",
+      "enabled": true,
+      "blocking": true,
+      "command": "npx tsc --noEmit",
+      "successPatterns": [],
+      "failurePatterns": ["error TS\\d+"],
+      "timeout": 120000,
+      "retries": 0
+    },
+    "eslint": {
+      "name": "ESLint",
+      "description": "Validates code style and potential issues",
+      "enabled": true,
+      "blocking": false,
+      "command": "npx eslint --ext .ts,.tsx apps/ packages/",
+      "successPatterns": ["0 problems"],
+      "failurePatterns": ["\\d+ error"],
+      "timeout": 60000,
+      "retries": 0,
+      "warningAsError": false
+    },
+    "prettier": {
+      "name": "Prettier",
+      "description": "Validates code formatting",
+      "enabled": true,
+      "blocking": false,
+      "command": "npx prettier --check \"**/*.{ts,tsx,json}\"",
+      "successPatterns": ["All matched files use Prettier code style"],
+      "failurePatterns": ["Code style issues found"],
+      "timeout": 30000,
+      "retries": 0,
+      "autoFix": {
+        "enabled": true,
+        "command": "npx prettier --write"
+      }
+    },
+    "tests": {
+      "name": "Unit Tests",
+      "description": "Runs unit test suite",
+      "enabled": true,
+      "blocking": true,
+      "command": "npm test -- --passWithNoTests",
+      "successPatterns": ["Tests:.*passed", "Test Suites:.*passed"],
+      "failurePatterns": ["Tests:.*failed", "FAIL "],
+      "timeout": 300000,
+      "retries": 1
+    },
+    "coverage": {
+      "name": "Test Coverage",
+      "description": "Validates minimum test coverage threshold",
+      "enabled": true,
+      "blocking": false,
+      "command": "npm test -- --coverage --passWithNoTests",
+      "thresholds": {
+        "lines": 80,
+        "branches": 70,
+        "functions": 80,
+        "statements": 80
+      },
+      "timeout": 300000,
+      "retries": 0
+    },
+    "security": {
+      "name": "Security Scan",
+      "description": "Scans for security vulnerabilities",
+      "enabled": true,
+      "blocking": false,
+      "command": "npm audit --audit-level=high",
+      "successPatterns": ["found 0 vulnerabilities"],
+      "failurePatterns": ["high", "critical"],
+      "timeout": 60000,
+      "retries": 0
+    },
+    "circularDeps": {
+      "name": "Circular Dependencies",
+      "description": "Checks for circular dependencies in code",
+      "enabled": true,
+      "blocking": false,
+      "command": "npx madge --circular --extensions ts apps/ packages/",
+      "successPatterns": ["No circular dependency found"],
+      "failurePatterns": ["Found \\d+ circular"],
+      "timeout": 60000,
+      "retries": 0
+    },
+    "bundleSize": {
+      "name": "Bundle Size",
+      "description": "Validates bundle size is within limits",
+      "enabled": false,
+      "blocking": false,
+      "command": "npm run build && npm run analyze",
+      "limits": {
+        "main": "500KB",
+        "vendor": "1MB"
+      },
+      "timeout": 180000,
+      "retries": 0
+    }
+  },
+  "pipelines": {
+    "preCommit": {
+      "description": "Gates to run before commits",
+      "gates": ["typescript", "eslint", "prettier"],
+      "parallel": false,
+      "stopOnFailure": true
+    },
+    "prePush": {
+      "description": "Gates to run before pushing",
+      "gates": ["typescript", "eslint", "tests"],
+      "parallel": false,
+      "stopOnFailure": true
+    },
+    "ci": {
+      "description": "Full CI pipeline",
+      "gates": ["typescript", "eslint", "prettier", "tests", "coverage", "security", "circularDeps"],
+      "parallel": true,
+      "stopOnFailure": false
+    }
+  }
+}

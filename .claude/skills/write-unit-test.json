@@ -1,0 +1,68 @@
+{
+  "id": "write-unit-test",
+  "name": "Write Unit Test",
+  "description": "Generates comprehensive unit tests for a given source file",
+  "version": "1.0.0",
+  "category": "testing",
+  "inputs": {
+    "sourceFile": {
+      "type": "string",
+      "description": "Path to the source file to test",
+      "required": true
+    },
+    "coverage": {
+      "type": "string",
+      "enum": ["minimal", "standard", "comprehensive"],
+      "description": "Level of test coverage",
+      "default": "standard"
+    },
+    "mockStrategy": {
+      "type": "string",
+      "enum": ["auto", "manual", "inline"],
+      "description": "How to handle dependencies",
+      "default": "auto"
+    }
+  },
+  "patterns": {
+    "service": {
+      "testStructure": "describe-per-method",
+      "mockPattern": "jest.Mock",
+      "includeEdgeCases": true,
+      "includeErrorCases": true
+    },
+    "controller": {
+      "testStructure": "describe-per-endpoint",
+      "mockPattern": "jest.Mock",
+      "includeAuthCases": true,
+      "includeValidationCases": true
+    },
+    "utility": {
+      "testStructure": "describe-per-function",
+      "mockPattern": "minimal",
+      "includeEdgeCases": true
+    }
+  },
+  "conventions": {
+    "describeFormat": "describe('ClassName', () => {...})",
+    "itFormat": "it('should {expected_behavior} when {condition}', async () => {...})",
+    "arrangActAssert": true,
+    "mockNaming": "mock{DependencyName}"
+  },
+  "validation": {
+    "sourceFileExists": true,
+    "isTypeScriptFile": true
+  },
+  "postActions": [
+    "run-test-file",
+    "check-coverage"
+  ],
+  "examples": [
+    {
+      "description": "Generate tests for a service",
+      "input": {
+        "sourceFile": "apps/api/src/user/user.service.ts",
+        "coverage": "comprehensive"
+      }
+    }
+  ]
+}

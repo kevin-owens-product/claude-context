@@ -1,0 +1,109 @@
+{
+  "$schema": "https://claude.ai/schemas/solutions-db.json",
+  "version": "1.0.0",
+  "description": "Database of proven solutions for common errors",
+  "lastUpdated": "2026-01-22T00:00:00Z",
+  "solutions": [
+    {
+      "id": "sol-001",
+      "errorPattern": "Cannot find module '@prisma/client'",
+      "category": "typescript",
+      "solution": {
+        "description": "Generate Prisma client",
+        "steps": [
+          "npx prisma generate --schema=packages/prisma/schema.prisma"
+        ],
+        "autoApply": true
+      },
+      "successRate": 0.95,
+      "appliedCount": 0
+    },
+    {
+      "id": "sol-002",
+      "errorPattern": "TS7006.*implicitly has an 'any' type",
+      "category": "typescript",
+      "solution": {
+        "description": "Add explicit type annotation",
+        "steps": [
+          "Identify the parameter without type",
+          "Determine appropriate type from usage",
+          "Add type annotation to parameter"
+        ],
+        "autoApply": false,
+        "codePattern": "function example(param: TYPE_HERE)"
+      },
+      "successRate": 0.90,
+      "appliedCount": 0
+    },
+    {
+      "id": "sol-003",
+      "errorPattern": "Cannot find module '(.+)'",
+      "category": "typescript",
+      "solution": {
+        "description": "Install missing dependency",
+        "steps": [
+          "Identify the missing module name",
+          "Run npm install [module-name]",
+          "If types are missing, install @types/[module-name]"
+        ],
+        "autoApply": true
+      },
+      "successRate": 0.85,
+      "appliedCount": 0
+    },
+    {
+      "id": "sol-004",
+      "errorPattern": "Exceeded timeout of \\d+ms",
+      "category": "test",
+      "solution": {
+        "description": "Increase test timeout or optimize test",
+        "steps": [
+          "Check if test has async operations",
+          "Ensure all promises are awaited",
+          "Consider increasing timeout if legitimately slow",
+          "Optimize slow operations or mock external calls"
+        ],
+        "autoApply": false
+      },
+      "successRate": 0.80,
+      "appliedCount": 0
+    },
+    {
+      "id": "sol-005",
+      "errorPattern": "Circular dependency detected",
+      "category": "build",
+      "solution": {
+        "description": "Break circular dependency",
+        "steps": [
+          "Identify the modules in the cycle",
+          "Extract shared code to a separate module",
+          "Use dependency injection to break direct imports",
+          "Consider lazy imports or dynamic imports"
+        ],
+        "autoApply": false
+      },
+      "successRate": 0.75,
+      "appliedCount": 0
+    },
+    {
+      "id": "sol-006",
+      "errorPattern": "ENOENT.*node_modules",
+      "category": "runtime",
+      "solution": {
+        "description": "Reinstall dependencies",
+        "steps": [
+          "rm -rf node_modules",
+          "npm ci"
+        ],
+        "autoApply": true
+      },
+      "successRate": 0.90,
+      "appliedCount": 0
+    }
+  ],
+  "statistics": {
+    "totalSolutions": 6,
+    "totalApplications": 0,
+    "averageSuccessRate": 0.86
+  }
+}

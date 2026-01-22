@@ -1,0 +1,121 @@
+{
+  "id": "add-prisma-model",
+  "name": "Add Prisma Model",
+  "description": "Adds a new model to the Prisma schema with proper conventions",
+  "version": "1.0.0",
+  "category": "database",
+  "inputs": {
+    "name": {
+      "type": "string",
+      "description": "Model name in PascalCase (e.g., 'Organization')",
+      "required": true
+    },
+    "fields": {
+      "type": "array",
+      "description": "List of fields for the model",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "optional": { "type": "boolean", "default": false },
+          "unique": { "type": "boolean", "default": false },
+          "default": { "type": "string" }
+        }
+      },
+      "required": true
+    },
+    "relations": {
+      "type": "array",
+      "description": "Relations to other models",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "relationField": { "type": "string" },
+          "references": { "type": "string" }
+        }
+      },
+      "required": false
+    },
+    "withTenant": {
+      "type": "boolean",
+      "description": "Include tenantId for multi-tenancy",
+      "default": true
+    },
+    "withTimestamps": {
+      "type": "boolean",
+      "description": "Include createdAt/updatedAt fields",
+      "default": true
+    },
+    "withSoftDelete": {
+      "type": "boolean",
+      "description": "Include deletedAt for soft delete",
+      "default": false
+    }
+  },
+  "conventions": {
+    "tableName": "snake_case",
+    "columnNames": "snake_case",
+    "idField": {
+      "name": "id",
+      "type": "String",
+      "default": "dbgenerated(\"uuid_generate_v4()\")",
+      "dbType": "@db.Uuid"
+    },
+    "tenantField": {
+      "name": "tenantId",
+      "map": "tenant_id",
+      "type": "String",
+      "dbType": "@db.Uuid"
+    },
+    "timestampFields": {
+      "createdAt": {
+        "name": "createdAt",
+        "map": "created_at",
+        "type": "DateTime",
+        "default": "now()"
+      },
+      "updatedAt": {
+        "name": "updatedAt",
+        "map": "updated_at",
+        "type": "DateTime",
+        "updatedAt": true
+      }
+    }
+  },
+  "validation": {
+    "namePattern": "^[A-Z][a-zA-Z0-9]*$",
+    "schemaExists": true,
+    "modelNotDuplicate": true
+  },
+  "postActions": [
+    "validate-schema",
+    "generate-prisma-client",
+    "create-migration-if-requested"
+  ],
+  "examples": [
+    {
+      "description": "Add a Project model with tenant isolation",
+      "input": {
+        "name": "Project",
+        "fields": [
+          { "name": "name", "type": "String" },
+          { "name": "description", "type": "String", "optional": true },
+          { "name": "status", "type": "String", "default": "'active'" }
+        ],
+        "relations": [
+          {
+            "name": "organization",
+            "type": "Organization",
+            "relationField": "organizationId",
+            "references": "id"
+          }
+        ],
+        "withTenant": true,
+        "withTimestamps": true
+      }
+    }
+  ]
+}

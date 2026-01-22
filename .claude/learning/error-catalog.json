@@ -1,0 +1,92 @@
+{
+  "$schema": "https://claude.ai/schemas/error-catalog.json",
+  "version": "1.0.0",
+  "description": "Catalog of known errors and their patterns",
+  "lastUpdated": "2026-01-22T00:00:00Z",
+  "categories": {
+    "typescript": {
+      "description": "TypeScript compilation errors",
+      "patterns": [
+        {
+          "code": "TS2345",
+          "pattern": "Argument of type '(.+)' is not assignable",
+          "severity": "error",
+          "frequency": "high",
+          "autoFixable": false
+        },
+        {
+          "code": "TS7006",
+          "pattern": "implicitly has an 'any' type",
+          "severity": "error",
+          "frequency": "high",
+          "autoFixable": true
+        },
+        {
+          "code": "TS2307",
+          "pattern": "Cannot find module",
+          "severity": "error",
+          "frequency": "medium",
+          "autoFixable": true
+        }
+      ]
+    },
+    "runtime": {
+      "description": "Runtime errors",
+      "patterns": [
+        {
+          "code": "ENOENT",
+          "pattern": "no such file or directory",
+          "severity": "error",
+          "frequency": "medium",
+          "autoFixable": false
+        },
+        {
+          "code": "EACCES",
+          "pattern": "permission denied",
+          "severity": "error",
+          "frequency": "low",
+          "autoFixable": false
+        }
+      ]
+    },
+    "test": {
+      "description": "Test failures",
+      "patterns": [
+        {
+          "code": "ASSERTION_FAILED",
+          "pattern": "expect\\(.+\\)\\.to(Be|Equal|Match)",
+          "severity": "error",
+          "frequency": "high",
+          "autoFixable": false
+        },
+        {
+          "code": "TIMEOUT",
+          "pattern": "Exceeded timeout of \\d+ms",
+          "severity": "warning",
+          "frequency": "medium",
+          "autoFixable": false
+        }
+      ]
+    },
+    "build": {
+      "description": "Build process errors",
+      "patterns": [
+        {
+          "code": "BUNDLE_SIZE",
+          "pattern": "Bundle size exceeded",
+          "severity": "warning",
+          "frequency": "low",
+          "autoFixable": false
+        },
+        {
+          "code": "CIRCULAR_DEP",
+          "pattern": "Circular dependency detected",
+          "severity": "warning",
+          "frequency": "medium",
+          "autoFixable": false
+        }
+      ]
+    }
+  },
+  "errors": []
+}

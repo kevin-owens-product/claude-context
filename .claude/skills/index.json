@@ -1,0 +1,61 @@
+{
+  "$schema": "https://claude.ai/schemas/skills-library.json",
+  "version": "1.0.0",
+  "description": "Skills library for Claude Code autonomous development",
+  "categories": {
+    "code-generation": {
+      "description": "Skills for generating new code",
+      "skills": [
+        "generate-service",
+        "generate-controller",
+        "generate-test",
+        "generate-module",
+        "generate-dto"
+      ]
+    },
+    "testing": {
+      "description": "Skills for writing and running tests",
+      "skills": [
+        "write-unit-test",
+        "write-integration-test",
+        "write-e2e-test",
+        "run-tests",
+        "analyze-coverage"
+      ]
+    },
+    "debugging": {
+      "description": "Skills for debugging and error resolution",
+      "skills": [
+        "diagnose-typescript-error",
+        "diagnose-runtime-error",
+        "diagnose-test-failure",
+        "fix-lint-errors"
+      ]
+    },
+    "refactoring": {
+      "description": "Skills for code refactoring",
+      "skills": [
+        "extract-interface",
+        "rename-symbol",
+        "move-to-module",
+        "optimize-imports"
+      ]
+    },
+    "documentation": {
+      "description": "Skills for documentation tasks",
+      "skills": [
+        "generate-jsdoc",
+        "write-readme-section",
+        "create-adr"
+      ]
+    },
+    "database": {
+      "description": "Skills for database operations",
+      "skills": [
+        "add-prisma-model",
+        "create-migration",
+        "generate-seed-data"
+      ]
+    }
+  }
+}
