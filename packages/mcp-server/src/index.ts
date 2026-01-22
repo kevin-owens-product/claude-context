@@ -115,6 +115,51 @@ const CreateDocumentFromTemplateSchema = z.object({
   variables: z.record(z.string()).optional().describe('Template variables to fill in'),
 });
 
+// Reactive Context Schemas (Tier 1: Universal - Real-time capabilities)
+const SubscribeContextSchema = z.object({
+  scopes: z.array(z.object({
+    type: z.enum(['workspace', 'graph', 'slice', 'node', 'pattern']),
+    id: z.string().optional(),
+    pattern: z.string().optional(),
+  })).describe('Scopes to subscribe to'),
+  filters: z.object({
+    nodeTypes: z.array(z.string()).optional(),
+    layers: z.array(z.string()).optional(),
+    eventTypes: z.array(z.string()).optional(),
+  }).optional().describe('Optional filters'),
+  options: z.object({
+    mode: z.enum(['realtime', 'batched', 'polling']).default('realtime'),
+    batchWindow: z.number().optional().describe('Batch window in ms for batched mode'),
+  }).optional().describe('Delivery options'),
+});
+
+const GetContextUpdatesSchema = z.object({
+  sinceVersion: z.string().optional().describe('Global version to get updates since'),
+  sinceTimestamp: z.string().optional().describe('ISO timestamp to get updates since'),
+  graphId: z.string().optional().describe('Filter to specific graph'),
+  entityTypes: z.array(z.string()).optional().describe('Filter by entity types'),
+  limit: z.number().default(100).describe('Maximum events to return'),
+});
+
+const GetEntityVersionSchema = z.object({
+  entityType: z.string().describe('Type of entity (context_node, slice, etc.)'),
+  entityId: z.string().describe('ID of the entity'),
+});
+
+const GetEntityHistorySchema = z.object({
+  entityType: z.string().describe('Type of entity'),
+  entityId: z.string().describe('ID of the entity'),
+  fromVersion: z.number().optional().describe('Start version'),
+  toVersion: z.number().optional().describe('End version'),
+  limit: z.number().default(50).describe('Maximum changes to return'),
+});
+
+const RollbackEntitySchema = z.object({
+  entityType: z.string().describe('Type of entity'),
+  entityId: z.string().describe('ID of the entity'),
+  toVersion: z.number().describe('Version to rollback to'),
+});
+
 // Server configuration
 interface ServerConfig {
   apiBaseUrl: string;
@@ -190,6 +235,18 @@ export function createMcpServer(config: ServerConfig) {
           uri: `context://analytics`,
           name: 'Context Analytics',
           description: 'Effectiveness metrics for context usage',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `context://version`,
+          name: 'Current Version',
+          description: 'Current global version for sync purposes',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `context://subscriptions`,
+          name: 'Active Subscriptions',
+          description: 'List of active context subscriptions',
           mimeType: 'application/json',
         },
       ],
@@ -276,6 +333,39 @@ export function createMcpServer(config: ServerConfig) {
             uri,
             mimeType: 'application/json',
             text: JSON.stringify(slice, null, 2),
+          },
+        ],
+      };
+    }
+
+    // Reactive context resources
+    if (uri === 'context://version') {
+      const version = await apiCall<{ globalVersion: string; timestamp: string }>(
+        'GET',
+        `/api/v1/context/version`
+      );
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(version, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === 'context://subscriptions') {
+      const subscriptions = await apiCall<{ subscriptions: unknown[] }>(
+        'GET',
+        `/api/v1/context/subscriptions`
+      );
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(subscriptions, null, 2),
           },
         ],
       };
@@ -569,6 +659,135 @@ export function createMcpServer(config: ServerConfig) {
               },
             },
             required: ['templateType', 'outputPath'],
+          },
+        },
+        // ============================================
+        // Reactive Context Tools (Tier 1: Universal - Real-time)
+        // ============================================
+        {
+          name: 'subscribe_context',
+          description:
+            'Subscribe to context changes for real-time updates. Returns subscription details for WebSocket or polling-based sync.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              scopes: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    type: { type: 'string', enum: ['workspace', 'graph', 'slice', 'node', 'pattern'] },
+                    id: { type: 'string', description: 'ID for workspace/graph/slice/node scopes' },
+                    pattern: { type: 'string', description: 'Glob pattern for pattern scope' },
+                  },
+                  required: ['type'],
+                },
+                description: 'Scopes to subscribe to',
+              },
+              filters: {
+                type: 'object',
+                properties: {
+                  nodeTypes: { type: 'array', items: { type: 'string' }, description: 'Filter by node types' },
+                  layers: { type: 'array', items: { type: 'string' }, description: 'Filter by context layers' },
+                  eventTypes: { type: 'array', items: { type: 'string' }, description: 'Filter by event types' },
+                },
+                description: 'Optional filters',
+              },
+              options: {
+                type: 'object',
+                properties: {
+                  mode: { type: 'string', enum: ['realtime', 'batched', 'polling'], description: 'Delivery mode' },
+                  batchWindow: { type: 'number', description: 'Batch window in ms for batched mode' },
+                },
+                description: 'Delivery options',
+              },
+            },
+            required: ['scopes'],
+          },
+        },
+        {
+          name: 'get_context_updates',
+          description:
+            'Poll for context updates since a specific version or timestamp. Use for clients without WebSocket support.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              sinceVersion: { type: 'string', description: 'Global version to get updates since' },
+              sinceTimestamp: { type: 'string', description: 'ISO timestamp to get updates since' },
+              graphId: { type: 'string', description: 'Filter to specific graph' },
+              entityTypes: { type: 'array', items: { type: 'string' }, description: 'Filter by entity types' },
+              limit: { type: 'number', description: 'Maximum events to return (default: 100)' },
+            },
+          },
+        },
+        {
+          name: 'get_entity_version',
+          description:
+            'Get the current version information for an entity including version number and last modified time.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              entityType: { type: 'string', description: 'Type of entity (context_node, slice, graph)' },
+              entityId: { type: 'string', description: 'ID of the entity' },
+            },
+            required: ['entityType', 'entityId'],
+          },
+        },
+        {
+          name: 'get_entity_history',
+          description:
+            'Get the change history for an entity showing all modifications over time.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              entityType: { type: 'string', description: 'Type of entity' },
+              entityId: { type: 'string', description: 'ID of the entity' },
+              fromVersion: { type: 'number', description: 'Start version (optional)' },
+              toVersion: { type: 'number', description: 'End version (optional)' },
+              limit: { type: 'number', description: 'Maximum changes to return (default: 50)' },
+            },
+            required: ['entityType', 'entityId'],
+          },
+        },
+        {
+          name: 'get_entity_at_version',
+          description:
+            'Get the state of an entity at a specific version for point-in-time queries.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              entityType: { type: 'string', description: 'Type of entity' },
+              entityId: { type: 'string', description: 'ID of the entity' },
+              version: { type: 'number', description: 'Version number to retrieve' },
+            },
+            required: ['entityType', 'entityId', 'version'],
+          },
+        },
+        {
+          name: 'diff_entity_versions',
+          description:
+            'Compare two versions of an entity and get a detailed diff of changes.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              entityType: { type: 'string', description: 'Type of entity' },
+              entityId: { type: 'string', description: 'ID of the entity' },
+              fromVersion: { type: 'number', description: 'Source version' },
+              toVersion: { type: 'number', description: 'Target version' },
+            },
+            required: ['entityType', 'entityId', 'fromVersion', 'toVersion'],
+          },
+        },
+        {
+          name: 'unsubscribe_context',
+          description:
+            'Unsubscribe from context updates.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              subscriptionId: { type: 'string', description: 'ID of the subscription to remove' },
+            },
+            required: ['subscriptionId'],
           },
         },
       ],
@@ -874,6 +1093,232 @@ export function createMcpServer(config: ServerConfig) {
             {
               type: 'text',
               text: `Report generated for ${input.outputPath}:\n\n${reportContent}`,
+            },
+          ],
+        };
+      }
+
+      // ============================================
+      // Reactive Context Tools
+      // ============================================
+
+      case 'subscribe_context': {
+        const input = SubscribeContextSchema.parse(args);
+
+        const subscription = await apiCall<{
+          subscriptionId: string;
+          websocketUrl: string;
+          currentVersion: string;
+        }>('POST', `/api/v1/context/subscribe`, {
+          clientId: `mcp-${config.workspaceId}-${Date.now()}`,
+          product: 'code', // MCP server is typically used by Claude Code
+          productVersion: '1.0.0',
+          scopes: input.scopes,
+          filters: input.filters,
+          options: {
+            delivery: {
+              mode: input.options?.mode || 'realtime',
+              batchWindow: input.options?.batchWindow,
+            },
+            content: {
+              includePayload: true,
+              deltaOnly: false,
+              compress: false,
+            },
+            reliability: {
+              ackRequired: true,
+              retryOnFailure: true,
+            },
+          },
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Subscription created successfully!\n\n` +
+                `Subscription ID: ${subscription.subscriptionId}\n` +
+                `WebSocket URL: ${subscription.websocketUrl}\n` +
+                `Current Version: ${subscription.currentVersion}\n\n` +
+                `To receive real-time updates, connect to the WebSocket URL and send:\n` +
+                `{ "type": "subscribe", "payload": { "subscriptionId": "${subscription.subscriptionId}" } }`,
+            },
+          ],
+        };
+      }
+
+      case 'get_context_updates': {
+        const input = GetContextUpdatesSchema.parse(args);
+
+        const updates = await apiCall<{
+          events: Array<{
+            id: string;
+            eventType: string;
+            entityType: string;
+            entityId: string;
+            version: number;
+            globalVersion: string;
+            payload: unknown;
+            timestamp: string;
+          }>;
+          currentVersion: string;
+          hasMore: boolean;
+        }>('GET', `/api/v1/context/updates?` + new URLSearchParams({
+          ...(input.sinceVersion && { sinceVersion: input.sinceVersion }),
+          ...(input.sinceTimestamp && { sinceTimestamp: input.sinceTimestamp }),
+          ...(input.graphId && { graphId: input.graphId }),
+          ...(input.entityTypes && { entityTypes: input.entityTypes.join(',') }),
+          limit: input.limit.toString(),
+        }).toString());
+
+        const summary = updates.events.length > 0
+          ? `Found ${updates.events.length} updates since version ${input.sinceVersion || 'start'}:\n\n` +
+            updates.events.map(e =>
+              `- [${e.eventType}] ${e.entityType}/${e.entityId} (v${e.version})`
+            ).join('\n')
+          : 'No updates since the specified version.';
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `${summary}\n\nCurrent Version: ${updates.currentVersion}\nHas More: ${updates.hasMore}\n\nFull data:\n${JSON.stringify(updates, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case 'get_entity_version': {
+        const input = GetEntityVersionSchema.parse(args);
+
+        const version = await apiCall<{
+          entityType: string;
+          entityId: string;
+          version: number;
+          updatedAt: string;
+        }>('GET', `/api/v1/entities/${input.entityType}/${input.entityId}/version`);
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Entity: ${input.entityType}/${input.entityId}\nVersion: ${version.version}\nLast Updated: ${version.updatedAt}`,
+            },
+          ],
+        };
+      }
+
+      case 'get_entity_history': {
+        const input = GetEntityHistorySchema.parse(args);
+
+        const history = await apiCall<Array<{
+          version: number;
+          changeType: string;
+          changedFields: string[];
+          actorId: string;
+          timestamp: string;
+        }>>('GET', `/api/v1/entities/${input.entityType}/${input.entityId}/history?` +
+          new URLSearchParams({
+            ...(input.fromVersion && { fromVersion: input.fromVersion.toString() }),
+            ...(input.toVersion && { toVersion: input.toVersion.toString() }),
+            limit: input.limit.toString(),
+          }).toString()
+        );
+
+        const historyText = history.map(h =>
+          `v${h.version} [${h.changeType}] - ${h.changedFields.join(', ')} (${h.timestamp})`
+        ).join('\n');
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Change history for ${input.entityType}/${input.entityId}:\n\n${historyText || 'No history found.'}`,
+            },
+          ],
+        };
+      }
+
+      case 'get_entity_at_version': {
+        const input = z.object({
+          entityType: z.string(),
+          entityId: z.string(),
+          version: z.number(),
+        }).parse(args);
+
+        const entity = await apiCall<unknown>(
+          'GET',
+          `/api/v1/entities/${input.entityType}/${input.entityId}/versions/${input.version}`
+        );
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Entity ${input.entityType}/${input.entityId} at version ${input.version}:\n\n${JSON.stringify(entity, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case 'diff_entity_versions': {
+        const input = z.object({
+          entityType: z.string(),
+          entityId: z.string(),
+          fromVersion: z.number(),
+          toVersion: z.number(),
+        }).parse(args);
+
+        const diff = await apiCall<{
+          fromVersion: number;
+          toVersion: number;
+          fieldDiffs: Array<{
+            field: string;
+            from: unknown;
+            to: unknown;
+            type: 'added' | 'removed' | 'changed';
+          }>;
+        }>('GET', `/api/v1/entities/${input.entityType}/${input.entityId}/diff?` +
+          new URLSearchParams({
+            fromVersion: input.fromVersion.toString(),
+            toVersion: input.toVersion.toString(),
+          }).toString()
+        );
+
+        const diffText = diff.fieldDiffs.map(d => {
+          switch (d.type) {
+            case 'added':
+              return `+ ${d.field}: ${JSON.stringify(d.to)}`;
+            case 'removed':
+              return `- ${d.field}: ${JSON.stringify(d.from)}`;
+            case 'changed':
+              return `~ ${d.field}: ${JSON.stringify(d.from)} → ${JSON.stringify(d.to)}`;
+          }
+        }).join('\n');
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Diff of ${input.entityType}/${input.entityId} from v${input.fromVersion} to v${input.toVersion}:\n\n${diffText || 'No differences found.'}`,
+            },
+          ],
+        };
+      }
+
+      case 'unsubscribe_context': {
+        const input = z.object({ subscriptionId: z.string() }).parse(args);
+
+        await apiCall<{ success: boolean }>(
+          'DELETE',
+          `/api/v1/context/subscriptions/${input.subscriptionId}`
+        );
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Successfully unsubscribed from ${input.subscriptionId}`,
             },
           ],
         };
