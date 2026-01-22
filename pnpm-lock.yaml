@@ -262,6 +262,12 @@ importers:
         specifier: ^5.8.0
         version: 5.22.0(prisma@5.22.0)
     devDependencies:
+      '@types/bcryptjs':
+        specifier: ^3.0.0
+        version: 3.0.0
+      bcryptjs:
+        specifier: ^3.0.3
+        version: 3.0.3
       prisma:
         specifier: ^5.8.0
         version: 5.22.0
