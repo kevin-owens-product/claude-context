@@ -350,6 +350,67 @@ const DetectCyclesSchema = z.object({
   startSymbolId: z.string().optional().describe('Start symbol (or search all if not provided)'),
 });
 
+// ============================================
+// Capability Mapping Schemas (Phase 3)
+// ============================================
+
+const LinkSymbolToCapabilitySchema = z.object({
+  symbolId: z.string().describe('Symbol ID to link'),
+  capabilityId: z.string().describe('Capability ID to link to'),
+  linkType: z.enum(['IMPLEMENTS', 'SUPPORTS', 'TESTS', 'CONFIGURES', 'DOCUMENTS']).describe('Type of link'),
+  confidence: z.number().optional().default(1.0).describe('Confidence score (0-1)'),
+  evidence: z.array(z.string()).optional().describe('Evidence/reasons for the link'),
+});
+
+const UnlinkSymbolFromCapabilitySchema = z.object({
+  symbolId: z.string().describe('Symbol ID to unlink'),
+  capabilityId: z.string().describe('Capability ID to unlink from'),
+});
+
+const GetCapabilityHealthSchema = z.object({
+  capabilityId: z.string().describe('Capability ID'),
+  repositoryId: z.string().optional().describe('Filter to specific repository'),
+  startDate: z.string().optional().describe('Start date (ISO format)'),
+  endDate: z.string().optional().describe('End date (ISO format)'),
+  limit: z.number().optional().default(30).describe('Maximum history records'),
+});
+
+const GetCapabilityEvolutionSchema = z.object({
+  capabilityId: z.string().optional().describe('Capability ID (all if not provided)'),
+  repositoryId: z.string().optional().describe('Filter to specific repository'),
+  eventTypes: z.array(z.enum([
+    'SYMBOLS_ADDED', 'SYMBOLS_MODIFIED', 'SYMBOLS_REMOVED',
+    'COMPLEXITY_SPIKE', 'QUALITY_CHANGE',
+    'HEALTH_DEGRADATION', 'HEALTH_IMPROVEMENT',
+    'BREAKING_CHANGE', 'REFACTORING',
+    'BUG_FIX', 'FEATURE_ADDITION', 'DEPRECATION',
+  ])).optional().describe('Filter by event types'),
+  minSignificance: z.enum(['TRIVIAL', 'MINOR', 'MODERATE', 'MAJOR', 'CRITICAL']).optional().describe('Minimum significance'),
+  since: z.string().optional().describe('Events since date (ISO format)'),
+  limit: z.number().optional().default(50).describe('Maximum events'),
+});
+
+const InferCapabilityLinksSchema = z.object({
+  repositoryId: z.string().describe('Repository ID to analyze'),
+  capabilityId: z.string().optional().describe('Specific capability (all if not provided)'),
+  threshold: z.number().optional().default(0.5).describe('Minimum confidence threshold'),
+  maxLinks: z.number().optional().default(20).describe('Maximum links to infer'),
+});
+
+const ApplyInferredLinksSchema = z.object({
+  links: z.array(z.object({
+    symbolId: z.string(),
+    capabilityId: z.string(),
+    linkType: z.enum(['IMPLEMENTS', 'SUPPORTS', 'TESTS', 'CONFIGURES', 'DOCUMENTS']),
+    confidence: z.number(),
+  })).describe('Links to apply'),
+});
+
+const CalculateCapabilityHealthSchema = z.object({
+  capabilityId: z.string().describe('Capability ID'),
+  repositoryId: z.string().describe('Repository ID'),
+});
+
 // Server configuration
 interface ServerConfig {
   apiBaseUrl: string;
@@ -1703,6 +1764,140 @@ export function createMcpServer(config: ServerConfig) {
             required: ['repoId'],
           },
         },
+
+        // ====================================
+        // Capability Mapping Tools (Phase 3)
+        // ====================================
+        {
+          name: 'link_symbol_to_capability',
+          description:
+            'Link a code symbol to a business capability. Creates a relationship between implementation code and business functionality.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              symbolId: { type: 'string', description: 'Symbol ID to link' },
+              capabilityId: { type: 'string', description: 'Capability ID to link to' },
+              linkType: {
+                type: 'string',
+                enum: ['IMPLEMENTS', 'SUPPORTS', 'TESTS', 'CONFIGURES', 'DOCUMENTS'],
+                description: 'Type of link'
+              },
+              confidence: { type: 'number', description: 'Confidence score (0-1)' },
+              evidence: { type: 'array', items: { type: 'string' }, description: 'Evidence for the link' },
+            },
+            required: ['symbolId', 'capabilityId', 'linkType'],
+          },
+        },
+        {
+          name: 'unlink_symbol_from_capability',
+          description:
+            'Remove a link between a code symbol and a business capability.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              symbolId: { type: 'string', description: 'Symbol ID to unlink' },
+              capabilityId: { type: 'string', description: 'Capability ID to unlink from' },
+            },
+            required: ['symbolId', 'capabilityId'],
+          },
+        },
+        {
+          name: 'get_capability_health',
+          description:
+            'Get health metrics and trend analysis for a capability. Shows complexity, quality, stability scores and alerts.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              capabilityId: { type: 'string', description: 'Capability ID' },
+              repositoryId: { type: 'string', description: 'Filter to specific repository' },
+              startDate: { type: 'string', description: 'Start date (ISO format)' },
+              endDate: { type: 'string', description: 'End date (ISO format)' },
+              limit: { type: 'number', description: 'Maximum history records' },
+            },
+            required: ['capabilityId'],
+          },
+        },
+        {
+          name: 'get_capability_evolution',
+          description:
+            'Get evolution history showing how a capability has changed over time. Tracks symbol changes, complexity spikes, health changes.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              capabilityId: { type: 'string', description: 'Capability ID (all if not provided)' },
+              repositoryId: { type: 'string', description: 'Filter to specific repository' },
+              eventTypes: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                  enum: ['SYMBOLS_ADDED', 'SYMBOLS_MODIFIED', 'SYMBOLS_REMOVED', 'COMPLEXITY_SPIKE', 'HEALTH_DEGRADATION', 'BREAKING_CHANGE']
+                },
+                description: 'Filter by event types'
+              },
+              minSignificance: {
+                type: 'string',
+                enum: ['TRIVIAL', 'MINOR', 'MODERATE', 'MAJOR', 'CRITICAL'],
+                description: 'Minimum significance'
+              },
+              since: { type: 'string', description: 'Events since date (ISO format)' },
+              limit: { type: 'number', description: 'Maximum events' },
+            },
+            required: [],
+          },
+        },
+        {
+          name: 'infer_capability_links',
+          description:
+            'Automatically infer links between code symbols and capabilities using AI. Analyzes symbol names, documentation, and context.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repositoryId: { type: 'string', description: 'Repository ID to analyze' },
+              capabilityId: { type: 'string', description: 'Specific capability (all if not provided)' },
+              threshold: { type: 'number', description: 'Minimum confidence threshold (0-1)' },
+              maxLinks: { type: 'number', description: 'Maximum links to infer' },
+            },
+            required: ['repositoryId'],
+          },
+        },
+        {
+          name: 'apply_inferred_links',
+          description:
+            'Apply previously inferred capability links. Confirms and saves the AI-suggested symbol-capability relationships.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              links: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    symbolId: { type: 'string' },
+                    capabilityId: { type: 'string' },
+                    linkType: { type: 'string' },
+                    confidence: { type: 'number' },
+                  },
+                  required: ['symbolId', 'capabilityId', 'linkType', 'confidence']
+                },
+                description: 'Links to apply'
+              },
+            },
+            required: ['links'],
+          },
+        },
+        {
+          name: 'calculate_capability_health',
+          description:
+            'Recalculate and store health metrics for a capability. Updates complexity, quality, and stability scores.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              capabilityId: { type: 'string', description: 'Capability ID' },
+              repositoryId: { type: 'string', description: 'Repository ID' },
+            },
+            required: ['capabilityId', 'repositoryId'],
+          },
+        },
       ],
     };
   });
@@ -2999,6 +3194,150 @@ ${contextResponse.text.substring(0, 300)}...
             {
               type: 'text',
               text: JSON.stringify(cycles, null, 2),
+            },
+          ],
+        };
+      }
+
+      // ====================================
+      // Capability Mapping Handlers (Phase 3)
+      // ====================================
+
+      case 'link_symbol_to_capability': {
+        const input = LinkSymbolToCapabilitySchema.parse(args);
+        const result = await apiCall<unknown>(
+          'POST',
+          `/api/v1/capabilities/${input.capabilityId}/links`,
+          {
+            symbolId: input.symbolId,
+            linkType: input.linkType,
+            confidence: input.confidence,
+            evidence: input.evidence,
+          }
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'unlink_symbol_from_capability': {
+        const input = UnlinkSymbolFromCapabilitySchema.parse(args);
+        const result = await apiCall<unknown>(
+          'DELETE',
+          `/api/v1/capabilities/${input.capabilityId}/links/${input.symbolId}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_capability_health': {
+        const input = GetCapabilityHealthSchema.parse(args);
+        const params = new URLSearchParams();
+        if (input.repositoryId) params.append('repositoryId', input.repositoryId);
+        if (input.startDate) params.append('startDate', input.startDate);
+        if (input.endDate) params.append('endDate', input.endDate);
+        if (input.limit) params.append('limit', String(input.limit));
+
+        const health = await apiCall<unknown>(
+          'GET',
+          `/api/v1/capabilities/${input.capabilityId}/health?${params.toString()}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(health, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_capability_evolution': {
+        const input = GetCapabilityEvolutionSchema.parse(args);
+        const params = new URLSearchParams();
+        if (input.capabilityId) params.append('capabilityId', input.capabilityId);
+        if (input.repositoryId) params.append('repositoryId', input.repositoryId);
+        if (input.eventTypes) params.append('eventTypes', input.eventTypes.join(','));
+        if (input.minSignificance) params.append('minSignificance', input.minSignificance);
+        if (input.since) params.append('since', input.since);
+        if (input.limit) params.append('limit', String(input.limit));
+
+        const evolution = await apiCall<unknown>(
+          'GET',
+          `/api/v1/capabilities/evolution?${params.toString()}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(evolution, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'infer_capability_links': {
+        const input = InferCapabilityLinksSchema.parse(args);
+        const result = await apiCall<unknown>(
+          'POST',
+          `/api/v1/capabilities/infer`,
+          {
+            repositoryId: input.repositoryId,
+            capabilityId: input.capabilityId,
+            threshold: input.threshold,
+            maxLinks: input.maxLinks,
+          }
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'apply_inferred_links': {
+        const input = ApplyInferredLinksSchema.parse(args);
+        const result = await apiCall<unknown>(
+          'POST',
+          `/api/v1/capabilities/apply-links`,
+          { links: input.links }
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'calculate_capability_health': {
+        const input = CalculateCapabilityHealthSchema.parse(args);
+        const result = await apiCall<unknown>(
+          'POST',
+          `/api/v1/capabilities/${input.capabilityId}/health/calculate`,
+          { repositoryId: input.repositoryId }
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
             },
           ],
         };

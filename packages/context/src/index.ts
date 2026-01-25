@@ -349,5 +349,8 @@ export {
   type SymbolNode,
 } from './services/call-graph.service';
 
+// Capability Mapping (Phase 3)
+export { CapabilityMapperService } from './services/capability-mapper.service';
+
 // Utilities
 export { countTokens, truncateToTokenBudget, chunkText } from './utils/tokens';

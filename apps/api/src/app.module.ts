@@ -41,6 +41,7 @@ import { WorkflowsModule } from './workflows/workflows.module';
 // Codebase Observation Engine
 import { RepositoriesModule } from './repositories/repositories.module';
 import { SymbolsModule } from './symbols/symbols.module';
+import { CapabilityMappingModule } from './capability-mapping/capability-mapping.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { SymbolsModule } from './symbols/symbols.module';
     // Codebase Observation Engine
     RepositoriesModule,
     SymbolsModule,
+    CapabilityMappingModule,
   ],
   providers: [
     {

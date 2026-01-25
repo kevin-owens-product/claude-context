@@ -774,3 +774,328 @@ export interface MCPComplexityInfo {
     line: number;
   }>;
 }
+
+// ============================================================================
+// CAPABILITY MAPPING TYPES (Phase 3)
+// ============================================================================
+
+export type CapabilityHealthId = string & { __brand: 'CapabilityHealthId' };
+export type CapabilityEvolutionId = string & { __brand: 'CapabilityEvolutionId' };
+export type CapabilityId = string & { __brand: 'CapabilityId' };
+
+export enum CapabilityHealthStatus {
+  HEALTHY = 'HEALTHY',
+  WARNING = 'WARNING',
+  CRITICAL = 'CRITICAL',
+  UNKNOWN = 'UNKNOWN',
+}
+
+export enum HealthTrend {
+  IMPROVING = 'IMPROVING',
+  STABLE = 'STABLE',
+  DECLINING = 'DECLINING',
+  VOLATILE = 'VOLATILE',
+}
+
+export enum CapabilityEventType {
+  SYMBOLS_ADDED = 'SYMBOLS_ADDED',
+  SYMBOLS_MODIFIED = 'SYMBOLS_MODIFIED',
+  SYMBOLS_REMOVED = 'SYMBOLS_REMOVED',
+  COMPLEXITY_SPIKE = 'COMPLEXITY_SPIKE',
+  QUALITY_CHANGE = 'QUALITY_CHANGE',
+  HEALTH_DEGRADATION = 'HEALTH_DEGRADATION',
+  HEALTH_IMPROVEMENT = 'HEALTH_IMPROVEMENT',
+  BREAKING_CHANGE = 'BREAKING_CHANGE',
+  REFACTORING = 'REFACTORING',
+  BUG_FIX = 'BUG_FIX',
+  FEATURE_ADDITION = 'FEATURE_ADDITION',
+  DEPRECATION = 'DEPRECATION',
+}
+
+export enum ChangeCategory {
+  FEATURE = 'FEATURE',
+  ENHANCEMENT = 'ENHANCEMENT',
+  BUG_FIX = 'BUG_FIX',
+  REFACTORING = 'REFACTORING',
+  PERFORMANCE = 'PERFORMANCE',
+  SECURITY = 'SECURITY',
+  MAINTENANCE = 'MAINTENANCE',
+  DOCUMENTATION = 'DOCUMENTATION',
+  TESTING = 'TESTING',
+  DEPRECATION = 'DEPRECATION',
+}
+
+export enum ChangeSignificance {
+  TRIVIAL = 'TRIVIAL',
+  MINOR = 'MINOR',
+  MODERATE = 'MODERATE',
+  MAJOR = 'MAJOR',
+  CRITICAL = 'CRITICAL',
+}
+
+export interface CapabilityHealth {
+  id: CapabilityHealthId;
+  capabilityId: CapabilityId;
+  repositoryId: RepositoryId;
+  date: Date;
+
+  // Code metrics
+  symbolCount: number;
+  totalComplexity: number;
+  avgComplexity: number;
+  maxComplexity: number;
+  totalLineCount: number;
+  documentedSymbols: number;
+  documentationRatio: number;
+
+  // Quality metrics
+  testCoverage: number;
+  testSymbolCount: number;
+  lintIssueCount: number;
+  typeErrorCount: number;
+  deprecatedUsageCount: number;
+
+  // Churn metrics
+  filesChanged: number;
+  symbolsAdded: number;
+  symbolsModified: number;
+  symbolsRemoved: number;
+  totalChurn: number;
+
+  // Coupling metrics
+  incomingDependencies: number;
+  outgoingDependencies: number;
+  couplingScore: number;
+  cohesionScore: number;
+
+  // Health scores (0-100)
+  complexityScore: number;
+  qualityScore: number;
+  stabilityScore: number;
+  maintainabilityScore: number;
+  overallHealthScore: number;
+
+  // Status
+  healthStatus: CapabilityHealthStatus;
+  healthTrend: HealthTrend;
+  trendDelta: number;
+
+  createdAt: Date;
+}
+
+export interface CapabilityEvolution {
+  id: CapabilityEvolutionId;
+  capabilityId: CapabilityId;
+  repositoryId: RepositoryId;
+
+  eventType: CapabilityEventType;
+  eventDate: Date;
+
+  commitSha: string;
+  commitMessage?: string;
+  commitAuthor?: string;
+
+  symbolsAffected: string[];
+  symbolsAdded: number;
+  symbolsModified: number;
+  symbolsRemoved: number;
+
+  filesAffected: string[];
+  filesChanged: number;
+
+  complexityDelta: number;
+  lineCountDelta: number;
+  healthScoreDelta: number;
+  breakingChange: boolean;
+  requiresReview: boolean;
+
+  changeCategory: ChangeCategory;
+  significance: ChangeSignificance;
+
+  summary?: string;
+  description?: string;
+  tags: string[];
+
+  createdAt: Date;
+}
+
+// Request types for capability mapping
+export interface LinkSymbolToCapabilityRequest {
+  symbolId: CodeSymbolId;
+  capabilityId: CapabilityId;
+  linkType: CapabilityLinkType;
+  confidence?: number;
+  evidence?: string[];
+}
+
+export interface InferCapabilityLinksRequest {
+  repositoryId: RepositoryId;
+  capabilityId?: CapabilityId;
+  threshold?: number; // Minimum confidence threshold
+  maxLinks?: number;
+}
+
+export interface CapabilityCodeRequest {
+  capabilityId: CapabilityId;
+  repositoryId?: RepositoryId;
+  includeTests?: boolean;
+  minConfidence?: number;
+}
+
+export interface CapabilityHealthRequest {
+  capabilityId: CapabilityId;
+  repositoryId?: RepositoryId;
+  startDate?: Date;
+  endDate?: Date;
+  limit?: number;
+}
+
+export interface CapabilityEvolutionFilter {
+  capabilityId?: CapabilityId;
+  repositoryId?: RepositoryId;
+  eventTypes?: CapabilityEventType[];
+  changeCategories?: ChangeCategory[];
+  minSignificance?: ChangeSignificance;
+  since?: Date;
+  until?: Date;
+  limit?: number;
+  offset?: number;
+}
+
+// Response types
+export interface CapabilityCodeSummary {
+  capabilityId: CapabilityId;
+  capabilityName: string;
+  totalSymbols: number;
+  totalFiles: number;
+  totalLines: number;
+  avgComplexity: number;
+  symbols: Array<{
+    symbol: CodeSymbol;
+    linkType: CapabilityLinkType;
+    confidence: number;
+    filePath: string;
+  }>;
+  files: Array<{
+    fileId: CodeFileId;
+    path: string;
+    symbolCount: number;
+  }>;
+}
+
+export interface CapabilityHealthTrend {
+  capabilityId: CapabilityId;
+  capabilityName: string;
+  currentHealth: CapabilityHealth | null;
+  history: CapabilityHealth[];
+  trend: {
+    direction: HealthTrend;
+    delta7d: number;
+    delta30d: number;
+    volatility: number;
+  };
+  alerts: Array<{
+    type: 'warning' | 'critical';
+    metric: string;
+    message: string;
+    value: number;
+    threshold: number;
+  }>;
+}
+
+export interface CapabilityEvolutionSummary {
+  capabilityId: CapabilityId;
+  capabilityName: string;
+  totalEvents: number;
+  eventsByType: Record<CapabilityEventType, number>;
+  eventsByCategory: Record<ChangeCategory, number>;
+  events: CapabilityEvolution[];
+  timeline: Array<{
+    date: string;
+    eventCount: number;
+    netComplexityChange: number;
+    netLineChange: number;
+  }>;
+}
+
+// Health score calculation types
+export interface HealthScoreWeights {
+  complexity: number;
+  quality: number;
+  stability: number;
+  maintainability: number;
+}
+
+export interface HealthScoreConfig {
+  weights: HealthScoreWeights;
+  thresholds: {
+    healthy: number;
+    warning: number;
+  };
+  complexityTargets: {
+    maxAvgComplexity: number;
+    maxSingleComplexity: number;
+  };
+  qualityTargets: {
+    minTestCoverage: number;
+    maxLintIssues: number;
+    minDocumentationRatio: number;
+  };
+  stabilityTargets: {
+    maxChurnRate: number;
+    maxFilesChangedPerDay: number;
+  };
+}
+
+// Inference types
+export interface InferredCapabilityLink {
+  symbolId: CodeSymbolId;
+  capabilityId: CapabilityId;
+  confidence: number;
+  linkType: CapabilityLinkType;
+  evidence: string[];
+  reasoning: string;
+}
+
+export interface CapabilityInferenceResult {
+  capabilityId: CapabilityId;
+  capabilityName: string;
+  inferredLinks: InferredCapabilityLink[];
+  existingLinks: number;
+  newLinksCount: number;
+  processingTime: number;
+}
+
+// MCP types for capability mapping
+export interface MCPCapabilityHealthInfo {
+  capabilityId: string;
+  capabilityName: string;
+  overallHealth: number;
+  status: CapabilityHealthStatus;
+  trend: HealthTrend;
+  symbolCount: number;
+  avgComplexity: number;
+  testCoverage: number;
+}
+
+export interface MCPCapabilityEvolutionInfo {
+  eventType: CapabilityEventType;
+  eventDate: string;
+  commitSha: string;
+  commitMessage?: string;
+  changeCategory: ChangeCategory;
+  significance: ChangeSignificance;
+  summary?: string;
+}
+
+export interface MCPCapabilityCodeInfo {
+  capabilityId: string;
+  capabilityName: string;
+  totalSymbols: number;
+  totalFiles: number;
+  files: Array<{
+    path: string;
+    symbolCount: number;
+    symbols: string[];
+  }>;
+}

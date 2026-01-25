@@ -2472,6 +2472,8 @@ model Capability {
   signals              Signal[]
   experiments          Experiment[]
   SymbolCapabilityLink SymbolCapabilityLink[]
+  healthSnapshots      CapabilityHealth[]
+  evolutionEvents      CapabilityEvolution[]
 
   @@index([tenantId])
   @@index([intentId])
@@ -2962,10 +2964,12 @@ model Repository {
   createdById String?  @map("created_by_id") @db.Uuid
 
   // Relations
-  branches CodeBranch[]
-  files    CodeFile[]
-  commits  CodeCommit[]
-  syncJobs RepoSyncJob[]
+  branches           CodeBranch[]
+  files              CodeFile[]
+  commits            CodeCommit[]
+  syncJobs           RepoSyncJob[]
+  capabilityHealth   CapabilityHealth[]
+  capabilityEvolution CapabilityEvolution[]
 
   @@unique([tenantId, url])
   @@index([tenantId])
@@ -3477,4 +3481,182 @@ enum CapabilityLinkType {
   TESTS // Symbol tests the capability
   CONFIGURES // Symbol configures the capability
   DOCUMENTS // Symbol documents the capability
+}
+
+// ==============================================================================
+// CAPABILITY HEALTH & EVOLUTION (Phase 3: Capability Mapping)
+// ==============================================================================
+
+/// Daily snapshots of capability health based on code metrics
+model CapabilityHealth {
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  capabilityId String @map("capability_id") @db.Uuid
+  repositoryId String @map("repository_id") @db.Uuid
+
+  // Snapshot date (one per day per capability)
+  date DateTime @db.Date
+
+  // Code metrics
+  symbolCount         Int   @default(0) @map("symbol_count")
+  totalComplexity     Int   @default(0) @map("total_complexity")
+  avgComplexity       Float @default(0) @map("avg_complexity")
+  maxComplexity       Int   @default(0) @map("max_complexity")
+  totalLineCount      Int   @default(0) @map("total_line_count")
+  documentedSymbols   Int   @default(0) @map("documented_symbols")
+  documentationRatio  Float @default(0) @map("documentation_ratio")
+
+  // Quality metrics
+  testCoverage         Float @default(0) @map("test_coverage") // 0-100%
+  testSymbolCount      Int   @default(0) @map("test_symbol_count")
+  lintIssueCount       Int   @default(0) @map("lint_issue_count")
+  typeErrorCount       Int   @default(0) @map("type_error_count")
+  deprecatedUsageCount Int   @default(0) @map("deprecated_usage_count")
+
+  // Churn metrics (for the day)
+  filesChanged    Int @default(0) @map("files_changed")
+  symbolsAdded    Int @default(0) @map("symbols_added")
+  symbolsModified Int @default(0) @map("symbols_modified")
+  symbolsRemoved  Int @default(0) @map("symbols_removed")
+  totalChurn      Int @default(0) @map("total_churn") // lines added + removed
+
+  // Coupling metrics
+  incomingDependencies Int   @default(0) @map("incoming_dependencies")
+  outgoingDependencies Int   @default(0) @map("outgoing_dependencies")
+  couplingScore        Float @default(0) @map("coupling_score")
+  cohesionScore        Float @default(0) @map("cohesion_score")
+
+  // Calculated health scores (0-100)
+  complexityScore    Float @default(50) @map("complexity_score")
+  qualityScore       Float @default(50) @map("quality_score")
+  stabilityScore     Float @default(50) @map("stability_score")
+  maintainabilityScore Float @default(50) @map("maintainability_score")
+  overallHealthScore Float @default(50) @map("overall_health_score")
+
+  // Health status
+  healthStatus CapabilityHealthStatus @default(HEALTHY) @map("health_status")
+
+  // Trend indicators
+  healthTrend HealthTrend @default(STABLE) @map("health_trend")
+  trendDelta  Float       @default(0) @map("trend_delta") // Change from previous day
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  capability Capability @relation(fields: [capabilityId], references: [id], onDelete: Cascade)
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([capabilityId, repositoryId, date])
+  @@index([capabilityId])
+  @@index([repositoryId])
+  @@index([date])
+  @@index([overallHealthScore])
+  @@index([healthStatus])
+  @@map("capability_health")
+}
+
+/// Track evolution and changes to capabilities over time
+model CapabilityEvolution {
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  capabilityId String @map("capability_id") @db.Uuid
+  repositoryId String @map("repository_id") @db.Uuid
+
+  // Event identification
+  eventType CapabilityEventType @map("event_type")
+  eventDate DateTime            @default(now()) @map("event_date")
+
+  // What changed
+  commitSha      String  @map("commit_sha") @db.VarChar(40)
+  commitMessage  String? @map("commit_message") @db.Text
+  commitAuthor   String? @map("commit_author") @db.VarChar(255)
+
+  // Symbols affected
+  symbolsAffected  Json @default("[]") @map("symbols_affected") // Array of symbol IDs
+  symbolsAdded     Int  @default(0) @map("symbols_added")
+  symbolsModified  Int  @default(0) @map("symbols_modified")
+  symbolsRemoved   Int  @default(0) @map("symbols_removed")
+
+  // Files affected
+  filesAffected Json @default("[]") @map("files_affected") // Array of file paths
+  filesChanged  Int  @default(0) @map("files_changed")
+
+  // Impact assessment
+  complexityDelta       Int   @default(0) @map("complexity_delta")
+  lineCountDelta        Int   @default(0) @map("line_count_delta")
+  healthScoreDelta      Float @default(0) @map("health_score_delta")
+  breakingChange        Boolean @default(false) @map("breaking_change")
+  requiresReview        Boolean @default(false) @map("requires_review")
+
+  // Classification
+  changeCategory ChangeCategory @default(MAINTENANCE) @map("change_category")
+  significance   ChangeSignificance @default(MINOR) @map("significance")
+
+  // Description generated by analysis
+  summary     String? @db.Text
+  description String? @db.Text
+  tags        Json    @default("[]") // Array of classification tags
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  capability Capability @relation(fields: [capabilityId], references: [id], onDelete: Cascade)
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@index([capabilityId])
+  @@index([repositoryId])
+  @@index([eventType])
+  @@index([eventDate])
+  @@index([commitSha])
+  @@index([changeCategory])
+  @@index([significance])
+  @@map("capability_evolution")
+}
+
+enum CapabilityHealthStatus {
+  HEALTHY    // Health score >= 70
+  WARNING    // Health score 40-69
+  CRITICAL   // Health score < 40
+  UNKNOWN    // Not enough data
+}
+
+enum HealthTrend {
+  IMPROVING  // Positive trajectory
+  STABLE     // No significant change
+  DECLINING  // Negative trajectory
+  VOLATILE   // Unpredictable changes
+}
+
+enum CapabilityEventType {
+  SYMBOLS_ADDED      // New symbols linked to capability
+  SYMBOLS_MODIFIED   // Existing symbols changed
+  SYMBOLS_REMOVED    // Symbols unlinked or deleted
+  COMPLEXITY_SPIKE   // Sudden complexity increase
+  QUALITY_CHANGE     // Test coverage or quality metrics changed
+  HEALTH_DEGRADATION // Health score dropped significantly
+  HEALTH_IMPROVEMENT // Health score improved significantly
+  BREAKING_CHANGE    // API or interface breaking change detected
+  REFACTORING        // Major restructuring detected
+  BUG_FIX            // Bug fix in capability code
+  FEATURE_ADDITION   // New feature added
+  DEPRECATION        // Capability marked as deprecated
+}
+
+enum ChangeCategory {
+  FEATURE       // New functionality
+  ENHANCEMENT   // Improvement to existing
+  BUG_FIX       // Bug resolution
+  REFACTORING   // Code restructuring
+  PERFORMANCE   // Performance improvement
+  SECURITY      // Security fix or enhancement
+  MAINTENANCE   // General maintenance
+  DOCUMENTATION // Documentation changes
+  TESTING       // Test changes
+  DEPRECATION   // Deprecation or removal
+}
+
+enum ChangeSignificance {
+  TRIVIAL  // Minimal impact
+  MINOR    // Small impact, no review needed
+  MODERATE // Moderate impact, review recommended
+  MAJOR    // Significant impact, review required
+  CRITICAL // Breaking or high-risk change
 }
