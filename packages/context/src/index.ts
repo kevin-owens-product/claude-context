@@ -352,5 +352,16 @@ export {
 // Capability Mapping (Phase 3)
 export { CapabilityMapperService } from './services/capability-mapper.service';
 
+// Background Job Processing
+export {
+  RepoSyncJobService,
+  createRepoSyncJobService,
+  REPO_SYNC_QUEUE,
+  JOB_NAMES,
+  type RepoSyncJobData,
+  type RepoSyncJobResult,
+  type RepoSyncQueueConfig,
+} from './services/repo-sync-job.service';
+
 // Utilities
 export { countTokens, truncateToTokenBudget, chunkText } from './utils/tokens';
