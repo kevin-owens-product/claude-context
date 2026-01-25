@@ -160,6 +160,157 @@ const RollbackEntitySchema = z.object({
   toVersion: z.number().describe('Version to rollback to'),
 });
 
+// ============================================
+// Living Software Platform Schemas
+// ============================================
+
+const AssembleContextSchema = z.object({
+  query: z.string().describe('Natural language query for context assembly'),
+  projectId: z.string().optional().describe('Project ID to focus context on'),
+  maxTokens: z.number().default(4000).describe('Maximum tokens for assembled context'),
+});
+
+const UpdateIdentitySchema = z.object({
+  key: z.string().describe('Attribute key (e.g., "preferred_language", "expertise")'),
+  value: z.string().describe('Attribute value'),
+  category: z.enum(['demographic', 'preference', 'skill', 'goal', 'constraint', 'context']).optional().describe('Attribute category'),
+  confidence: z.number().min(0).max(1).optional().describe('Confidence level (0-1)'),
+});
+
+const AddProjectGoalSchema = z.object({
+  projectId: z.string().describe('Project ID'),
+  description: z.string().describe('Goal description'),
+  priority: z.enum(['critical', 'high', 'medium', 'low']).describe('Goal priority'),
+  parentGoalId: z.string().optional().describe('Parent goal ID for hierarchical goals'),
+  successCriteria: z.array(z.string()).optional().describe('Success criteria for the goal'),
+});
+
+const RecordProjectDecisionSchema = z.object({
+  projectId: z.string().describe('Project ID'),
+  description: z.string().describe('Decision description'),
+  rationale: z.string().describe('Rationale for the decision'),
+  alternatives: z.array(z.string()).optional().describe('Alternatives considered'),
+});
+
+const AddProjectConstraintSchema = z.object({
+  projectId: z.string().describe('Project ID'),
+  description: z.string().describe('Constraint description'),
+  category: z.enum(['technical', 'business', 'regulatory', 'security', 'performance', 'accessibility', 'compatibility', 'budget', 'timeline']).describe('Constraint category'),
+  severity: z.enum(['must', 'should', 'could', 'wont']).describe('Constraint severity (MoSCoW)'),
+  rationale: z.string().optional().describe('Rationale for the constraint'),
+});
+
+const CreateIntentGraphSchema = z.object({
+  projectId: z.string().describe('Project ID'),
+  name: z.string().describe('Intent graph name'),
+  description: z.string().optional().describe('Intent graph description'),
+});
+
+const AddIntentGoalSchema = z.object({
+  graphId: z.string().describe('Intent graph ID'),
+  description: z.string().describe('Goal description'),
+  priority: z.enum(['critical', 'high', 'medium', 'low']).describe('Priority'),
+  successCriteria: z.array(z.string()).optional().describe('Success criteria'),
+  parentId: z.string().optional().describe('Parent goal ID'),
+});
+
+const AddIntentEntitySchema = z.object({
+  graphId: z.string().describe('Intent graph ID'),
+  name: z.string().describe('Entity name'),
+  description: z.string().describe('Entity description'),
+  attributes: z.array(z.object({
+    name: z.string(),
+    type: z.string(),
+    required: z.boolean().default(true),
+    description: z.string().optional(),
+  })).describe('Entity attributes'),
+});
+
+const CreateArtifactSchema = z.object({
+  projectId: z.string().describe('Project ID'),
+  intentGraphId: z.string().optional().describe('Intent graph ID'),
+  name: z.string().describe('Artifact name'),
+  description: z.string().optional().describe('Artifact description'),
+  type: z.enum(['code', 'test', 'documentation', 'schema', 'config', 'api_spec', 'diagram', 'other']).describe('Artifact type'),
+  content: z.string().describe('Artifact content'),
+});
+
+const ProposeArtifactEvolutionSchema = z.object({
+  artifactId: z.string().describe('Artifact ID'),
+  changedIntentNodeIds: z.array(z.string()).describe('Intent node IDs that have changed'),
+});
+
+// ============================================
+// Codebase Observation Schemas
+// ============================================
+
+const ListRepositoriesSchema = z.object({
+  status: z.enum(['PENDING', 'CLONING', 'ACTIVE', 'SYNCING', 'ERROR', 'ARCHIVED']).optional().describe('Filter by status'),
+  provider: z.enum(['GITHUB', 'GITLAB', 'BITBUCKET', 'AZURE_DEVOPS', 'OTHER']).optional().describe('Filter by provider'),
+  search: z.string().optional().describe('Search by name'),
+  limit: z.number().optional().default(20).describe('Maximum results'),
+});
+
+const GetRepositoryFilesSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  path: z.string().optional().describe('Filter by path prefix'),
+  extension: z.string().optional().describe('Filter by file extension'),
+  language: z.string().optional().describe('Filter by language'),
+  limit: z.number().optional().default(100).describe('Maximum results'),
+});
+
+const GetFileDependenciesSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  fileId: z.string().describe('File ID'),
+  depth: z.number().optional().default(3).describe('Maximum depth to traverse'),
+});
+
+const GetRecentChangesSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  branch: z.string().optional().describe('Filter by branch'),
+  author: z.string().optional().describe('Filter by author email'),
+  since: z.string().optional().describe('ISO date - commits after this date'),
+  limit: z.number().optional().default(50).describe('Maximum commits'),
+});
+
+const AnalyzeHotspotsSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  days: z.number().optional().default(30).describe('Analysis period in days'),
+});
+
+const SyncRepositorySchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+});
+
+const CreateRepositorySchema = z.object({
+  name: z.string().describe('Repository name'),
+  url: z.string().describe('Git clone URL'),
+  description: z.string().optional().describe('Repository description'),
+  provider: z.enum(['GITHUB', 'GITLAB', 'BITBUCKET', 'AZURE_DEVOPS', 'OTHER']).optional().describe('Git provider'),
+  defaultBranch: z.string().optional().default('main').describe('Default branch name'),
+  authType: z.enum(['NONE', 'PAT', 'SSH_KEY', 'GITHUB_APP']).optional().describe('Auth type'),
+  authToken: z.string().optional().describe('Auth token (if PAT)'),
+});
+
+const SearchCodeSymbolsSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  query: z.string().describe('Symbol name or pattern to search'),
+  symbolType: z.enum(['function', 'class', 'interface', 'variable', 'type']).optional().describe('Filter by symbol type'),
+  limit: z.number().optional().default(20).describe('Maximum results'),
+});
+
+const GetCapabilityCodeSchema = z.object({
+  capabilityId: z.string().describe('Capability ID'),
+  includeTests: z.boolean().optional().default(true).describe('Include test files'),
+});
+
+const GetCallGraphSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  fileId: z.string().describe('File ID'),
+  direction: z.enum(['callers', 'callees', 'both']).optional().default('both').describe('Graph direction'),
+  depth: z.number().optional().default(2).describe('Maximum depth'),
+});
+
 // Server configuration
 interface ServerConfig {
   apiBaseUrl: string;
@@ -219,6 +370,38 @@ export function createMcpServer(config: ServerConfig) {
   server.setRequestHandler(ListResourcesRequestSchema, async () => {
     return {
       resources: [
+        // Living Software Platform Resources
+        {
+          uri: `claude_context://identity`,
+          name: 'Identity Graph',
+          description: 'User identity attributes and preferences for personalized context',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `claude_context://projects`,
+          name: 'Projects',
+          description: 'Active projects with goals, constraints, and decisions',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `claude_context://intent-graphs`,
+          name: 'Intent Graphs',
+          description: 'Intent graphs capturing goals, entities, and behaviors',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `claude_context://artifacts`,
+          name: 'Living Artifacts',
+          description: 'Code and documentation artifacts with intent provenance',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `claude_context://assembly`,
+          name: 'Assembled Context',
+          description: 'Pre-assembled context optimized for Claude injection',
+          mimeType: 'application/xml',
+        },
+        // Legacy Resources
         {
           uri: `context://graphs`,
           name: 'Context Graphs',
@@ -247,6 +430,37 @@ export function createMcpServer(config: ServerConfig) {
           uri: `context://subscriptions`,
           name: 'Active Subscriptions',
           description: 'List of active context subscriptions',
+          mimeType: 'application/json',
+        },
+        // Codebase Observation Resources
+        {
+          uri: `codebase://repositories`,
+          name: 'Code Repositories',
+          description: 'Tracked git repositories with file and dependency information',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `codebase://repositories/{id}/structure`,
+          name: 'Repository Structure',
+          description: 'File tree and directory structure of a repository',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `codebase://repositories/{id}/dependencies`,
+          name: 'Repository Dependencies',
+          description: 'Import graph and external dependencies of a repository',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `codebase://repositories/{id}/activity`,
+          name: 'Repository Activity',
+          description: 'Recent commits and change activity in a repository',
+          mimeType: 'application/json',
+        },
+        {
+          uri: `codebase://repositories/{id}/hotspots`,
+          name: 'Repository Hotspots',
+          description: 'High-churn files that may need attention',
           mimeType: 'application/json',
         },
       ],
@@ -366,6 +580,239 @@ export function createMcpServer(config: ServerConfig) {
             uri,
             mimeType: 'application/json',
             text: JSON.stringify(subscriptions, null, 2),
+          },
+        ],
+      };
+    }
+
+    // Living Software Platform Resources
+    if (uri === 'claude_context://identity') {
+      const identity = await apiCall<{
+        contextId: string;
+        attributes: Array<{
+          key: string;
+          value: string;
+          category: string;
+          confidence: number;
+          source: string;
+        }>;
+      }>('GET', `/api/v1/context/identity`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(identity, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === 'claude_context://projects') {
+      const projects = await apiCall<{
+        projects: Array<{
+          id: string;
+          name: string;
+          description: string;
+          status: string;
+          goals: unknown[];
+          constraints: unknown[];
+        }>;
+        total: number;
+      }>('GET', `/api/v1/context/projects`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(projects, null, 2),
+          },
+        ],
+      };
+    }
+
+    const projectMatch = uri.match(/^claude_context:\/\/projects\/([^/]+)$/);
+    if (projectMatch) {
+      const projectId = projectMatch[1];
+      const project = await apiCall<unknown>('GET', `/api/v1/context/projects/${projectId}`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(project, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === 'claude_context://intent-graphs') {
+      const graphs = await apiCall<{
+        graphs: Array<{
+          id: string;
+          name: string;
+          status: string;
+          goals: unknown[];
+          entities: unknown[];
+          behaviors: unknown[];
+        }>;
+        total: number;
+      }>('GET', `/api/v1/intent-graphs`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(graphs, null, 2),
+          },
+        ],
+      };
+    }
+
+    const intentGraphMatch = uri.match(/^claude_context:\/\/intent-graphs\/([^/]+)$/);
+    if (intentGraphMatch) {
+      const graphId = intentGraphMatch[1];
+      const graph = await apiCall<unknown>('GET', `/api/v1/intent-graphs/${graphId}`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(graph, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === 'claude_context://artifacts') {
+      const artifacts = await apiCall<{
+        artifacts: Array<{
+          id: string;
+          name: string;
+          type: string;
+          status: string;
+          currentVersion: number;
+        }>;
+        total: number;
+      }>('GET', `/api/v1/artifacts`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(artifacts, null, 2),
+          },
+        ],
+      };
+    }
+
+    const artifactMatch = uri.match(/^claude_context:\/\/artifacts\/([^/]+)$/);
+    if (artifactMatch) {
+      const artifactId = artifactMatch[1];
+      const artifact = await apiCall<unknown>('GET', `/api/v1/artifacts/${artifactId}`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(artifact, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === 'claude_context://assembly') {
+      const assembled = await apiCall<{
+        context: string;
+        sources: Array<{ id: string; type: string; name: string; relevanceScore: number }>;
+        tokenBudget: { total: { used: number; allocated: number } };
+      }>('POST', `/api/v1/context/assembly`, {
+        query: 'general context',
+        maxTokens: 4000,
+      });
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/xml',
+            text: assembled.context,
+          },
+        ],
+      };
+    }
+
+    // ============================================
+    // Codebase Observation Resources
+    // ============================================
+
+    if (uri === 'codebase://repositories') {
+      const repositories = await apiCall<unknown[]>('GET', `/api/v1/repositories`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(repositories, null, 2),
+          },
+        ],
+      };
+    }
+
+    const repoStructureMatch = uri.match(/^codebase:\/\/repositories\/([^/]+)\/structure$/);
+    if (repoStructureMatch) {
+      const repoId = repoStructureMatch[1];
+      const files = await apiCall<unknown[]>('GET', `/api/v1/repositories/${repoId}/files?limit=500`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(files, null, 2),
+          },
+        ],
+      };
+    }
+
+    const repoDepsMatch = uri.match(/^codebase:\/\/repositories\/([^/]+)\/dependencies$/);
+    if (repoDepsMatch) {
+      const repoId = repoDepsMatch[1];
+      const stats = await apiCall<unknown>('GET', `/api/v1/repositories/${repoId}/stats`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(stats, null, 2),
+          },
+        ],
+      };
+    }
+
+    const repoActivityMatch = uri.match(/^codebase:\/\/repositories\/([^/]+)\/activity$/);
+    if (repoActivityMatch) {
+      const repoId = repoActivityMatch[1];
+      const activity = await apiCall<unknown[]>('GET', `/api/v1/repositories/${repoId}/activity?days=30`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(activity, null, 2),
+          },
+        ],
+      };
+    }
+
+    const repoHotspotsMatch = uri.match(/^codebase:\/\/repositories\/([^/]+)\/hotspots$/);
+    if (repoHotspotsMatch) {
+      const repoId = repoHotspotsMatch[1];
+      const hotspots = await apiCall<unknown[]>('GET', `/api/v1/repositories/${repoId}/hotspots?days=30`);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(hotspots, null, 2),
           },
         ],
       };
@@ -788,6 +1235,346 @@ export function createMcpServer(config: ServerConfig) {
               subscriptionId: { type: 'string', description: 'ID of the subscription to remove' },
             },
             required: ['subscriptionId'],
+          },
+        },
+        // ============================================
+        // Living Software Platform Tools
+        // ============================================
+        {
+          name: 'assemble_context',
+          description:
+            'Assemble optimized context for Claude injection with semantic search, relevance scoring, and token budgets.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              query: { type: 'string', description: 'Natural language query for context assembly' },
+              projectId: { type: 'string', description: 'Project ID to focus context on' },
+              maxTokens: { type: 'number', description: 'Maximum tokens for assembled context (default: 4000)' },
+            },
+            required: ['query'],
+          },
+        },
+        {
+          name: 'update_identity',
+          description:
+            'Update or create an identity attribute. Identity attributes personalize context and AI behavior.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              key: { type: 'string', description: 'Attribute key (e.g., "preferred_language", "expertise")' },
+              value: { type: 'string', description: 'Attribute value' },
+              category: {
+                type: 'string',
+                enum: ['demographic', 'preference', 'skill', 'goal', 'constraint', 'context'],
+                description: 'Attribute category',
+              },
+              confidence: { type: 'number', description: 'Confidence level (0-1)' },
+            },
+            required: ['key', 'value'],
+          },
+        },
+        {
+          name: 'add_project_goal',
+          description:
+            'Add a goal to a project. Goals define what the project should accomplish.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              projectId: { type: 'string', description: 'Project ID' },
+              description: { type: 'string', description: 'Goal description' },
+              priority: { type: 'string', enum: ['critical', 'high', 'medium', 'low'], description: 'Goal priority' },
+              parentGoalId: { type: 'string', description: 'Parent goal ID for hierarchical goals' },
+              successCriteria: { type: 'array', items: { type: 'string' }, description: 'Success criteria' },
+            },
+            required: ['projectId', 'description', 'priority'],
+          },
+        },
+        {
+          name: 'record_decision',
+          description:
+            'Record a project decision with rationale and alternatives considered.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              projectId: { type: 'string', description: 'Project ID' },
+              description: { type: 'string', description: 'Decision description' },
+              rationale: { type: 'string', description: 'Rationale for the decision' },
+              alternatives: { type: 'array', items: { type: 'string' }, description: 'Alternatives considered' },
+            },
+            required: ['projectId', 'description', 'rationale'],
+          },
+        },
+        {
+          name: 'add_project_constraint',
+          description:
+            'Add a constraint to a project using MoSCoW prioritization.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              projectId: { type: 'string', description: 'Project ID' },
+              description: { type: 'string', description: 'Constraint description' },
+              category: {
+                type: 'string',
+                enum: ['technical', 'business', 'regulatory', 'security', 'performance', 'accessibility', 'compatibility', 'budget', 'timeline'],
+                description: 'Constraint category',
+              },
+              severity: { type: 'string', enum: ['must', 'should', 'could', 'wont'], description: 'MoSCoW severity' },
+              rationale: { type: 'string', description: 'Rationale for the constraint' },
+            },
+            required: ['projectId', 'description', 'category', 'severity'],
+          },
+        },
+        {
+          name: 'create_intent_graph',
+          description:
+            'Create an intent graph to capture goals, constraints, entities, and behaviors for a project.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              projectId: { type: 'string', description: 'Project ID' },
+              name: { type: 'string', description: 'Intent graph name' },
+              description: { type: 'string', description: 'Intent graph description' },
+            },
+            required: ['projectId', 'name'],
+          },
+        },
+        {
+          name: 'add_intent_goal',
+          description:
+            'Add a goal to an intent graph with success criteria.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              graphId: { type: 'string', description: 'Intent graph ID' },
+              description: { type: 'string', description: 'Goal description' },
+              priority: { type: 'string', enum: ['critical', 'high', 'medium', 'low'], description: 'Priority' },
+              successCriteria: { type: 'array', items: { type: 'string' }, description: 'Success criteria' },
+              parentId: { type: 'string', description: 'Parent goal ID' },
+            },
+            required: ['graphId', 'description', 'priority'],
+          },
+        },
+        {
+          name: 'add_intent_entity',
+          description:
+            'Add an entity to an intent graph with attributes and relationships.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              graphId: { type: 'string', description: 'Intent graph ID' },
+              name: { type: 'string', description: 'Entity name' },
+              description: { type: 'string', description: 'Entity description' },
+              attributes: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    type: { type: 'string' },
+                    required: { type: 'boolean' },
+                    description: { type: 'string' },
+                  },
+                  required: ['name', 'type'],
+                },
+                description: 'Entity attributes',
+              },
+            },
+            required: ['graphId', 'name', 'description', 'attributes'],
+          },
+        },
+        {
+          name: 'create_artifact',
+          description:
+            'Create a living artifact with intent provenance tracking.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              projectId: { type: 'string', description: 'Project ID' },
+              intentGraphId: { type: 'string', description: 'Intent graph ID for provenance' },
+              name: { type: 'string', description: 'Artifact name' },
+              description: { type: 'string', description: 'Artifact description' },
+              type: {
+                type: 'string',
+                enum: ['code', 'test', 'documentation', 'schema', 'config', 'api_spec', 'diagram', 'other'],
+                description: 'Artifact type',
+              },
+              content: { type: 'string', description: 'Artifact content' },
+            },
+            required: ['projectId', 'name', 'type', 'content'],
+          },
+        },
+        {
+          name: 'propose_artifact_evolution',
+          description:
+            'Propose artifact updates based on changes to linked intent nodes.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              artifactId: { type: 'string', description: 'Artifact ID' },
+              changedIntentNodeIds: { type: 'array', items: { type: 'string' }, description: 'Changed intent node IDs' },
+            },
+            required: ['artifactId', 'changedIntentNodeIds'],
+          },
+        },
+        // ============================================
+        // Codebase Observation Tools
+        // ============================================
+        {
+          name: 'list_repositories',
+          description:
+            'List tracked code repositories with their status, file counts, and language breakdown.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['PENDING', 'CLONING', 'ACTIVE', 'SYNCING', 'ERROR', 'ARCHIVED'], description: 'Filter by status' },
+              provider: { type: 'string', enum: ['GITHUB', 'GITLAB', 'BITBUCKET', 'AZURE_DEVOPS', 'OTHER'], description: 'Filter by provider' },
+              search: { type: 'string', description: 'Search by repository name' },
+              limit: { type: 'number', description: 'Maximum results (default: 20)' },
+            },
+          },
+        },
+        {
+          name: 'create_repository',
+          description:
+            'Add a git repository to track. Once created, use sync_repository to clone and index files.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              name: { type: 'string', description: 'Repository name' },
+              url: { type: 'string', description: 'Git clone URL' },
+              description: { type: 'string', description: 'Repository description' },
+              provider: { type: 'string', enum: ['GITHUB', 'GITLAB', 'BITBUCKET', 'AZURE_DEVOPS', 'OTHER'], description: 'Git provider' },
+              defaultBranch: { type: 'string', description: 'Default branch name (default: main)' },
+              authType: { type: 'string', enum: ['NONE', 'PAT', 'SSH_KEY', 'GITHUB_APP'], description: 'Authentication type' },
+              authToken: { type: 'string', description: 'Authentication token (for PAT auth)' },
+            },
+            required: ['name', 'url'],
+          },
+        },
+        {
+          name: 'get_repository_files',
+          description:
+            'List files in a repository with optional filtering by path, extension, or language.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              path: { type: 'string', description: 'Filter by path prefix (e.g., "src/components")' },
+              extension: { type: 'string', description: 'Filter by file extension (e.g., "ts", "tsx")' },
+              language: { type: 'string', description: 'Filter by language (e.g., "typescript")' },
+              limit: { type: 'number', description: 'Maximum results (default: 100)' },
+            },
+            required: ['repoId'],
+          },
+        },
+        {
+          name: 'get_file_dependencies',
+          description:
+            'Get the import/dependency graph for a file, showing what it imports and what imports it.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              fileId: { type: 'string', description: 'File ID' },
+              depth: { type: 'number', description: 'Maximum depth to traverse (default: 3)' },
+            },
+            required: ['repoId', 'fileId'],
+          },
+        },
+        {
+          name: 'get_recent_changes',
+          description:
+            'Get recent commits and changes in a repository.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              branch: { type: 'string', description: 'Filter by branch name' },
+              author: { type: 'string', description: 'Filter by author email' },
+              since: { type: 'string', description: 'ISO date - get commits after this date' },
+              limit: { type: 'number', description: 'Maximum commits (default: 50)' },
+            },
+            required: ['repoId'],
+          },
+        },
+        {
+          name: 'analyze_hotspots',
+          description:
+            'Identify high-churn files (hotspots) that may need attention due to frequent changes.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              days: { type: 'number', description: 'Analysis period in days (default: 30)' },
+            },
+            required: ['repoId'],
+          },
+        },
+        {
+          name: 'sync_repository',
+          description:
+            'Sync a repository with its remote, fetching new commits and updating file tracking.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+            },
+            required: ['repoId'],
+          },
+        },
+        {
+          name: 'get_repository_stats',
+          description:
+            'Get statistics for a repository including file counts, line counts, and language breakdown.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+            },
+            required: ['repoId'],
+          },
+        },
+        {
+          name: 'search_code_symbols',
+          description:
+            'Search for code symbols (functions, classes, interfaces) by name or pattern.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              query: { type: 'string', description: 'Symbol name or pattern to search' },
+              symbolType: { type: 'string', enum: ['function', 'class', 'interface', 'variable', 'type'], description: 'Filter by symbol type' },
+              limit: { type: 'number', description: 'Maximum results (default: 20)' },
+            },
+            required: ['repoId', 'query'],
+          },
+        },
+        {
+          name: 'get_capability_code',
+          description:
+            'Get code files associated with a business capability, including implementation and tests.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              capabilityId: { type: 'string', description: 'Capability ID' },
+              includeTests: { type: 'boolean', description: 'Include test files (default: true)' },
+            },
+            required: ['capabilityId'],
+          },
+        },
+        {
+          name: 'get_call_graph',
+          description:
+            'Get the call graph for a file showing function calls and dependencies.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              fileId: { type: 'string', description: 'File ID' },
+              direction: { type: 'string', enum: ['callers', 'callees', 'both'], description: 'Graph direction (default: both)' },
+              depth: { type: 'number', description: 'Maximum depth (default: 2)' },
+            },
+            required: ['repoId', 'fileId'],
           },
         },
       ],
@@ -1508,6 +2295,467 @@ ${contextResponse.text.substring(0, 300)}...
             {
               type: 'text',
               text: `Document template for ${input.outputPath}:\n\n${template}`,
+            },
+          ],
+        };
+      }
+
+      // ============================================
+      // Living Software Platform Tools
+      // ============================================
+
+      case 'assemble_context': {
+        const input = AssembleContextSchema.parse(args);
+
+        const assembled = await apiCall<{
+          context: string;
+          sources: Array<{ id: string; type: string; name: string; relevanceScore: number }>;
+          relevanceScores: Array<{ nodeId: string; totalScore: number }>;
+          tokenBudget: { total: { used: number; allocated: number } };
+        }>('POST', `/api/v1/context/assembly`, {
+          query: input.query,
+          projectId: input.projectId,
+          maxTokens: input.maxTokens,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Assembled context (${assembled.tokenBudget.total.used}/${assembled.tokenBudget.total.allocated} tokens):\n\n` +
+                `Sources: ${assembled.sources.map(s => `${s.name} (${Math.round(s.relevanceScore * 100)}%)`).join(', ')}\n\n` +
+                assembled.context,
+            },
+          ],
+        };
+      }
+
+      case 'update_identity': {
+        const input = UpdateIdentitySchema.parse(args);
+
+        const attribute = await apiCall<{
+          key: string;
+          value: string;
+          category: string;
+          confidence: number;
+        }>('PUT', `/api/v1/context/identity/attributes/${input.key}`, {
+          value: input.value,
+          category: input.category || 'preference',
+          confidence: input.confidence || 0.8,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Identity attribute updated:\n\nKey: ${attribute.key}\nValue: ${attribute.value}\nCategory: ${attribute.category}\nConfidence: ${Math.round(attribute.confidence * 100)}%`,
+            },
+          ],
+        };
+      }
+
+      case 'add_project_goal': {
+        const input = AddProjectGoalSchema.parse(args);
+
+        const goal = await apiCall<{
+          id: string;
+          description: string;
+          priority: string;
+          status: string;
+        }>('POST', `/api/v1/context/projects/${input.projectId}/goals`, {
+          description: input.description,
+          priority: input.priority,
+          parentGoalId: input.parentGoalId,
+          successCriteria: input.successCriteria,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Goal added to project:\n\nID: ${goal.id}\nDescription: ${goal.description}\nPriority: ${goal.priority}\nStatus: ${goal.status}`,
+            },
+          ],
+        };
+      }
+
+      case 'record_decision': {
+        const input = RecordProjectDecisionSchema.parse(args);
+
+        const decision = await apiCall<{
+          id: string;
+          description: string;
+          rationale: string;
+          madeAt: string;
+        }>('POST', `/api/v1/context/projects/${input.projectId}/decisions`, {
+          description: input.description,
+          rationale: input.rationale,
+          alternatives: input.alternatives,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Decision recorded:\n\nID: ${decision.id}\nDescription: ${decision.description}\nRationale: ${decision.rationale}\nMade at: ${decision.madeAt}`,
+            },
+          ],
+        };
+      }
+
+      case 'add_project_constraint': {
+        const input = AddProjectConstraintSchema.parse(args);
+
+        const constraint = await apiCall<{
+          id: string;
+          description: string;
+          category: string;
+          severity: string;
+        }>('POST', `/api/v1/context/projects/${input.projectId}/constraints`, {
+          description: input.description,
+          category: input.category,
+          severity: input.severity,
+          rationale: input.rationale,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Constraint added:\n\nID: ${constraint.id}\nDescription: ${constraint.description}\nCategory: ${constraint.category}\nSeverity: ${constraint.severity}`,
+            },
+          ],
+        };
+      }
+
+      case 'create_intent_graph': {
+        const input = CreateIntentGraphSchema.parse(args);
+
+        const graph = await apiCall<{
+          id: string;
+          name: string;
+          status: string;
+          version: number;
+        }>('POST', `/api/v1/intent-graphs`, {
+          projectId: input.projectId,
+          name: input.name,
+          description: input.description,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Intent graph created:\n\nID: ${graph.id}\nName: ${graph.name}\nStatus: ${graph.status}\nVersion: ${graph.version}`,
+            },
+          ],
+        };
+      }
+
+      case 'add_intent_goal': {
+        const input = AddIntentGoalSchema.parse(args);
+
+        const goal = await apiCall<{
+          id: string;
+          description: string;
+          priority: string;
+        }>('POST', `/api/v1/intent-graphs/${input.graphId}/goals`, {
+          description: input.description,
+          priority: input.priority,
+          successCriteria: input.successCriteria,
+          parentId: input.parentId,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Intent goal added:\n\nID: ${goal.id}\nDescription: ${goal.description}\nPriority: ${goal.priority}`,
+            },
+          ],
+        };
+      }
+
+      case 'add_intent_entity': {
+        const input = AddIntentEntitySchema.parse(args);
+
+        const entity = await apiCall<{
+          id: string;
+          name: string;
+          description: string;
+          attributes: Array<{ name: string; type: string }>;
+        }>('POST', `/api/v1/intent-graphs/${input.graphId}/entities`, {
+          name: input.name,
+          description: input.description,
+          attributes: input.attributes,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Intent entity added:\n\nID: ${entity.id}\nName: ${entity.name}\nDescription: ${entity.description}\nAttributes: ${entity.attributes.map(a => `${a.name}: ${a.type}`).join(', ')}`,
+            },
+          ],
+        };
+      }
+
+      case 'create_artifact': {
+        const input = CreateArtifactSchema.parse(args);
+
+        const artifact = await apiCall<{
+          id: string;
+          name: string;
+          type: string;
+          status: string;
+          currentVersion: number;
+        }>('POST', `/api/v1/artifacts`, {
+          projectId: input.projectId,
+          intentGraphId: input.intentGraphId,
+          name: input.name,
+          description: input.description,
+          type: input.type,
+          content: input.content,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Artifact created:\n\nID: ${artifact.id}\nName: ${artifact.name}\nType: ${artifact.type}\nStatus: ${artifact.status}\nVersion: ${artifact.currentVersion}`,
+            },
+          ],
+        };
+      }
+
+      case 'propose_artifact_evolution': {
+        const input = ProposeArtifactEvolutionSchema.parse(args);
+
+        const proposal = await apiCall<{
+          artifactId: string;
+          changedIntentNodes: string[];
+          proposedChanges: string;
+          impactAnalysis: string;
+        } | { message: string }>('POST', `/api/v1/artifacts/${input.artifactId}/propose-evolution`, {
+          changedIntentNodeIds: input.changedIntentNodeIds,
+        });
+
+        if ('message' in proposal) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: proposal.message,
+              },
+            ],
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Evolution proposal for artifact ${proposal.artifactId}:\n\n` +
+                `Changed Intent Nodes: ${proposal.changedIntentNodes.join(', ')}\n\n` +
+                `Proposed Changes:\n${proposal.proposedChanges}\n\n` +
+                `Impact Analysis:\n${proposal.impactAnalysis}`,
+            },
+          ],
+        };
+      }
+
+      // ============================================
+      // Codebase Observation Tool Handlers
+      // ============================================
+
+      case 'list_repositories': {
+        const input = ListRepositoriesSchema.parse(args);
+        const params = new URLSearchParams();
+        if (input.status) params.append('status', input.status);
+        if (input.provider) params.append('provider', input.provider);
+        if (input.search) params.append('search', input.search);
+        if (input.limit) params.append('limit', input.limit.toString());
+
+        const repos = await apiCall<unknown>('GET', `/api/v1/repositories?${params.toString()}`);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(repos, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'create_repository': {
+        const input = CreateRepositorySchema.parse(args);
+        const repo = await apiCall<unknown>('POST', `/api/v1/repositories`, {
+          name: input.name,
+          url: input.url,
+          description: input.description,
+          provider: input.provider,
+          defaultBranch: input.defaultBranch,
+          authType: input.authType,
+          authConfig: input.authToken ? { token: input.authToken } : undefined,
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Repository created: ${JSON.stringify(repo, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case 'get_repository_files': {
+        const input = GetRepositoryFilesSchema.parse(args);
+        const params = new URLSearchParams();
+        if (input.path) params.append('path', input.path);
+        if (input.extension) params.append('extension', input.extension);
+        if (input.language) params.append('language', input.language);
+        if (input.limit) params.append('limit', input.limit.toString());
+
+        const files = await apiCall<unknown>('GET', `/api/v1/repositories/${input.repoId}/files?${params.toString()}`);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(files, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_file_dependencies': {
+        const input = GetFileDependenciesSchema.parse(args);
+        const deps = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/files/${input.fileId}/dependencies?depth=${input.depth || 3}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(deps, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_recent_changes': {
+        const input = GetRecentChangesSchema.parse(args);
+        const params = new URLSearchParams();
+        if (input.branch) params.append('branch', input.branch);
+        if (input.author) params.append('author', input.author);
+        if (input.since) params.append('since', input.since);
+        if (input.limit) params.append('limit', input.limit.toString());
+
+        const commits = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/commits?${params.toString()}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(commits, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'analyze_hotspots': {
+        const input = AnalyzeHotspotsSchema.parse(args);
+        const hotspots = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/hotspots?days=${input.days || 30}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(hotspots, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'sync_repository': {
+        const input = SyncRepositorySchema.parse(args);
+        const job = await apiCall<unknown>('POST', `/api/v1/repositories/${input.repoId}/sync`);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Sync started: ${JSON.stringify(job, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      case 'get_repository_stats': {
+        const input = z.object({ repoId: z.string() }).parse(args);
+        const stats = await apiCall<unknown>('GET', `/api/v1/repositories/${input.repoId}/stats`);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(stats, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'search_code_symbols': {
+        const input = SearchCodeSymbolsSchema.parse(args);
+        const params = new URLSearchParams();
+        params.append('query', input.query);
+        if (input.symbolType) params.append('symbolType', input.symbolType);
+        if (input.limit) params.append('limit', input.limit.toString());
+
+        // Note: This endpoint would need to be implemented for full symbol search
+        // For now, we search files by name pattern as a basic implementation
+        const files = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/files?path=${encodeURIComponent(input.query)}&limit=${input.limit || 20}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(files, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_capability_code': {
+        const input = GetCapabilityCodeSchema.parse(args);
+        // This would link capabilities to code files via SymbolCapabilityLink
+        // For now, return a placeholder
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Capability code mapping not yet implemented. Capability: ${input.capabilityId}`,
+            },
+          ],
+        };
+      }
+
+      case 'get_call_graph': {
+        const input = GetCallGraphSchema.parse(args);
+        // This would need symbol analysis (Phase 2) to work fully
+        const deps = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/files/${input.fileId}/dependencies?depth=${input.depth || 2}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(deps, null, 2),
             },
           ],
         };
