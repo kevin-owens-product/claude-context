@@ -25,3 +25,11 @@ export { ReleasesView } from './ReleasesView';
 
 // Workflow Automation Views
 export { AutomationView } from './AutomationView';
+
+// Code Intelligence Views
+export { RepositoriesView } from './RepositoriesView';
+export { FileExplorerView } from './FileExplorerView';
+export { SymbolSearchView } from './SymbolSearchView';
+export { CallGraphView } from './CallGraphView';
+export { HotspotsView } from './HotspotsView';
+export { CodeHealthView } from './CodeHealthView';

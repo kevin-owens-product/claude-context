@@ -55,3 +55,47 @@ export {
 
 // Workflow Automation API
 export * from './workflows';
+
+// Code Intelligence APIs
+export {
+  // Types
+  type RepoStatus,
+  type FileType,
+  type ImportType,
+  type FileChangeType,
+  type Repository,
+  type CodeBranch,
+  type CodeFile,
+  type FileImport,
+  type CodeCommit,
+  type FileChange,
+  type Hotspot,
+  type DependencyNode as RepoDependencyNode,
+  type DependencyEdge,
+  type RepositorySummary,
+  type SyncProgress,
+  // Functions
+  createRepository,
+  listRepositories,
+  getRepository,
+  updateRepository,
+  deleteRepository,
+  syncRepository,
+  getSyncProgress,
+  getRepositorySummary,
+  listBranches,
+  getBranch,
+  listFiles,
+  getFile,
+  getFileContent,
+  getFileDependencies,
+  getFileImports,
+  listCommits,
+  getCommit,
+  getHotspots,
+  getLanguageStats,
+  getActivityStats,
+  getContributorStats,
+} from './repositories';
+export * from './symbols';
+export * from './codeHealth';

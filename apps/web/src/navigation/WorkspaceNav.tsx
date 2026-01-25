@@ -26,6 +26,13 @@ import {
   LayoutDashboard,
   HelpCircle,
   Zap,
+  // Code Intelligence icons
+  GitBranch,
+  FileCode,
+  Code,
+  GitGraph,
+  Flame,
+  HeartPulse,
 } from 'lucide-react';
 import { useWorkspace, type ViewType } from '../contexts';
 import { SystemPulse } from '../components/pulse';
@@ -52,6 +59,15 @@ const businessTools = [
   { id: 'outcomes', label: 'OKRs', icon: Target },
   { id: 'releases', label: 'Releases', icon: Rocket },
   { id: 'automation', label: 'Automations', icon: Zap },
+];
+
+const codeIntelligence = [
+  { id: 'repositories', label: 'Repositories', icon: GitBranch, color: 'text-blue-400' },
+  { id: 'file-explorer', label: 'File Explorer', icon: FileCode, color: 'text-green-400' },
+  { id: 'symbol-search', label: 'Symbol Search', icon: Code, color: 'text-purple-400' },
+  { id: 'call-graph', label: 'Call Graph', icon: GitGraph, color: 'text-cyan-400' },
+  { id: 'hotspots', label: 'Hotspots', icon: Flame, color: 'text-orange-400' },
+  { id: 'code-health', label: 'Code Health', icon: HeartPulse, color: 'text-red-400' },
 ];
 
 export function WorkspaceNav({
@@ -229,6 +245,45 @@ export function WorkspaceNav({
                 >
                   <tool.icon className="w-4 h-4" />
                   <span className="flex-1 text-left">{tool.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Code Intelligence */}
+        <div className="px-3 py-2 border-t border-claude-neutral-800/50">
+          <button
+            onClick={() => toggleSection('code')}
+            className="w-full flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-claude-neutral-400 uppercase tracking-wider hover:text-claude-neutral-300 rounded transition-colors"
+          >
+            {expandedSections.has('code') ? (
+              <ChevronDown className="w-3 h-3" />
+            ) : (
+              <ChevronRight className="w-3 h-3" />
+            )}
+            <Code className="w-3 h-3 text-blue-400" />
+            <span>Code Intelligence</span>
+          </button>
+
+          {expandedSections.has('code') && (
+            <div className="mt-1 space-y-0.5">
+              {codeIntelligence.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => setCurrentView(item.id as ViewType)}
+                  className={clsx(
+                    'w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-all',
+                    currentView === item.id
+                      ? 'bg-claude-primary-500/20 text-claude-primary-400 border border-claude-primary-500/30'
+                      : 'text-claude-neutral-400 hover:text-claude-neutral-100 hover:bg-claude-neutral-800/50 border border-transparent'
+                  )}
+                >
+                  <item.icon className={clsx(
+                    'w-4 h-4',
+                    currentView === item.id ? 'text-claude-primary-400' : item.color
+                  )} />
+                  <span className="flex-1 text-left">{item.label}</span>
                 </button>
               ))}
             </div>

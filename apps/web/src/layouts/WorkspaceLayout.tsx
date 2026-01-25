@@ -51,6 +51,13 @@ import {
   SolutionsView,
   ReleasesView,
   AutomationView,
+  // Code Intelligence Views
+  RepositoriesView,
+  FileExplorerView,
+  SymbolSearchView,
+  CallGraphView,
+  HotspotsView,
+  CodeHealthView,
 } from '../views';
 import { ClaudeAssistant } from '../components/claude';
 import { DetailPanel } from '../components/detail';
@@ -293,6 +300,19 @@ export function WorkspaceLayout({
         return <ReleasesView tenantId="demo-tenant" />;
       case 'automation':
         return <AutomationView tenantId="demo-tenant" />;
+      // Code Intelligence Views
+      case 'repositories':
+        return <RepositoriesView />;
+      case 'file-explorer':
+        return <FileExplorerView />;
+      case 'symbol-search':
+        return <SymbolSearchView />;
+      case 'call-graph':
+        return <CallGraphView />;
+      case 'hotspots':
+        return <HotspotsView />;
+      case 'code-health':
+        return <CodeHealthView />;
       default:
         return null;
     }

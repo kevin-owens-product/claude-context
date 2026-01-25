@@ -18,7 +18,9 @@ export type ViewType =
   | 'dashboard' | 'board' | 'list' | 'timeline' | 'canvas' | 'gallery' | 'document'
   | 'intents' | 'signals' | 'capabilities' | 'experiments'
   | 'customer-intelligence' | 'customers' | 'feedback' | 'roadmap' | 'sales' | 'outcomes' | 'solutions' | 'releases'
-  | 'automation';
+  | 'automation'
+  // Code Intelligence Views
+  | 'repositories' | 'file-explorer' | 'symbol-search' | 'call-graph' | 'hotspots' | 'code-health';
 export type DetailType = 'project' | 'intent' | 'slice' | 'context' | 'artifact' | null;
 export type AssistantMode = 'chat' | 'code' | 'review' | 'plan';
 
