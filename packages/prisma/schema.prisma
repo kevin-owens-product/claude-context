@@ -29,12 +29,12 @@ model Tenant {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  users          User[]
-  workspaces     Workspace[]
-  contextGraphs  ContextGraph[]
-  slices         Slice[]
-  aiSessions     AISession[]
-  integrations   Integration[]
+  users         User[]
+  workspaces    Workspace[]
+  contextGraphs ContextGraph[]
+  slices        Slice[]
+  aiSessions    AISession[]
+  integrations  Integration[]
 
   @@map("tenants")
 }
@@ -58,20 +58,20 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Auth fields
-  passwordHash String?  @map("password_hash") @db.VarChar(255)
-  mfaEnabled   Boolean  @default(false) @map("mfa_enabled")
-  mfaSecret    String?  @map("mfa_secret") @db.VarChar(255)
+  passwordHash String? @map("password_hash") @db.VarChar(255)
+  mfaEnabled   Boolean @default(false) @map("mfa_enabled")
+  mfaSecret    String? @map("mfa_secret") @db.VarChar(255)
 
   // Relations
-  tenant               Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  workspaceMembers     WorkspaceMember[]
-  createdSlices        Slice[]            @relation("SliceCreator")
-  ownedSlices          Slice[]            @relation("SliceOwner")
-  sliceReviews         SliceReview[]
-  aiSessions           AISession[]
-  sessionFeedback      SessionFeedback[]
-  createdContextNodes  ContextNode[]
-  apiKeys              ApiKey[]
+  tenant              Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workspaceMembers    WorkspaceMember[]
+  createdSlices       Slice[]           @relation("SliceCreator")
+  ownedSlices         Slice[]           @relation("SliceOwner")
+  sliceReviews        SliceReview[]
+  aiSessions          AISession[]
+  sessionFeedback     SessionFeedback[]
+  createdContextNodes ContextNode[]
+  apiKeys             ApiKey[]
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -149,14 +149,14 @@ model ContextGraph {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Version tracking
-  version       Int      @default(1)
-  globalVersion BigInt   @default(0) @map("global_version")
-  createdById   String?  @map("created_by_id") @db.Uuid
-  updatedById   String?  @map("updated_by_id") @db.Uuid
+  version       Int     @default(1)
+  globalVersion BigInt  @default(0) @map("global_version")
+  createdById   String? @map("created_by_id") @db.Uuid
+  updatedById   String? @map("updated_by_id") @db.Uuid
 
   // Relations
-  tenant    Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  workspace Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  tenant    Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workspace Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   nodes     ContextNode[]
   edges     ContextEdge[]
   events    ContextEvent[]
@@ -168,22 +168,22 @@ model ContextGraph {
 }
 
 model ContextNode {
-  id          String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId    String           @map("tenant_id") @db.Uuid
-  graphId     String           @map("graph_id") @db.Uuid
-  type        ContextNodeType
-  layer       ContextLayer
-  name        String           @db.VarChar(255)
-  content     String?          @db.Text
+  id       String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String          @map("tenant_id") @db.Uuid
+  graphId  String          @map("graph_id") @db.Uuid
+  type     ContextNodeType
+  layer    ContextLayer
+  name     String          @db.VarChar(255)
+  content  String?         @db.Text
   /// @pii - May contain user-generated content
-  metadata    Json             @default("{}")
+  metadata Json            @default("{}")
 
   // Vector embedding for semantic search (1536 dimensions for OpenAI ada-002)
-  embedding   Unsupported("vector(1536)")?
+  embedding Unsupported("vector(1536)")?
 
   // Freshness tracking
-  freshness   Freshness        @default(CURRENT)
-  validatedAt DateTime?        @map("validated_at")
+  freshness   Freshness @default(CURRENT)
+  validatedAt DateTime? @map("validated_at")
 
   // External source tracking
   externalUrl    String?   @map("external_url") @db.VarChar(2000)
@@ -205,10 +205,10 @@ model ContextNode {
   deletedById String?   @map("deleted_by_id") @db.Uuid
 
   // Relations
-  graph         ContextGraph  @relation(fields: [graphId], references: [id], onDelete: Cascade)
-  createdBy     User?         @relation(fields: [createdById], references: [id])
-  outgoingEdges ContextEdge[] @relation("SourceNode")
-  incomingEdges ContextEdge[] @relation("TargetNode")
+  graph         ContextGraph   @relation(fields: [graphId], references: [id], onDelete: Cascade)
+  createdBy     User?          @relation(fields: [createdById], references: [id])
+  outgoingEdges ContextEdge[]  @relation("SourceNode")
+  incomingEdges ContextEdge[]  @relation("TargetNode")
   sliceContexts SliceContext[]
 
   @@index([tenantId])
@@ -241,14 +241,14 @@ enum Freshness {
 }
 
 model ContextEdge {
-  id               String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId         String       @map("tenant_id") @db.Uuid
-  graphId          String       @map("graph_id") @db.Uuid
-  sourceNodeId     String       @map("source_node_id") @db.Uuid
-  targetNodeId     String       @map("target_node_id") @db.Uuid
-  relationshipType EdgeType     @map("relationship_type")
-  metadata         Json         @default("{}")
-  createdAt        DateTime     @default(now()) @map("created_at")
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId         String   @map("tenant_id") @db.Uuid
+  graphId          String   @map("graph_id") @db.Uuid
+  sourceNodeId     String   @map("source_node_id") @db.Uuid
+  targetNodeId     String   @map("target_node_id") @db.Uuid
+  relationshipType EdgeType @map("relationship_type")
+  metadata         Json     @default("{}")
+  createdAt        DateTime @default(now()) @map("created_at")
 
   // Relations
   graph      ContextGraph @relation(fields: [graphId], references: [id], onDelete: Cascade)
@@ -274,46 +274,46 @@ enum EdgeType {
 // ============================================================================
 
 model Slice {
-  id          String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId    String      @map("tenant_id") @db.Uuid
-  workspaceId String      @map("workspace_id") @db.Uuid
+  id          String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String @map("tenant_id") @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
 
   // Identifiers
-  shortId     String      @map("short_id") @db.VarChar(20) // e.g., "SL-2847"
-  name        String      @db.VarChar(255)
+  shortId String @map("short_id") @db.VarChar(20) // e.g., "SL-2847"
+  name    String @db.VarChar(255)
 
   // Core content
-  outcome     String      @db.Text // Outcome statement
-  antiScope   String[]    @map("anti_scope") // Explicitly excluded items
+  outcome   String   @db.Text // Outcome statement
+  antiScope String[] @map("anti_scope") // Explicitly excluded items
 
   // State machine
-  status      SliceStatus @default(PENDING)
+  status SliceStatus @default(PENDING)
 
   // Ownership
-  ownerId     String      @map("owner_id") @db.Uuid
-  createdById String      @map("created_by_id") @db.Uuid
+  ownerId     String @map("owner_id") @db.Uuid
+  createdById String @map("created_by_id") @db.Uuid
 
   // Timestamps
-  startedAt   DateTime?   @map("started_at")
-  submittedAt DateTime?   @map("submitted_at")
-  completedAt DateTime?   @map("completed_at")
-  archivedAt  DateTime?   @map("archived_at")
+  startedAt   DateTime? @map("started_at")
+  submittedAt DateTime? @map("submitted_at")
+  completedAt DateTime? @map("completed_at")
+  archivedAt  DateTime? @map("archived_at")
 
   // Version tracking
-  version     Int         @default(1)
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
-  updatedById String?     @map("updated_by_id") @db.Uuid
+  version     Int      @default(1)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  updatedById String?  @map("updated_by_id") @db.Uuid
 
   // Soft delete support
-  deletedAt   DateTime?   @map("deleted_at")
-  deletedById String?     @map("deleted_by_id") @db.Uuid
+  deletedAt   DateTime? @map("deleted_at")
+  deletedById String?   @map("deleted_by_id") @db.Uuid
 
   // Relations
-  tenant             Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  workspace          Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  owner              User                 @relation("SliceOwner", fields: [ownerId], references: [id])
-  createdBy          User                 @relation("SliceCreator", fields: [createdById], references: [id])
+  tenant             Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workspace          Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  owner              User                  @relation("SliceOwner", fields: [ownerId], references: [id])
+  createdBy          User                  @relation("SliceCreator", fields: [createdById], references: [id])
   constraints        SliceConstraint[]
   acceptanceCriteria AcceptanceCriterion[]
   contextPackage     SliceContext[]
@@ -340,11 +340,11 @@ enum SliceStatus {
 }
 
 model SliceConstraint {
-  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  sliceId   String   @map("slice_id") @db.Uuid
-  content   String   @db.Text
-  orderIndex Int     @default(0) @map("order_index")
-  createdAt DateTime @default(now()) @map("created_at")
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sliceId    String   @map("slice_id") @db.Uuid
+  content    String   @db.Text
+  orderIndex Int      @default(0) @map("order_index")
+  createdAt  DateTime @default(now()) @map("created_at")
 
   // Relations
   slice Slice @relation(fields: [sliceId], references: [id], onDelete: Cascade)
@@ -354,13 +354,13 @@ model SliceConstraint {
 }
 
 model AcceptanceCriterion {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  sliceId     String   @map("slice_id") @db.Uuid
-  content     String   @db.Text
-  isCompleted Boolean  @default(false) @map("is_completed")
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sliceId     String    @map("slice_id") @db.Uuid
+  content     String    @db.Text
+  isCompleted Boolean   @default(false) @map("is_completed")
   completedAt DateTime? @map("completed_at")
-  orderIndex  Int      @default(0) @map("order_index")
-  createdAt   DateTime @default(now()) @map("created_at")
+  orderIndex  Int       @default(0) @map("order_index")
+  createdAt   DateTime  @default(now()) @map("created_at")
 
   // Relations
   slice Slice @relation(fields: [sliceId], references: [id], onDelete: Cascade)
@@ -370,11 +370,11 @@ model AcceptanceCriterion {
 }
 
 model SliceContext {
-  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  sliceId   String   @map("slice_id") @db.Uuid
-  nodeId    String   @map("node_id") @db.Uuid
-  isPinned  Boolean  @default(false) @map("is_pinned")
-  addedAt   DateTime @default(now()) @map("added_at")
+  id       String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sliceId  String   @map("slice_id") @db.Uuid
+  nodeId   String   @map("node_id") @db.Uuid
+  isPinned Boolean  @default(false) @map("is_pinned")
+  addedAt  DateTime @default(now()) @map("added_at")
 
   // Relations
   slice Slice       @relation(fields: [sliceId], references: [id], onDelete: Cascade)
@@ -430,15 +430,15 @@ enum ReviewVerdict {
 // ============================================================================
 
 model AISession {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId    String   @map("tenant_id") @db.Uuid
-  workspaceId String   @map("workspace_id") @db.Uuid
-  sliceId     String?  @map("slice_id") @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
+  id          String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String  @map("tenant_id") @db.Uuid
+  workspaceId String  @map("workspace_id") @db.Uuid
+  sliceId     String? @map("slice_id") @db.Uuid
+  userId      String  @map("user_id") @db.Uuid
 
   // Context snapshot
-  contextNodeIds  String[] @map("context_node_ids") @db.Uuid
-  contextTokenCount Int    @map("context_token_count")
+  contextNodeIds    String[] @map("context_node_ids") @db.Uuid
+  contextTokenCount Int      @map("context_token_count")
   contextCompiledAt DateTime @map("context_compiled_at")
 
   // Session timing
@@ -451,10 +451,10 @@ model AISession {
   createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  tenant    Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  workspace Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  slice     Slice?            @relation(fields: [sliceId], references: [id])
-  user      User              @relation(fields: [userId], references: [id])
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workspace Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  slice     Slice?           @relation(fields: [sliceId], references: [id])
+  user      User             @relation(fields: [userId], references: [id])
   feedback  SessionFeedback?
 
   @@index([tenantId])
@@ -466,17 +466,17 @@ model AISession {
 }
 
 model SessionFeedback {
-  id        String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId  String        @map("tenant_id") @db.Uuid
-  sessionId String        @unique @map("session_id") @db.Uuid
+  id        String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId  String @map("tenant_id") @db.Uuid
+  sessionId String @unique @map("session_id") @db.Uuid
 
   // Quick rating
   rating FeedbackRating
 
   // Detailed feedback
-  errorCategories String[]  @map("error_categories")
-  missingContext  String?   @map("missing_context") @db.Text
-  comment         String?   @db.Text
+  errorCategories String[] @map("error_categories")
+  missingContext  String?  @map("missing_context") @db.Text
+  comment         String?  @db.Text
 
   // Quality scores (0-100)
   accuracyScore     Int? @map("accuracy_score")
@@ -514,10 +514,10 @@ model FeedbackMetrics {
   date        DateTime @db.Date
 
   // Session counts
-  totalSessions    Int @default(0) @map("total_sessions")
-  positiveRatings  Int @default(0) @map("positive_ratings")
-  negativeRatings  Int @default(0) @map("negative_ratings")
-  skippedRatings   Int @default(0) @map("skipped_ratings")
+  totalSessions   Int @default(0) @map("total_sessions")
+  positiveRatings Int @default(0) @map("positive_ratings")
+  negativeRatings Int @default(0) @map("negative_ratings")
+  skippedRatings  Int @default(0) @map("skipped_ratings")
 
   // Rates
   firstPassAcceptanceRate Float? @map("first_pass_acceptance_rate")
@@ -546,26 +546,26 @@ model FeedbackMetrics {
 // ============================================================================
 
 model Integration {
-  id          String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId    String          @map("tenant_id") @db.Uuid
-  workspaceId String          @map("workspace_id") @db.Uuid
+  id          String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String              @map("tenant_id") @db.Uuid
+  workspaceId String              @map("workspace_id") @db.Uuid
   provider    IntegrationProvider
-  name        String          @db.VarChar(255)
+  name        String              @db.VarChar(255)
 
   // OAuth credentials (encrypted at rest)
   /// @pii - Contains OAuth tokens
-  credentials Json            @default("{}")
+  credentials Json @default("{}")
 
   // Sync configuration
-  syncConfig  Json            @default("{}") @map("sync_config")
+  syncConfig Json @default("{}") @map("sync_config")
 
   // Status
-  status      IntegrationStatus @default(PENDING)
-  lastSyncAt  DateTime?       @map("last_sync_at")
-  lastError   String?         @map("last_error") @db.Text
+  status     IntegrationStatus @default(PENDING)
+  lastSyncAt DateTime?         @map("last_sync_at")
+  lastError  String?           @map("last_error") @db.Text
 
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
   tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -594,19 +594,19 @@ enum IntegrationStatus {
 }
 
 model SyncJob {
-  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  integrationId String    @map("integration_id") @db.Uuid
+  id            String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  integrationId String        @map("integration_id") @db.Uuid
   status        SyncJobStatus @default(PENDING)
-  syncType      String    @map("sync_type") @db.VarChar(50) // 'full' or 'incremental'
+  syncType      String        @map("sync_type") @db.VarChar(50) // 'full' or 'incremental'
 
   // Results
-  itemsProcessed Int      @default(0) @map("items_processed")
-  itemsFailed    Int      @default(0) @map("items_failed")
-  errorLog       String?  @map("error_log") @db.Text
+  itemsProcessed Int     @default(0) @map("items_processed")
+  itemsFailed    Int     @default(0) @map("items_failed")
+  errorLog       String? @map("error_log") @db.Text
 
-  startedAt     DateTime? @map("started_at")
-  completedAt   DateTime? @map("completed_at")
-  createdAt     DateTime  @default(now()) @map("created_at")
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
 
   // Relations
   integration Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
@@ -634,7 +634,7 @@ model ApiKey {
   name        String    @db.VarChar(255)
   keyHash     String    @unique @map("key_hash") @db.VarChar(64)
   keyPrefix   String    @map("key_prefix") @db.VarChar(10) // For display (e.g., "cc_abc123...")
-  permissions String[]  // Specific permissions for this key
+  permissions String[] // Specific permissions for this key
   isActive    Boolean   @default(true) @map("is_active")
   expiresAt   DateTime? @map("expires_at")
   lastUsedAt  DateTime? @map("last_used_at")
@@ -653,32 +653,32 @@ model ApiKey {
 // ============================================================================
 
 model AuditLog {
-  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId     String   @map("tenant_id") @db.Uuid
-  timestamp    DateTime @default(now())
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  timestamp DateTime @default(now())
 
   // Actor
-  actorId      String   @map("actor_id") @db.VarChar(255)
-  actorType    String   @map("actor_type") @db.VarChar(50) // 'user', 'api_key', 'system'
+  actorId   String @map("actor_id") @db.VarChar(255)
+  actorType String @map("actor_type") @db.VarChar(50) // 'user', 'api_key', 'system'
 
   // Action
-  action       String   @db.VarChar(100) // e.g., 'auth.login.success'
+  action String @db.VarChar(100) // e.g., 'auth.login.success'
 
   // Resource
-  resourceType String?  @map("resource_type") @db.VarChar(100)
-  resourceId   String?  @map("resource_id") @db.VarChar(255)
+  resourceType String? @map("resource_type") @db.VarChar(100)
+  resourceId   String? @map("resource_id") @db.VarChar(255)
 
   // Details
-  metadata     Json     @default("{}")
+  metadata Json @default("{}")
 
   // Outcome
-  outcome      String   @db.VarChar(20) // 'success', 'failure', 'denied'
-  errorCode    String?  @map("error_code") @db.VarChar(50)
-  errorMessage String?  @map("error_message") @db.Text
+  outcome      String  @db.VarChar(20) // 'success', 'failure', 'denied'
+  errorCode    String? @map("error_code") @db.VarChar(50)
+  errorMessage String? @map("error_message") @db.Text
 
   // Request context
-  ipAddress    String?  @map("ip_address") @db.VarChar(45) // IPv6 max length
-  userAgent    String?  @map("user_agent") @db.VarChar(500)
+  ipAddress String? @map("ip_address") @db.VarChar(45) // IPv6 max length
+  userAgent String? @map("user_agent") @db.VarChar(500)
 
   @@index([tenantId])
   @@index([timestamp])
@@ -693,32 +693,32 @@ model AuditLog {
 // ============================================================================
 
 model ContextEvent {
-  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId      String   @map("tenant_id") @db.Uuid
-  graphId       String   @map("graph_id") @db.Uuid
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
+  graphId  String @map("graph_id") @db.Uuid
 
   // Event type
-  eventType     String   @map("event_type") @db.VarChar(100)
-  entityType    String   @map("entity_type") @db.VarChar(50)
-  entityId      String   @map("entity_id") @db.Uuid
+  eventType  String @map("event_type") @db.VarChar(100)
+  entityType String @map("entity_type") @db.VarChar(50)
+  entityId   String @map("entity_id") @db.Uuid
 
   // Version tracking
   version       Int
-  globalVersion BigInt   @map("global_version")
-  vectorClock   Json     @map("vector_clock") @default("{}")
+  globalVersion BigInt @map("global_version")
+  vectorClock   Json   @default("{}") @map("vector_clock")
 
   // Actor
-  actorId       String   @map("actor_id") @db.VarChar(255)
-  actorType     String   @map("actor_type") @db.VarChar(50)
+  actorId   String @map("actor_id") @db.VarChar(255)
+  actorType String @map("actor_type") @db.VarChar(50)
 
   // Payload
-  payload       Json
-  metadata      Json     @default("{}")
+  payload  Json
+  metadata Json @default("{}")
 
-  timestamp     DateTime @default(now())
+  timestamp DateTime @default(now())
 
   // Relations
-  graph         ContextGraph @relation(fields: [graphId], references: [id], onDelete: Cascade)
+  graph ContextGraph @relation(fields: [graphId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, globalVersion])
   @@index([tenantId, graphId, entityType, entityId])
@@ -728,33 +728,33 @@ model ContextEvent {
 }
 
 model EntityChange {
-  id              String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String     @map("tenant_id") @db.Uuid
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
 
   // Entity reference
-  entityType      String     @map("entity_type") @db.VarChar(100)
-  entityId        String     @map("entity_id") @db.Uuid
+  entityType String @map("entity_type") @db.VarChar(100)
+  entityId   String @map("entity_id") @db.Uuid
 
   // Version info
   version         Int
-  previousVersion Int?       @map("previous_version")
+  previousVersion Int? @map("previous_version")
 
   // Change details
-  changeType      ChangeType @map("change_type")
-  changedFields   String[]   @map("changed_fields")
-  previousValues  Json?      @map("previous_values")
-  newValues       Json       @map("new_values")
+  changeType     ChangeType @map("change_type")
+  changedFields  String[]   @map("changed_fields")
+  previousValues Json?      @map("previous_values")
+  newValues      Json       @map("new_values")
 
   // Actor
-  actorId         String     @map("actor_id") @db.VarChar(255)
-  actorType       String     @map("actor_type") @db.VarChar(50)
+  actorId   String @map("actor_id") @db.VarChar(255)
+  actorType String @map("actor_type") @db.VarChar(50)
 
   // Metadata
-  metadata        Json       @default("{}")
-  timestamp       DateTime   @default(now())
+  metadata  Json     @default("{}")
+  timestamp DateTime @default(now())
 
   // Event correlation
-  eventId         String?    @map("event_id") @db.Uuid
+  eventId String? @map("event_id") @db.Uuid
 
   @@index([tenantId, entityType, entityId])
   @@index([tenantId, timestamp])
@@ -772,15 +772,15 @@ enum ChangeType {
 }
 
 model EntitySnapshot {
-  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId      String   @map("tenant_id") @db.Uuid
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
 
-  entityType    String   @map("entity_type") @db.VarChar(100)
-  entityId      String   @map("entity_id") @db.Uuid
-  version       Int
+  entityType String @map("entity_type") @db.VarChar(100)
+  entityId   String @map("entity_id") @db.Uuid
+  version    Int
 
-  snapshot      Json
-  createdAt     DateTime @default(now()) @map("created_at")
+  snapshot  Json
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@unique([tenantId, entityType, entityId, version])
   @@index([tenantId, entityType, entityId])
@@ -788,24 +788,24 @@ model EntitySnapshot {
 }
 
 model EntityDraft {
-  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId      String    @map("tenant_id") @db.Uuid
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
 
   // Source entity
-  entityType    String    @map("entity_type") @db.VarChar(100)
-  entityId      String    @map("entity_id") @db.Uuid
-  baseVersion   Int       @map("base_version")
+  entityType  String @map("entity_type") @db.VarChar(100)
+  entityId    String @map("entity_id") @db.Uuid
+  baseVersion Int    @map("base_version")
 
   // Draft content
-  draftContent  Json      @map("draft_content")
-  changedFields String[]  @map("changed_fields")
+  draftContent  Json     @map("draft_content")
+  changedFields String[] @map("changed_fields")
 
   // Metadata
-  name          String?   @db.VarChar(255)
-  createdById   String    @map("created_by_id") @db.Uuid
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-  expiresAt     DateTime? @map("expires_at")
+  name        String?   @db.VarChar(255)
+  createdById String    @map("created_by_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  expiresAt   DateTime? @map("expires_at")
 
   @@unique([tenantId, entityType, entityId, createdById])
   @@index([tenantId, createdById])
@@ -814,16 +814,16 @@ model EntityDraft {
 }
 
 model EntityVersion {
-  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId      String   @map("tenant_id") @db.Uuid
-  entityType    String   @map("entity_type") @db.VarChar(50)
-  entityId      String   @map("entity_id") @db.Uuid
+  id         String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId   String @map("tenant_id") @db.Uuid
+  entityType String @map("entity_type") @db.VarChar(50)
+  entityId   String @map("entity_id") @db.Uuid
 
-  version       Int      @default(1)
-  vectorClock   Json     @map("vector_clock") @default("{}")
+  version     Int  @default(1)
+  vectorClock Json @default("{}") @map("vector_clock")
 
-  lastEventId   String?  @map("last_event_id") @db.Uuid
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  lastEventId String?  @map("last_event_id") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@unique([tenantId, entityType, entityId])
   @@map("entity_versions")
@@ -834,26 +834,26 @@ model EntityVersion {
 // ============================================================================
 
 model ContextSubscription {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId    String   @map("tenant_id") @db.Uuid
-  clientId    String   @map("client_id") @db.VarChar(255)
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
+  clientId String @map("client_id") @db.VarChar(255)
 
   // Product info
-  product     String   @db.VarChar(50) // 'chat', 'code', 'cowork'
+  product        String @db.VarChar(50) // 'chat', 'code', 'cowork'
   productVersion String @map("product_version") @db.VarChar(50)
 
   // Subscription scopes
-  scopes      Json     // SubscriptionScope[]
-  filters     Json?    // Optional filters
-  options     Json     // Delivery options
+  scopes  Json // SubscriptionScope[]
+  filters Json? // Optional filters
+  options Json // Delivery options
 
   // State
-  lastVersion BigInt?  @map("last_version")
+  lastVersion BigInt?   @map("last_version")
   lastAckAt   DateTime? @map("last_ack_at")
-  isActive    Boolean  @default(true) @map("is_active")
+  isActive    Boolean   @default(true) @map("is_active")
 
-  createdAt   DateTime @default(now()) @map("created_at")
-  expiresAt   DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime @map("expires_at")
 
   @@index([tenantId, clientId])
   @@index([tenantId, product])
@@ -863,16 +863,16 @@ model ContextSubscription {
 }
 
 model PendingDelivery {
-  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  subscriptionId  String   @map("subscription_id") @db.Uuid
-  eventId         String   @map("event_id") @db.Uuid
+  id             String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  subscriptionId String @map("subscription_id") @db.Uuid
+  eventId        String @map("event_id") @db.Uuid
 
-  payload         Json
-  attempts        Int      @default(0)
-  lastAttemptAt   DateTime? @map("last_attempt_at")
-  nextAttemptAt   DateTime  @map("next_attempt_at")
+  payload       Json
+  attempts      Int       @default(0)
+  lastAttemptAt DateTime? @map("last_attempt_at")
+  nextAttemptAt DateTime  @map("next_attempt_at")
 
-  createdAt       DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@index([subscriptionId])
   @@index([nextAttemptAt])
@@ -903,11 +903,11 @@ model UserContext {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  identityAttributes    IdentityAttribute[]
-  projects              Project[]
-  interactionPatterns   InteractionPattern[]
+  identityAttributes     IdentityAttribute[]
+  projects               Project[]
+  interactionPatterns    InteractionPattern[]
   interactionCorrections InteractionCorrection[]
-  artifactOutcomes      ArtifactOutcome[]
+  artifactOutcomes       ArtifactOutcome[]
 
   @@index([tenantId])
   @@map("user_contexts")
@@ -915,16 +915,16 @@ model UserContext {
 
 // Identity attributes with confidence scoring
 model IdentityAttribute {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  contextId   String   @map("context_id") @db.Uuid
-  key         String   @db.VarChar(255)
-  value       Json
-  valueType   String   @map("value_type") @db.VarChar(50) // string, number, array, object
-  confidence  Float    @default(0.5)
-  source      String   @db.VarChar(50) // explicit, inferred, corrected
-  sourceRef   String?  @map("source_ref") @db.Uuid // Reference to interaction
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  contextId  String   @map("context_id") @db.Uuid
+  key        String   @db.VarChar(255)
+  value      Json
+  valueType  String   @map("value_type") @db.VarChar(50) // string, number, array, object
+  confidence Float    @default(0.5)
+  source     String   @db.VarChar(50) // explicit, inferred, corrected
+  sourceRef  String?  @map("source_ref") @db.Uuid // Reference to interaction
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   // Relations
   context UserContext @relation(fields: [contextId], references: [id], onDelete: Cascade)
@@ -976,22 +976,22 @@ enum ProjectStatus {
 
 // Hierarchical goals with success criteria
 model ProjectGoal {
-  id              String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  projectId       String     @map("project_id") @db.Uuid
-  description     String     @db.Text
-  successCriteria Json       @default("[]") @map("success_criteria") // string[]
+  id              String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  projectId       String       @map("project_id") @db.Uuid
+  description     String       @db.Text
+  successCriteria Json         @default("[]") @map("success_criteria") // string[]
   priority        GoalPriority @default(MEDIUM)
-  status          GoalStatus @default(PROPOSED)
-  parentGoalId    String?    @map("parent_goal_id") @db.Uuid
-  confidence      Float      @default(0.5)
-  sourceRef       String?    @map("source_ref") @db.Uuid
-  createdAt       DateTime   @default(now()) @map("created_at")
-  updatedAt       DateTime   @updatedAt @map("updated_at")
+  status          GoalStatus   @default(PROPOSED)
+  parentGoalId    String?      @map("parent_goal_id") @db.Uuid
+  confidence      Float        @default(0.5)
+  sourceRef       String?      @map("source_ref") @db.Uuid
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
 
   // Relations
-  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  parentGoal  ProjectGoal?  @relation("GoalHierarchy", fields: [parentGoalId], references: [id])
-  subGoals    ProjectGoal[] @relation("GoalHierarchy")
+  project    Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parentGoal ProjectGoal?  @relation("GoalHierarchy", fields: [parentGoalId], references: [id])
+  subGoals   ProjectGoal[] @relation("GoalHierarchy")
 
   @@index([projectId])
   @@index([status])
@@ -1055,15 +1055,15 @@ enum ConstraintSeverity {
 
 // Project decisions with rationale
 model ProjectDecision {
-  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  projectId             String    @map("project_id") @db.Uuid
-  description           String    @db.Text
-  rationale             String?   @db.Text
-  alternativesConsidered Json     @default("[]") @map("alternatives_considered") // string[]
-  madeAt                DateTime  @default(now()) @map("made_at")
-  reversedAt            DateTime? @map("reversed_at")
-  sourceRef             String?   @map("source_ref") @db.Uuid
-  createdAt             DateTime  @default(now()) @map("created_at")
+  id                     String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  projectId              String    @map("project_id") @db.Uuid
+  description            String    @db.Text
+  rationale              String?   @db.Text
+  alternativesConsidered Json      @default("[]") @map("alternatives_considered") // string[]
+  madeAt                 DateTime  @default(now()) @map("made_at")
+  reversedAt             DateTime? @map("reversed_at")
+  sourceRef              String?   @map("source_ref") @db.Uuid
+  createdAt              DateTime  @default(now()) @map("created_at")
 
   // Relations
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -1144,26 +1144,26 @@ model ArtifactOutcome {
 // ============================================================================
 
 model IntentGraph {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId    String   @map("tenant_id") @db.Uuid
-  projectId   String   @map("project_id") @db.Uuid
-  name        String   @db.VarChar(255)
-  description String?  @db.Text
-  version     Int      @default(1)
+  id          String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String            @map("tenant_id") @db.Uuid
+  projectId   String            @map("project_id") @db.Uuid
+  name        String            @db.VarChar(255)
+  description String?           @db.Text
+  version     Int               @default(1)
   status      IntentGraphStatus @default(DRAFT)
-  metadata    Json     @default("{}")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  createdById String?  @map("created_by_id") @db.Uuid
+  metadata    Json              @default("{}")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  createdById String?           @map("created_by_id") @db.Uuid
 
   // Relations
-  project    Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  goals      IntentGoal[]
+  project     Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  goals       IntentGoal[]
   constraints IntentConstraint[]
-  entities   IntentEntity[]
-  behaviors  IntentBehavior[]
-  contexts   IntentContext[]
-  artifacts  Artifact[]
+  entities    IntentEntity[]
+  behaviors   IntentBehavior[]
+  contexts    IntentContext[]
+  artifacts   Artifact[]
 
   @@index([tenantId])
   @@index([projectId])
@@ -1195,9 +1195,9 @@ model IntentGoal {
   updatedAt           DateTime     @updatedAt @map("updated_at")
 
   // Relations
-  intentGraph IntentGraph   @relation(fields: [intentGraphId], references: [id], onDelete: Cascade)
-  parentGoal  IntentGoal?   @relation("IntentGoalHierarchy", fields: [parentGoalId], references: [id])
-  subGoals    IntentGoal[]  @relation("IntentGoalHierarchy")
+  intentGraph IntentGraph  @relation(fields: [intentGraphId], references: [id], onDelete: Cascade)
+  parentGoal  IntentGoal?  @relation("IntentGoalHierarchy", fields: [parentGoalId], references: [id])
+  subGoals    IntentGoal[] @relation("IntentGoalHierarchy")
 
   @@index([intentGraphId])
   @@index([status])
@@ -1230,20 +1230,20 @@ model IntentConstraint {
 }
 
 model IntentEntity {
-  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  intentGraphId   String   @map("intent_graph_id") @db.Uuid
-  name            String   @db.VarChar(100) // PascalCase
-  description     String?  @db.Text
-  attributes      Json     @default("[]") // EntityAttribute[]
-  relationships   Json     @default("[]") // EntityRelationship[]
-  stateMachine    Json?    @map("state_machine") // StateMachine
-  validationRules Json     @default("[]") @map("validation_rules") // ValidationRule[]
-  linkedBehaviorIds Json   @default("[]") @map("linked_behavior_ids")
-  confidence      Float    @default(0.5)
-  userConfirmed   Boolean  @default(false) @map("user_confirmed")
-  sourceOrigin    String   @default("conversation") @map("source_origin") @db.VarChar(50)
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  intentGraphId     String   @map("intent_graph_id") @db.Uuid
+  name              String   @db.VarChar(100) // PascalCase
+  description       String?  @db.Text
+  attributes        Json     @default("[]") // EntityAttribute[]
+  relationships     Json     @default("[]") // EntityRelationship[]
+  stateMachine      Json?    @map("state_machine") // StateMachine
+  validationRules   Json     @default("[]") @map("validation_rules") // ValidationRule[]
+  linkedBehaviorIds Json     @default("[]") @map("linked_behavior_ids")
+  confidence        Float    @default(0.5)
+  userConfirmed     Boolean  @default(false) @map("user_confirmed")
+  sourceOrigin      String   @default("conversation") @map("source_origin") @db.VarChar(50)
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   // Relations
   intentGraph IntentGraph @relation(fields: [intentGraphId], references: [id], onDelete: Cascade)
@@ -1257,7 +1257,7 @@ model IntentBehavior {
   intentGraphId       String   @map("intent_graph_id") @db.Uuid
   name                String   @db.VarChar(200)
   description         String?  @db.Text
-  trigger             Json     // BehaviorTrigger
+  trigger             Json // BehaviorTrigger
   preconditions       Json     @default("[]") // string[]
   steps               Json     @default("[]") // BehaviorStep[]
   postconditions      Json     @default("[]") // string[]
@@ -1327,11 +1327,11 @@ model Artifact {
   createdById   String?        @map("created_by_id") @db.Uuid
 
   // Relations
-  project      Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  intentGraph  IntentGraph?      @relation(fields: [intentGraphId], references: [id])
-  versions     ArtifactVersion[]
-  links        ArtifactLink[]
-  outcomes     ArtifactOutcome[]
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  intentGraph IntentGraph?      @relation(fields: [intentGraphId], references: [id])
+  versions    ArtifactVersion[]
+  links       ArtifactLink[]
+  outcomes    ArtifactOutcome[]
 
   @@index([tenantId])
   @@index([projectId])
@@ -1377,13 +1377,13 @@ model ArtifactVersion {
 }
 
 model ArtifactLink {
-  id           String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  artifactId   String       @map("artifact_id") @db.Uuid
-  intentNodeId String       @map("intent_node_id") @db.Uuid
-  intentNodeType String     @map("intent_node_type") @db.VarChar(50) // goal, constraint, entity, behavior
-  linkType     ArtifactLinkType @map("link_type")
-  metadata     Json         @default("{}")
-  createdAt    DateTime     @default(now()) @map("created_at")
+  id             String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  artifactId     String           @map("artifact_id") @db.Uuid
+  intentNodeId   String           @map("intent_node_id") @db.Uuid
+  intentNodeType String           @map("intent_node_type") @db.VarChar(50) // goal, constraint, entity, behavior
+  linkType       ArtifactLinkType @map("link_type")
+  metadata       Json             @default("{}")
+  createdAt      DateTime         @default(now()) @map("created_at")
 
   // Relations
   artifact Artifact @relation(fields: [artifactId], references: [id], onDelete: Cascade)
@@ -1418,13 +1418,13 @@ model Customer {
   updatedAt   DateTime     @updatedAt @map("updated_at")
 
   // Relations
-  contacts      CustomerContact[]
-  subscriptions CustomerSubscription[]
-  engagements   CustomerEngagement[]
-  feedback      CustomerFeedback[]
-  deals         Deal[]
-  featureVotes  FeatureVote[]
-  outcomes      CustomerOutcome[]
+  contacts        CustomerContact[]
+  subscriptions   CustomerSubscription[]
+  engagements     CustomerEngagement[]
+  feedback        CustomerFeedback[]
+  deals           Deal[]
+  featureVotes    FeatureVote[]
+  outcomes        CustomerOutcome[]
   implementations UseCaseImplementation[]
 
   @@unique([tenantId, externalId])
@@ -1452,17 +1452,17 @@ enum CustomerTier {
 }
 
 model CustomerContact {
-  id         String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  customerId String         @map("customer_id") @db.Uuid
-  email      String         @db.VarChar(255)
-  name       String         @db.VarChar(255)
-  title      String?        @db.VarChar(255)
+  id         String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  customerId String      @map("customer_id") @db.Uuid
+  email      String      @db.VarChar(255)
+  name       String      @db.VarChar(255)
+  title      String?     @db.VarChar(255)
   role       ContactRole
-  phone      String?        @db.VarChar(50)
-  isPrimary  Boolean        @default(false) @map("is_primary")
-  metadata   Json           @default("{}")
-  createdAt  DateTime       @default(now()) @map("created_at")
-  updatedAt  DateTime       @updatedAt @map("updated_at")
+  phone      String?     @db.VarChar(50)
+  isPrimary  Boolean     @default(false) @map("is_primary")
+  metadata   Json        @default("{}")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
 
   // Relations
   customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -1482,21 +1482,21 @@ enum ContactRole {
 }
 
 model CustomerSubscription {
-  id            String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  customerId    String             @map("customer_id") @db.Uuid
-  planId        String             @map("plan_id") @db.VarChar(100)
-  planName      String             @map("plan_name") @db.VarChar(255)
-  status        SubscriptionStatus @default(ACTIVE)
-  mrr           Decimal            @db.Decimal(12, 2) // Monthly Recurring Revenue
-  arr           Decimal            @db.Decimal(12, 2) // Annual Recurring Revenue
-  seats         Int?
-  billingCycle  BillingCycle       @default(MONTHLY) @map("billing_cycle")
-  startDate     DateTime           @map("start_date")
-  endDate       DateTime?          @map("end_date")
-  renewalDate   DateTime?          @map("renewal_date")
-  metadata      Json               @default("{}")
-  createdAt     DateTime           @default(now()) @map("created_at")
-  updatedAt     DateTime           @updatedAt @map("updated_at")
+  id           String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  customerId   String             @map("customer_id") @db.Uuid
+  planId       String             @map("plan_id") @db.VarChar(100)
+  planName     String             @map("plan_name") @db.VarChar(255)
+  status       SubscriptionStatus @default(ACTIVE)
+  mrr          Decimal            @db.Decimal(12, 2) // Monthly Recurring Revenue
+  arr          Decimal            @db.Decimal(12, 2) // Annual Recurring Revenue
+  seats        Int?
+  billingCycle BillingCycle       @default(MONTHLY) @map("billing_cycle")
+  startDate    DateTime           @map("start_date")
+  endDate      DateTime?          @map("end_date")
+  renewalDate  DateTime?          @map("renewal_date")
+  metadata     Json               @default("{}")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
 
   // Relations
   customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -1522,14 +1522,14 @@ enum BillingCycle {
 }
 
 model CustomerEngagement {
-  id             String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  customerId     String         @map("customer_id") @db.Uuid
-  type           EngagementType
-  description    String?        @db.Text
-  occurredAt     DateTime       @map("occurred_at")
-  actorId        String?        @map("actor_id") @db.Uuid // User who created engagement
-  metadata       Json           @default("{}")
-  createdAt      DateTime       @default(now()) @map("created_at")
+  id          String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  customerId  String         @map("customer_id") @db.Uuid
+  type        EngagementType
+  description String?        @db.Text
+  occurredAt  DateTime       @map("occurred_at")
+  actorId     String?        @map("actor_id") @db.Uuid // User who created engagement
+  metadata    Json           @default("{}")
+  createdAt   DateTime       @default(now()) @map("created_at")
 
   // Relations
   customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -1558,33 +1558,33 @@ enum EngagementType {
 // ============================================================================
 
 model CustomerFeedback {
-  id              String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String           @map("tenant_id") @db.Uuid
-  customerId      String?          @map("customer_id") @db.Uuid
-  contactEmail    String?          @map("contact_email") @db.VarChar(255) // For anonymous feedback
-  type            FeedbackType
-  channel         FeedbackChannel  @default(IN_APP)
-  subject         String?          @db.VarChar(500)
-  content         String           @db.Text
-  sentimentScore  Float?           @map("sentiment_score") // -1.0 to 1.0
-  sentimentLabel  SentimentLabel?  @map("sentiment_label")
-  npsScore        Int?             @map("nps_score") // 0-10
-  csatScore       Int?             @map("csat_score") // 1-5
-  priority        FeedbackPriority @default(MEDIUM)
-  status          FeedbackStatus   @default(NEW)
+  id             String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId       String           @map("tenant_id") @db.Uuid
+  customerId     String?          @map("customer_id") @db.Uuid
+  contactEmail   String?          @map("contact_email") @db.VarChar(255) // For anonymous feedback
+  type           FeedbackType
+  channel        FeedbackChannel  @default(IN_APP)
+  subject        String?          @db.VarChar(500)
+  content        String           @db.Text
+  sentimentScore Float?           @map("sentiment_score") // -1.0 to 1.0
+  sentimentLabel SentimentLabel?  @map("sentiment_label")
+  npsScore       Int?             @map("nps_score") // 0-10
+  csatScore      Int?             @map("csat_score") // 1-5
+  priority       FeedbackPriority @default(MEDIUM)
+  status         FeedbackStatus   @default(NEW)
 
   // Vector embedding for semantic search
-  embedding       Unsupported("vector(1536)")?
+  embedding Unsupported("vector(1536)")?
 
   // Linking
-  featureRequestId String?        @map("feature_request_id") @db.Uuid
-  sessionId        String?        @map("session_id") @db.Uuid // Link to AI session
+  featureRequestId String? @map("feature_request_id") @db.Uuid
+  sessionId        String? @map("session_id") @db.Uuid // Link to AI session
 
-  respondedAt     DateTime?       @map("responded_at")
-  respondedById   String?         @map("responded_by_id") @db.Uuid
-  metadata        Json            @default("{}")
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime        @updatedAt @map("updated_at")
+  respondedAt   DateTime? @map("responded_at")
+  respondedById String?   @map("responded_by_id") @db.Uuid
+  metadata      Json      @default("{}")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
   // Relations
   customer       Customer?       @relation(fields: [customerId], references: [id])
@@ -1650,50 +1650,50 @@ enum FeedbackStatus {
 // ============================================================================
 
 model FeatureRequest {
-  id              String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String              @map("tenant_id") @db.Uuid
-  shortId         String              @map("short_id") @db.VarChar(20) // e.g., "FR-1234"
-  title           String              @db.VarChar(500)
-  description     String              @db.Text
-  category        String?             @db.VarChar(100)
-  status          FeatureRequestStatus @default(SUBMITTED)
-  priority        FeatureRequestPriority @default(MEDIUM)
+  id          String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String                 @map("tenant_id") @db.Uuid
+  shortId     String                 @map("short_id") @db.VarChar(20) // e.g., "FR-1234"
+  title       String                 @db.VarChar(500)
+  description String                 @db.Text
+  category    String?                @db.VarChar(100)
+  status      FeatureRequestStatus   @default(SUBMITTED)
+  priority    FeatureRequestPriority @default(MEDIUM)
 
   // Aggregated metrics
-  voteCount       Int                 @default(0) @map("vote_count")
-  totalMRR        Decimal             @default(0) @map("total_mrr") @db.Decimal(12, 2)
-  dealBlockerValue Decimal            @default(0) @map("deal_blocker_value") @db.Decimal(12, 2)
-  urgencyScore    Float               @default(0) @map("urgency_score") // 0-10
+  voteCount        Int     @default(0) @map("vote_count")
+  totalMRR         Decimal @default(0) @map("total_mrr") @db.Decimal(12, 2)
+  dealBlockerValue Decimal @default(0) @map("deal_blocker_value") @db.Decimal(12, 2)
+  urgencyScore     Float   @default(0) @map("urgency_score") // 0-10
 
   // Calculated priority score
-  priorityScore   Float               @default(0) @map("priority_score")
-  effortEstimate  EffortEstimate?     @map("effort_estimate")
+  priorityScore  Float           @default(0) @map("priority_score")
+  effortEstimate EffortEstimate? @map("effort_estimate")
 
   // Linking to development
-  linkedGoalIds   Json                @default("[]") @map("linked_goal_ids")
-  linkedSliceIds  Json                @default("[]") @map("linked_slice_ids")
-  linkedArtifactIds Json              @default("[]") @map("linked_artifact_ids")
+  linkedGoalIds     Json @default("[]") @map("linked_goal_ids")
+  linkedSliceIds    Json @default("[]") @map("linked_slice_ids")
+  linkedArtifactIds Json @default("[]") @map("linked_artifact_ids")
 
   // Vector embedding for deduplication
-  embedding       Unsupported("vector(1536)")?
-  duplicateOfId   String?             @map("duplicate_of_id") @db.Uuid
+  embedding     Unsupported("vector(1536)")?
+  duplicateOfId String?                      @map("duplicate_of_id") @db.Uuid
 
-  targetReleaseId String?             @map("target_release_id") @db.Uuid
-  releasedInId    String?             @map("released_in_id") @db.Uuid
+  targetReleaseId String? @map("target_release_id") @db.Uuid
+  releasedInId    String? @map("released_in_id") @db.Uuid
 
-  createdById     String?             @map("created_by_id") @db.Uuid
-  metadata        Json                @default("{}")
-  createdAt       DateTime            @default(now()) @map("created_at")
-  updatedAt       DateTime            @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id") @db.Uuid
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  feedback       CustomerFeedback[]
-  votes          FeatureVote[]
-  dealBlockers   DealBlocker[]
-  duplicates     FeatureRequest[]    @relation("FeatureDuplicates")
-  duplicateOf    FeatureRequest?     @relation("FeatureDuplicates", fields: [duplicateOfId], references: [id])
-  targetRelease  Release?            @relation("TargetRelease", fields: [targetReleaseId], references: [id])
-  releasedIn     Release?            @relation("ReleasedIn", fields: [releasedInId], references: [id])
+  feedback      CustomerFeedback[]
+  votes         FeatureVote[]
+  dealBlockers  DealBlocker[]
+  duplicates    FeatureRequest[]   @relation("FeatureDuplicates")
+  duplicateOf   FeatureRequest?    @relation("FeatureDuplicates", fields: [duplicateOfId], references: [id])
+  targetRelease Release?           @relation("TargetRelease", fields: [targetReleaseId], references: [id])
+  releasedIn    Release?           @relation("ReleasedIn", fields: [releasedInId], references: [id])
 
   @@unique([tenantId, shortId])
   @@index([tenantId])
@@ -1729,14 +1729,14 @@ enum EffortEstimate {
 }
 
 model FeatureVote {
-  id              String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  featureRequestId String          @map("feature_request_id") @db.Uuid
-  customerId      String           @map("customer_id") @db.Uuid
-  urgency         VoteUrgency      @default(NICE_TO_HAVE)
-  businessImpact  String?          @map("business_impact") @db.Text
-  useCaseDescription String?       @map("use_case_description") @db.Text
-  mrrAtVote       Decimal?         @map("mrr_at_vote") @db.Decimal(12, 2)
-  createdAt       DateTime         @default(now()) @map("created_at")
+  id                 String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  featureRequestId   String      @map("feature_request_id") @db.Uuid
+  customerId         String      @map("customer_id") @db.Uuid
+  urgency            VoteUrgency @default(NICE_TO_HAVE)
+  businessImpact     String?     @map("business_impact") @db.Text
+  useCaseDescription String?     @map("use_case_description") @db.Text
+  mrrAtVote          Decimal?    @map("mrr_at_vote") @db.Decimal(12, 2)
+  createdAt          DateTime    @default(now()) @map("created_at")
 
   // Relations
   featureRequest FeatureRequest @relation(fields: [featureRequestId], references: [id], onDelete: Cascade)
@@ -1760,29 +1760,29 @@ enum VoteUrgency {
 // ============================================================================
 
 model Deal {
-  id              String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String      @map("tenant_id") @db.Uuid
-  customerId      String      @map("customer_id") @db.Uuid
-  name            String      @db.VarChar(500)
-  description     String?     @db.Text
-  stage           DealStage   @default(QUALIFICATION)
-  probability     Int         @default(10) // 0-100
-  value           Decimal     @db.Decimal(12, 2)
-  currency        String      @default("USD") @db.VarChar(3)
-  closeDate       DateTime?   @map("close_date")
-  ownerId         String      @map("owner_id") @db.Uuid // Sales rep
-  sourceType      DealSource  @default(OUTBOUND) @map("source_type")
-  lostReason      String?     @map("lost_reason") @db.Text
-  wonAt           DateTime?   @map("won_at")
-  lostAt          DateTime?   @map("lost_at")
-  metadata        Json        @default("{}")
-  createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
+  id          String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String     @map("tenant_id") @db.Uuid
+  customerId  String     @map("customer_id") @db.Uuid
+  name        String     @db.VarChar(500)
+  description String?    @db.Text
+  stage       DealStage  @default(QUALIFICATION)
+  probability Int        @default(10) // 0-100
+  value       Decimal    @db.Decimal(12, 2)
+  currency    String     @default("USD") @db.VarChar(3)
+  closeDate   DateTime?  @map("close_date")
+  ownerId     String     @map("owner_id") @db.Uuid // Sales rep
+  sourceType  DealSource @default(OUTBOUND) @map("source_type")
+  lostReason  String?    @map("lost_reason") @db.Text
+  wonAt       DateTime?  @map("won_at")
+  lostAt      DateTime?  @map("lost_at")
+  metadata    Json       @default("{}")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
 
   // Relations
-  customer    Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  blockers    DealBlocker[]
-  activities  DealActivity[]
+  customer   Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  blockers   DealBlocker[]
+  activities DealActivity[]
 
   @@index([tenantId])
   @@index([customerId])
@@ -1812,13 +1812,13 @@ enum DealSource {
 }
 
 model DealBlocker {
-  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  dealId          String        @map("deal_id") @db.Uuid
-  featureRequestId String       @map("feature_request_id") @db.Uuid
-  description     String?       @db.Text
-  impact          BlockerImpact @default(MAJOR)
-  resolvedAt      DateTime?     @map("resolved_at")
-  createdAt       DateTime      @default(now()) @map("created_at")
+  id               String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  dealId           String        @map("deal_id") @db.Uuid
+  featureRequestId String        @map("feature_request_id") @db.Uuid
+  description      String?       @db.Text
+  impact           BlockerImpact @default(MAJOR)
+  resolvedAt       DateTime?     @map("resolved_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
 
   // Relations
   deal           Deal           @relation(fields: [dealId], references: [id], onDelete: Cascade)
@@ -1843,7 +1843,7 @@ model DealActivity {
   description String?      @db.Text
   actorId     String       @map("actor_id") @db.Uuid
   occurredAt  DateTime     @map("occurred_at")
-  duration    Int?         // Minutes
+  duration    Int? // Minutes
   metadata    Json         @default("{}")
   createdAt   DateTime     @default(now()) @map("created_at")
 
@@ -1873,27 +1873,27 @@ enum ActivityType {
 // ============================================================================
 
 model BusinessObjective {
-  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String          @map("tenant_id") @db.Uuid
-  title           String          @db.VarChar(500)
-  description     String?         @db.Text
-  type            ObjectiveType   @default(OKR)
-  level           ObjectiveLevel  @default(TEAM)
-  status          ObjectiveStatus @default(ACTIVE)
-  ownerId         String          @map("owner_id") @db.Uuid
-  parentId        String?         @map("parent_id") @db.Uuid
-  startDate       DateTime        @map("start_date")
-  endDate         DateTime        @map("end_date")
-  progress        Float           @default(0) // 0.0-1.0
-  metadata        Json            @default("{}")
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime        @updatedAt @map("updated_at")
+  id          String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String          @map("tenant_id") @db.Uuid
+  title       String          @db.VarChar(500)
+  description String?         @db.Text
+  type        ObjectiveType   @default(OKR)
+  level       ObjectiveLevel  @default(TEAM)
+  status      ObjectiveStatus @default(ACTIVE)
+  ownerId     String          @map("owner_id") @db.Uuid
+  parentId    String?         @map("parent_id") @db.Uuid
+  startDate   DateTime        @map("start_date")
+  endDate     DateTime        @map("end_date")
+  progress    Float           @default(0) // 0.0-1.0
+  metadata    Json            @default("{}")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
 
   // Relations
-  parent         BusinessObjective?  @relation("ObjectiveHierarchy", fields: [parentId], references: [id])
-  children       BusinessObjective[] @relation("ObjectiveHierarchy")
-  keyResults     KeyResult[]
-  sliceObjectives SliceObjective[]
+  parent             BusinessObjective?  @relation("ObjectiveHierarchy", fields: [parentId], references: [id])
+  children           BusinessObjective[] @relation("ObjectiveHierarchy")
+  keyResults         KeyResult[]
+  sliceObjectives    SliceObjective[]
   keyResultArtifacts KeyResultArtifact[]
 
   @@index([tenantId])
@@ -1927,25 +1927,25 @@ enum ObjectiveStatus {
 }
 
 model KeyResult {
-  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  objectiveId     String            @map("objective_id") @db.Uuid
-  title           String            @db.VarChar(500)
-  description     String?           @db.Text
-  metricType      MetricType        @default(NUMBER) @map("metric_type")
-  unit            String?           @db.VarChar(50)
-  startValue      Decimal           @default(0) @map("start_value") @db.Decimal(15, 4)
-  currentValue    Decimal           @default(0) @map("current_value") @db.Decimal(15, 4)
-  targetValue     Decimal           @map("target_value") @db.Decimal(15, 4)
-  direction       MetricDirection   @default(INCREASE)
-  status          KeyResultStatus   @default(ON_TRACK)
-  confidence      Float             @default(0.5) // 0.0-1.0
-  lastMeasuredAt  DateTime?         @map("last_measured_at")
-  metadata        Json              @default("{}")
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedAt       DateTime          @updatedAt @map("updated_at")
+  id             String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  objectiveId    String          @map("objective_id") @db.Uuid
+  title          String          @db.VarChar(500)
+  description    String?         @db.Text
+  metricType     MetricType      @default(NUMBER) @map("metric_type")
+  unit           String?         @db.VarChar(50)
+  startValue     Decimal         @default(0) @map("start_value") @db.Decimal(15, 4)
+  currentValue   Decimal         @default(0) @map("current_value") @db.Decimal(15, 4)
+  targetValue    Decimal         @map("target_value") @db.Decimal(15, 4)
+  direction      MetricDirection @default(INCREASE)
+  status         KeyResultStatus @default(ON_TRACK)
+  confidence     Float           @default(0.5) // 0.0-1.0
+  lastMeasuredAt DateTime?       @map("last_measured_at")
+  metadata       Json            @default("{}")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
 
   // Relations
-  objective    BusinessObjective       @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  objective    BusinessObjective      @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
   measurements KeyResultMeasurement[]
 
   @@index([objectiveId])
@@ -1993,14 +1993,14 @@ model KeyResultMeasurement {
 }
 
 model SliceObjective {
-  id           String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  sliceId      String            @map("slice_id") @db.Uuid
-  objectiveId  String            @map("objective_id") @db.Uuid
-  contribution Float             @default(0) // How much this slice contributes (0.0-1.0)
+  id           String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sliceId      String             @map("slice_id") @db.Uuid
+  objectiveId  String             @map("objective_id") @db.Uuid
+  contribution Float              @default(0) // How much this slice contributes (0.0-1.0)
   status       ContributionStatus @default(PLANNED)
-  notes        String?           @db.Text
-  createdAt    DateTime          @default(now()) @map("created_at")
-  updatedAt    DateTime          @updatedAt @map("updated_at")
+  notes        String?            @db.Text
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
 
   // Relations
   objective BusinessObjective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
@@ -2036,29 +2036,29 @@ model KeyResultArtifact {
 }
 
 model CustomerOutcome {
-  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String        @map("tenant_id") @db.Uuid
-  customerId      String        @map("customer_id") @db.Uuid
-  title           String        @db.VarChar(500)
-  description     String        @db.Text
+  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId        String          @map("tenant_id") @db.Uuid
+  customerId      String          @map("customer_id") @db.Uuid
+  title           String          @db.VarChar(500)
+  description     String          @db.Text
   category        OutcomeCategory
-  quantifiedValue Decimal?      @map("quantified_value") @db.Decimal(15, 2)
-  valueUnit       String?       @map("value_unit") @db.VarChar(50)
-  status          OutcomeStatus @default(CLAIMED)
-  verifiedAt      DateTime?     @map("verified_at")
-  verifiedById    String?       @map("verified_by_id") @db.Uuid
+  quantifiedValue Decimal?        @map("quantified_value") @db.Decimal(15, 2)
+  valueUnit       String?         @map("value_unit") @db.VarChar(50)
+  status          OutcomeStatus   @default(CLAIMED)
+  verifiedAt      DateTime?       @map("verified_at")
+  verifiedById    String?         @map("verified_by_id") @db.Uuid
 
   // Attribution
-  linkedArtifactIds Json        @default("[]") @map("linked_artifact_ids")
-  linkedSliceIds    Json        @default("[]") @map("linked_slice_ids")
-  linkedUseCaseId   String?     @map("linked_use_case_id") @db.Uuid
+  linkedArtifactIds Json    @default("[]") @map("linked_artifact_ids")
+  linkedSliceIds    Json    @default("[]") @map("linked_slice_ids")
+  linkedUseCaseId   String? @map("linked_use_case_id") @db.Uuid
 
-  metadata        Json          @default("{}")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  customer    Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   linkedUseCase UseCase? @relation(fields: [linkedUseCaseId], references: [id])
 
   @@index([tenantId])
@@ -2090,34 +2090,34 @@ enum OutcomeStatus {
 // ============================================================================
 
 model UseCase {
-  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String          @map("tenant_id") @db.Uuid
-  name            String          @db.VarChar(255)
-  slug            String          @db.VarChar(100)
-  description     String          @db.Text
-  category        String          @db.VarChar(100)
-  industry        String?         @db.VarChar(100)
-  persona         String?         @db.VarChar(100)
-  problemStatement String?        @map("problem_statement") @db.Text
-  solutionOverview String?        @map("solution_overview") @db.Text
-  valueProposition String?        @map("value_proposition") @db.Text
-  status          UseCaseStatus   @default(DRAFT)
-  isPublic        Boolean         @default(false) @map("is_public")
+  id               String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId         String        @map("tenant_id") @db.Uuid
+  name             String        @db.VarChar(255)
+  slug             String        @db.VarChar(100)
+  description      String        @db.Text
+  category         String        @db.VarChar(100)
+  industry         String?       @db.VarChar(100)
+  persona          String?       @db.VarChar(100)
+  problemStatement String?       @map("problem_statement") @db.Text
+  solutionOverview String?       @map("solution_overview") @db.Text
+  valueProposition String?       @map("value_proposition") @db.Text
+  status           UseCaseStatus @default(DRAFT)
+  isPublic         Boolean       @default(false) @map("is_public")
 
   // Success metrics
-  avgTimeSaving    Float?         @map("avg_time_saving") // Hours
-  avgCostSaving    Decimal?       @map("avg_cost_saving") @db.Decimal(12, 2)
-  successRate      Float?         @map("success_rate") // 0.0-1.0
-  implementationCount Int         @default(0) @map("implementation_count")
+  avgTimeSaving       Float?   @map("avg_time_saving") // Hours
+  avgCostSaving       Decimal? @map("avg_cost_saving") @db.Decimal(12, 2)
+  successRate         Float?   @map("success_rate") // 0.0-1.0
+  implementationCount Int      @default(0) @map("implementation_count")
 
-  metadata        Json            @default("{}")
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime        @updatedAt @map("updated_at")
-  createdById     String?         @map("created_by_id") @db.Uuid
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id") @db.Uuid
 
   // Relations
-  artifacts       UseCaseArtifact[]
-  implementations UseCaseImplementation[]
+  artifacts        UseCaseArtifact[]
+  implementations  UseCaseImplementation[]
   customerOutcomes CustomerOutcome[]
 
   @@unique([tenantId, slug])
@@ -2154,17 +2154,17 @@ model UseCaseArtifact {
 }
 
 model UseCaseImplementation {
-  id            String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  useCaseId     String                    @map("use_case_id") @db.Uuid
-  customerId    String                    @map("customer_id") @db.Uuid
-  status        ImplementationStatus      @default(NOT_STARTED)
-  startedAt     DateTime?                 @map("started_at")
-  completedAt   DateTime?                 @map("completed_at")
-  progress      Float                     @default(0) // 0.0-1.0
-  notes         String?                   @db.Text
-  metadata      Json                      @default("{}")
-  createdAt     DateTime                  @default(now()) @map("created_at")
-  updatedAt     DateTime                  @updatedAt @map("updated_at")
+  id          String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  useCaseId   String               @map("use_case_id") @db.Uuid
+  customerId  String               @map("customer_id") @db.Uuid
+  status      ImplementationStatus @default(NOT_STARTED)
+  startedAt   DateTime?            @map("started_at")
+  completedAt DateTime?            @map("completed_at")
+  progress    Float                @default(0) // 0.0-1.0
+  notes       String?              @db.Text
+  metadata    Json                 @default("{}")
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
 
   // Relations
   useCase  UseCase  @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
@@ -2190,27 +2190,27 @@ enum ImplementationStatus {
 // ============================================================================
 
 model Release {
-  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String        @map("tenant_id") @db.Uuid
-  version         String        @db.VarChar(50) // Semver
-  name            String?       @db.VarChar(255)
-  description     String?       @db.Text
-  type            ReleaseType   @default(MINOR)
-  status          ReleaseStatus @default(PLANNED)
-  plannedDate     DateTime?     @map("planned_date")
-  releasedAt      DateTime?     @map("released_at")
-  releaseNotes    String?       @map("release_notes") @db.Text
-  changelogMd     String?       @map("changelog_md") @db.Text
-  metadata        Json          @default("{}")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  createdById     String?       @map("created_by_id") @db.Uuid
+  id           String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId     String        @map("tenant_id") @db.Uuid
+  version      String        @db.VarChar(50) // Semver
+  name         String?       @db.VarChar(255)
+  description  String?       @db.Text
+  type         ReleaseType   @default(MINOR)
+  status       ReleaseStatus @default(PLANNED)
+  plannedDate  DateTime?     @map("planned_date")
+  releasedAt   DateTime?     @map("released_at")
+  releaseNotes String?       @map("release_notes") @db.Text
+  changelogMd  String?       @map("changelog_md") @db.Text
+  metadata     Json          @default("{}")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  createdById  String?       @map("created_by_id") @db.Uuid
 
   // Relations
-  items           ReleaseItem[]
-  announcements   ReleaseAnnouncement[]
-  targetedFeatures FeatureRequest[] @relation("TargetRelease")
-  releasedFeatures FeatureRequest[] @relation("ReleasedIn")
+  items            ReleaseItem[]
+  announcements    ReleaseAnnouncement[]
+  targetedFeatures FeatureRequest[]      @relation("TargetRelease")
+  releasedFeatures FeatureRequest[]      @relation("ReleasedIn")
 
   @@unique([tenantId, version])
   @@index([tenantId])
@@ -2261,18 +2261,18 @@ enum ReleaseItemType {
 }
 
 model ReleaseAnnouncement {
-  id              String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  releaseId       String              @map("release_id") @db.Uuid
-  channel         AnnouncementChannel
-  status          AnnouncementStatus  @default(DRAFT)
-  title           String              @db.VarChar(500)
-  content         String              @db.Text
-  scheduledFor    DateTime?           @map("scheduled_for")
-  publishedAt     DateTime?           @map("published_at")
-  publishedById   String?             @map("published_by_id") @db.Uuid
-  metadata        Json                @default("{}")
-  createdAt       DateTime            @default(now()) @map("created_at")
-  updatedAt       DateTime            @updatedAt @map("updated_at")
+  id            String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  releaseId     String              @map("release_id") @db.Uuid
+  channel       AnnouncementChannel
+  status        AnnouncementStatus  @default(DRAFT)
+  title         String              @db.VarChar(500)
+  content       String              @db.Text
+  scheduledFor  DateTime?           @map("scheduled_for")
+  publishedAt   DateTime?           @map("published_at")
+  publishedById String?             @map("published_by_id") @db.Uuid
+  metadata      Json                @default("{}")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
 
   // Relations
   release Release @relation(fields: [releaseId], references: [id], onDelete: Cascade)
@@ -2304,27 +2304,27 @@ enum AnnouncementStatus {
 // ============================================================================
 
 model RevenueEvent {
-  id               String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId         String           @map("tenant_id") @db.Uuid
-  customerId       String           @map("customer_id") @db.Uuid
-  type             RevenueEventType
-  amount           Decimal          @db.Decimal(12, 2)
-  currency         String           @default("USD") @db.VarChar(3)
-  recurringType    RecurringType    @default(ONE_TIME) @map("recurring_type")
-  occurredAt       DateTime         @map("occurred_at")
+  id            String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId      String           @map("tenant_id") @db.Uuid
+  customerId    String           @map("customer_id") @db.Uuid
+  type          RevenueEventType
+  amount        Decimal          @db.Decimal(12, 2)
+  currency      String           @default("USD") @db.VarChar(3)
+  recurringType RecurringType    @default(ONE_TIME) @map("recurring_type")
+  occurredAt    DateTime         @map("occurred_at")
 
   // Attribution
-  attributedSliceIds    Json        @default("[]") @map("attributed_slice_ids")
-  attributedArtifactIds Json        @default("[]") @map("attributed_artifact_ids")
-  attributedFeatureIds  Json        @default("[]") @map("attributed_feature_ids")
-  attributionConfidence Float       @default(0.5) @map("attribution_confidence") // 0.0-1.0
-  attributionMethod     String      @default("manual") @map("attribution_method") @db.VarChar(50)
+  attributedSliceIds    Json   @default("[]") @map("attributed_slice_ids")
+  attributedArtifactIds Json   @default("[]") @map("attributed_artifact_ids")
+  attributedFeatureIds  Json   @default("[]") @map("attributed_feature_ids")
+  attributionConfidence Float  @default(0.5) @map("attribution_confidence") // 0.0-1.0
+  attributionMethod     String @default("manual") @map("attribution_method") @db.VarChar(50)
 
   // Context
-  relatedDealId    String?          @map("related_deal_id") @db.Uuid
-  description      String?          @db.Text
-  metadata         Json             @default("{}")
-  createdAt        DateTime         @default(now()) @map("created_at")
+  relatedDealId String?  @map("related_deal_id") @db.Uuid
+  description   String?  @db.Text
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   @@index([tenantId])
   @@index([customerId])
@@ -2354,53 +2354,53 @@ enum RecurringType {
 
 // Intent: The core "why" - a desired state change in the world
 model Intent {
-  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String        @map("tenant_id") @db.Uuid
-  projectId       String?       @map("project_id") @db.Uuid
+  id        String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId  String  @map("tenant_id") @db.Uuid
+  projectId String? @map("project_id") @db.Uuid
 
   // Identity
-  shortId         String        @map("short_id") @db.VarChar(20) // e.g., "INT-2847"
-  title           String        @db.VarChar(500)
-  description     String        @db.Text
+  shortId     String @map("short_id") @db.VarChar(20) // e.g., "INT-2847"
+  title       String @db.VarChar(500)
+  description String @db.Text
 
   // The outcome we want
-  desiredState    String        @map("desired_state") @db.Text // What the world looks like when this is fulfilled
-  successCriteria Json          @default("[]") @map("success_criteria") // Measurable criteria
-  antiPatterns    Json          @default("[]") @map("anti_patterns") // What we explicitly don't want
+  desiredState    String @map("desired_state") @db.Text // What the world looks like when this is fulfilled
+  successCriteria Json   @default("[]") @map("success_criteria") // Measurable criteria
+  antiPatterns    Json   @default("[]") @map("anti_patterns") // What we explicitly don't want
 
   // Evidence & confidence
-  evidence        Json          @default("[]") // Why we believe this intent matters
-  confidenceScore Float         @default(0.5) @map("confidence_score") // 0.0-1.0
-  fulfillmentScore Float        @default(0) @map("fulfillment_score") // 0.0-1.0, computed from signals
+  evidence         Json  @default("[]") // Why we believe this intent matters
+  confidenceScore  Float @default(0.5) @map("confidence_score") // 0.0-1.0
+  fulfillmentScore Float @default(0) @map("fulfillment_score") // 0.0-1.0, computed from signals
 
   // Hierarchy & relationships
-  parentIntentId  String?       @map("parent_intent_id") @db.Uuid
-  priority        IntentPriority @default(MEDIUM)
-  status          IntentStatus  @default(HYPOTHESIZED)
+  parentIntentId String?        @map("parent_intent_id") @db.Uuid
+  priority       IntentPriority @default(MEDIUM)
+  status         IntentStatus   @default(HYPOTHESIZED)
 
   // Stakeholder impact
-  primaryStakeholder String?    @map("primary_stakeholder") @db.VarChar(100) // Who this mainly benefits
-  affectedPersonas Json         @default("[]") @map("affected_personas") // All personas affected
-  businessValue   Json?         @map("business_value") // Estimated value if fulfilled
+  primaryStakeholder String? @map("primary_stakeholder") @db.VarChar(100) // Who this mainly benefits
+  affectedPersonas   Json    @default("[]") @map("affected_personas") // All personas affected
+  businessValue      Json?   @map("business_value") // Estimated value if fulfilled
 
   // Timestamps
-  validatedAt     DateTime?     @map("validated_at") // When confidence became high
-  fulfilledAt     DateTime?     @map("fulfilled_at") // When fulfillment > threshold
-  abandonedAt     DateTime?     @map("abandoned_at")
+  validatedAt DateTime? @map("validated_at") // When confidence became high
+  fulfilledAt DateTime? @map("fulfilled_at") // When fulfillment > threshold
+  abandonedAt DateTime? @map("abandoned_at")
 
-  createdById     String?       @map("created_by_id") @db.Uuid
-  metadata        Json          @default("{}")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id") @db.Uuid
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  parentIntent    Intent?       @relation("IntentHierarchy", fields: [parentIntentId], references: [id])
-  childIntents    Intent[]      @relation("IntentHierarchy")
-  capabilities    Capability[]
-  signals         Signal[]
-  experiments     Experiment[]
-  stakeholders    OutcomeStakeholder[]
-  learnings       IntentLearning[]
+  parentIntent Intent?              @relation("IntentHierarchy", fields: [parentIntentId], references: [id])
+  childIntents Intent[]             @relation("IntentHierarchy")
+  capabilities Capability[]
+  signals      Signal[]
+  experiments  Experiment[]
+  stakeholders OutcomeStakeholder[]
+  learnings    IntentLearning[]
 
   @@unique([tenantId, shortId])
   @@index([tenantId])
@@ -2421,56 +2421,57 @@ enum IntentPriority {
 }
 
 enum IntentStatus {
-  HYPOTHESIZED    // We think this matters
-  VALIDATED       // Evidence confirms it matters
-  ACTIVE          // We're actively working toward it
-  FULFILLED       // Success criteria met
-  ABANDONED       // No longer pursuing
-  SUPERSEDED      // Replaced by a better understanding
+  HYPOTHESIZED // We think this matters
+  VALIDATED // Evidence confirms it matters
+  ACTIVE // We're actively working toward it
+  FULFILLED // Success criteria met
+  ABANDONED // No longer pursuing
+  SUPERSEDED // Replaced by a better understanding
 }
 
 // Capability: What the system can do to fulfill intents
 model Capability {
-  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String          @map("tenant_id") @db.Uuid
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
 
   // Identity
-  name            String          @db.VarChar(255)
-  description     String          @db.Text
+  name        String @db.VarChar(255)
+  description String @db.Text
 
   // What it does
-  provides        String          @db.Text // What capability this gives users
-  limitations     Json            @default("[]") // Known limitations
-  assumptions     Json            @default("[]") // Assumptions it makes
+  provides    String @db.Text // What capability this gives users
+  limitations Json   @default("[]") // Known limitations
+  assumptions Json   @default("[]") // Assumptions it makes
 
   // Effectiveness tracking
-  effectivenessScore Float        @default(0) @map("effectiveness_score") // 0.0-1.0
-  usageCount      Int             @default(0) @map("usage_count")
-  successRate     Float?          @map("success_rate") // When used, how often does it work?
-  lastUsedAt      DateTime?       @map("last_used_at")
+  effectivenessScore Float     @default(0) @map("effectiveness_score") // 0.0-1.0
+  usageCount         Int       @default(0) @map("usage_count")
+  successRate        Float?    @map("success_rate") // When used, how often does it work?
+  lastUsedAt         DateTime? @map("last_used_at")
 
   // Value delivered
-  valueDelivered  Json?           @map("value_delivered") // Aggregate value metrics
-  gaps            Json            @default("[]") // Detected gaps in capability
+  valueDelivered Json? @map("value_delivered") // Aggregate value metrics
+  gaps           Json  @default("[]") // Detected gaps in capability
 
   // Status
-  status          CapabilityStatus @default(DEVELOPING)
-  maturityLevel   MaturityLevel   @default(EXPERIMENTAL) @map("maturity_level")
+  status        CapabilityStatus @default(DEVELOPING)
+  maturityLevel MaturityLevel    @default(EXPERIMENTAL) @map("maturity_level")
 
   // Links
-  intentId        String?         @map("intent_id") @db.Uuid // Primary intent this serves
-  artifactIds     Json            @default("[]") @map("artifact_ids") // Artifacts that implement this
-  dependsOn       Json            @default("[]") @map("depends_on") // Other capability IDs
+  intentId    String? @map("intent_id") @db.Uuid // Primary intent this serves
+  artifactIds Json    @default("[]") @map("artifact_ids") // Artifacts that implement this
+  dependsOn   Json    @default("[]") @map("depends_on") // Other capability IDs
 
-  createdById     String?         @map("created_by_id") @db.Uuid
-  metadata        Json            @default("{}")
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime        @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id") @db.Uuid
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  intent          Intent?         @relation(fields: [intentId], references: [id])
-  signals         Signal[]
-  experiments     Experiment[]
+  intent               Intent?                @relation(fields: [intentId], references: [id])
+  signals              Signal[]
+  experiments          Experiment[]
+  SymbolCapabilityLink SymbolCapabilityLink[]
 
   @@index([tenantId])
   @@index([intentId])
@@ -2496,53 +2497,53 @@ enum MaturityLevel {
 
 // Signal: Continuous evidence stream about intent/capability health
 model Signal {
-  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String        @map("tenant_id") @db.Uuid
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
 
   // What this signal measures
-  name            String        @db.VarChar(255)
-  description     String?       @db.Text
-  signalType      SignalType    @map("signal_type")
+  name        String     @db.VarChar(255)
+  description String?    @db.Text
+  signalType  SignalType @map("signal_type")
 
   // What it's measuring
-  intentId        String?       @map("intent_id") @db.Uuid
-  capabilityId    String?       @map("capability_id") @db.Uuid
+  intentId     String? @map("intent_id") @db.Uuid
+  capabilityId String? @map("capability_id") @db.Uuid
 
   // Current state
-  currentValue    Decimal       @default(0) @map("current_value") @db.Decimal(15, 4)
-  previousValue   Decimal?      @map("previous_value") @db.Decimal(15, 4)
-  trend           SignalTrend   @default(STABLE)
-  health          SignalHealth  @default(UNKNOWN)
+  currentValue  Decimal      @default(0) @map("current_value") @db.Decimal(15, 4)
+  previousValue Decimal?     @map("previous_value") @db.Decimal(15, 4)
+  trend         SignalTrend  @default(STABLE)
+  health        SignalHealth @default(UNKNOWN)
 
   // Thresholds
-  targetValue     Decimal?      @map("target_value") @db.Decimal(15, 4)
-  warningThreshold Decimal?     @map("warning_threshold") @db.Decimal(15, 4)
-  criticalThreshold Decimal?    @map("critical_threshold") @db.Decimal(15, 4)
-  direction       MetricDirection @default(INCREASE) // Do we want this to go up or down?
+  targetValue       Decimal?        @map("target_value") @db.Decimal(15, 4)
+  warningThreshold  Decimal?        @map("warning_threshold") @db.Decimal(15, 4)
+  criticalThreshold Decimal?        @map("critical_threshold") @db.Decimal(15, 4)
+  direction         MetricDirection @default(INCREASE) // Do we want this to go up or down?
 
   // Measurement config
-  unit            String?       @db.VarChar(50)
-  aggregation     AggregationType @default(AVG)
-  windowMinutes   Int           @default(60) @map("window_minutes") // Measurement window
+  unit          String?         @db.VarChar(50)
+  aggregation   AggregationType @default(AVG)
+  windowMinutes Int             @default(60) @map("window_minutes") // Measurement window
 
   // Sources
-  sources         Json          @default("[]") // SignalSource[]
+  sources Json @default("[]") // SignalSource[]
 
   // Anomaly detection
-  anomalyDetected Boolean       @default(false) @map("anomaly_detected")
-  anomalyDetails  Json?         @map("anomaly_details")
-  lastAnomalyAt   DateTime?     @map("last_anomaly_at")
+  anomalyDetected Boolean   @default(false) @map("anomaly_detected")
+  anomalyDetails  Json?     @map("anomaly_details")
+  lastAnomalyAt   DateTime? @map("last_anomaly_at")
 
-  isActive        Boolean       @default(true) @map("is_active")
-  lastMeasuredAt  DateTime?     @map("last_measured_at")
-  metadata        Json          @default("{}")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
+  isActive       Boolean   @default(true) @map("is_active")
+  lastMeasuredAt DateTime? @map("last_measured_at")
+  metadata       Json      @default("{}")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  intent          Intent?       @relation(fields: [intentId], references: [id])
-  capability      Capability?   @relation(fields: [capabilityId], references: [id])
-  measurements    SignalMeasurement[]
+  intent       Intent?             @relation(fields: [intentId], references: [id])
+  capability   Capability?         @relation(fields: [capabilityId], references: [id])
+  measurements SignalMeasurement[]
 
   @@index([tenantId])
   @@index([intentId])
@@ -2553,16 +2554,16 @@ model Signal {
 }
 
 enum SignalType {
-  USAGE           // How often something is used
-  PERFORMANCE     // Latency, throughput, etc.
-  ERROR_RATE      // How often things fail
-  SATISFACTION    // User sentiment
-  CONVERSION      // Funnel progression
-  RETENTION       // Users coming back
-  ENGAGEMENT      // Depth of interaction
-  VALUE           // Business value metrics
-  HEALTH          // Composite health score
-  CUSTOM          // User-defined
+  USAGE // How often something is used
+  PERFORMANCE // Latency, throughput, etc.
+  ERROR_RATE // How often things fail
+  SATISFACTION // User sentiment
+  CONVERSION // Funnel progression
+  RETENTION // Users coming back
+  ENGAGEMENT // Depth of interaction
+  VALUE // Business value metrics
+  HEALTH // Composite health score
+  CUSTOM // User-defined
 }
 
 enum SignalTrend {
@@ -2593,16 +2594,16 @@ enum AggregationType {
 
 // Time-series measurements for signals
 model SignalMeasurement {
-  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  signalId        String        @map("signal_id") @db.Uuid
-  value           Decimal       @db.Decimal(15, 4)
-  sampleCount     Int           @default(1) @map("sample_count")
-  metadata        Json          @default("{}")
-  measuredAt      DateTime      @map("measured_at")
-  createdAt       DateTime      @default(now()) @map("created_at")
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  signalId    String   @map("signal_id") @db.Uuid
+  value       Decimal  @db.Decimal(15, 4)
+  sampleCount Int      @default(1) @map("sample_count")
+  metadata    Json     @default("{}")
+  measuredAt  DateTime @map("measured_at")
+  createdAt   DateTime @default(now()) @map("created_at")
 
   // Relations
-  signal          Signal        @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  signal Signal @relation(fields: [signalId], references: [id], onDelete: Cascade)
 
   @@index([signalId])
   @@index([measuredAt])
@@ -2611,59 +2612,59 @@ model SignalMeasurement {
 
 // Experiment: A hypothesis about how to improve intent fulfillment
 model Experiment {
-  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String            @map("tenant_id") @db.Uuid
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
 
   // Identity
-  name            String            @db.VarChar(255)
-  description     String            @db.Text
+  name        String @db.VarChar(255)
+  description String @db.Text
 
   // Hypothesis
-  hypothesis      String            @db.Text // "If we X, then Y will improve by Z"
-  rationale       String?           @db.Text // Why we believe this hypothesis
+  hypothesis String  @db.Text // "If we X, then Y will improve by Z"
+  rationale  String? @db.Text // Why we believe this hypothesis
 
   // What we're testing
-  intentId        String?           @map("intent_id") @db.Uuid
-  capabilityId    String?           @map("capability_id") @db.Uuid
+  intentId     String? @map("intent_id") @db.Uuid
+  capabilityId String? @map("capability_id") @db.Uuid
 
   // Experiment config
-  experimentType  ExperimentType    @default(A_B_TEST) @map("experiment_type")
-  targetMetrics   Json              @default("[]") @map("target_metrics") // Signal IDs to measure
-  successCriteria Json              @default("[]") @map("success_criteria") // What "success" looks like
-  guardrails      Json              @default("[]") // Conditions that auto-stop experiment
+  experimentType  ExperimentType @default(A_B_TEST) @map("experiment_type")
+  targetMetrics   Json           @default("[]") @map("target_metrics") // Signal IDs to measure
+  successCriteria Json           @default("[]") @map("success_criteria") // What "success" looks like
+  guardrails      Json           @default("[]") // Conditions that auto-stop experiment
 
   // Targeting
-  targetAudience  Json?             @map("target_audience") // Who sees this experiment
-  trafficPercent  Float             @default(10) @map("traffic_percent") // 0-100
+  targetAudience Json? @map("target_audience") // Who sees this experiment
+  trafficPercent Float @default(10) @map("traffic_percent") // 0-100
 
   // Duration
-  plannedDuration Int?              @map("planned_duration") // Minutes
-  minSampleSize   Int?              @map("min_sample_size")
+  plannedDuration Int? @map("planned_duration") // Minutes
+  minSampleSize   Int? @map("min_sample_size")
 
   // Status
-  status          ExperimentStatus  @default(DRAFT)
-  startedAt       DateTime?         @map("started_at")
-  endedAt         DateTime?         @map("ended_at")
+  status    ExperimentStatus @default(DRAFT)
+  startedAt DateTime?        @map("started_at")
+  endedAt   DateTime?        @map("ended_at")
 
   // Results
-  controlMetrics  Json?             @map("control_metrics")
-  treatmentMetrics Json?            @map("treatment_metrics")
-  statisticalSignificance Float?    @map("statistical_significance") // 0.0-1.0
-  verdict         ExperimentVerdict?
-  verdictReason   String?           @map("verdict_reason") @db.Text
+  controlMetrics          Json?              @map("control_metrics")
+  treatmentMetrics        Json?              @map("treatment_metrics")
+  statisticalSignificance Float?             @map("statistical_significance") // 0.0-1.0
+  verdict                 ExperimentVerdict?
+  verdictReason           String?            @map("verdict_reason") @db.Text
 
   // Learning capture
-  learnings       String?           @db.Text // What we learned from this experiment
-  appliedToIntent Boolean           @default(false) @map("applied_to_intent")
+  learnings       String? @db.Text // What we learned from this experiment
+  appliedToIntent Boolean @default(false) @map("applied_to_intent")
 
-  createdById     String?           @map("created_by_id") @db.Uuid
-  metadata        Json              @default("{}")
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedAt       DateTime          @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id") @db.Uuid
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  intent          Intent?           @relation(fields: [intentId], references: [id])
-  capability      Capability?       @relation(fields: [capabilityId], references: [id])
+  intent     Intent?     @relation(fields: [intentId], references: [id])
+  capability Capability? @relation(fields: [capabilityId], references: [id])
 
   @@index([tenantId])
   @@index([intentId])
@@ -2692,43 +2693,43 @@ enum ExperimentStatus {
 }
 
 enum ExperimentVerdict {
-  SUCCESS           // Treatment significantly better
-  FAILURE           // Treatment significantly worse
-  INCONCLUSIVE      // No significant difference
+  SUCCESS // Treatment significantly better
+  FAILURE // Treatment significantly worse
+  INCONCLUSIVE // No significant difference
   GUARDRAIL_TRIPPED // Stopped due to guardrail violation
 }
 
 // OutcomeStakeholder: Who cares about which outcomes
 model OutcomeStakeholder {
-  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId        String            @map("tenant_id") @db.Uuid
-  intentId        String            @map("intent_id") @db.Uuid
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
+  intentId String @map("intent_id") @db.Uuid
 
   // Who
-  stakeholderType StakeholderType   @map("stakeholder_type")
-  stakeholderId   String?           @map("stakeholder_id") @db.Uuid // Customer, User, etc.
-  persona         String?           @db.VarChar(100) // "Engineering Manager", "End User", etc.
+  stakeholderType StakeholderType @map("stakeholder_type")
+  stakeholderId   String?         @map("stakeholder_id") @db.Uuid // Customer, User, etc.
+  persona         String?         @db.VarChar(100) // "Engineering Manager", "End User", etc.
 
   // Their relationship to the intent
-  role            StakeholderRole
-  influence       InfluenceLevel    @default(MEDIUM)
+  role      StakeholderRole
+  influence InfluenceLevel  @default(MEDIUM)
 
   // What they care about
-  successCriteria Json              @default("[]") @map("success_criteria") // Their specific criteria
-  concerns        Json              @default("[]") // What worries them about this
-  expectations    Json              @default("[]") // What they expect
+  successCriteria Json @default("[]") @map("success_criteria") // Their specific criteria
+  concerns        Json @default("[]") // What worries them about this
+  expectations    Json @default("[]") // What they expect
 
   // Satisfaction tracking
-  currentSatisfaction Float?        @map("current_satisfaction") // -1.0 to 1.0
-  targetSatisfaction Float?         @map("target_satisfaction")
-  lastFeedbackAt  DateTime?         @map("last_feedback_at")
+  currentSatisfaction Float?    @map("current_satisfaction") // -1.0 to 1.0
+  targetSatisfaction  Float?    @map("target_satisfaction")
+  lastFeedbackAt      DateTime? @map("last_feedback_at")
 
-  metadata        Json              @default("{}")
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedAt       DateTime          @updatedAt @map("updated_at")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  intent          Intent            @relation(fields: [intentId], references: [id], onDelete: Cascade)
+  intent Intent @relation(fields: [intentId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@index([intentId])
@@ -2748,12 +2749,12 @@ enum StakeholderType {
 }
 
 enum StakeholderRole {
-  BENEFICIARY       // Directly benefits from the intent
-  OPERATOR          // Operates/maintains the capability
-  SPONSOR           // Provides resources/budget
-  INFLUENCER        // Affects decisions about the intent
-  GATEKEEPER        // Must approve before intent can proceed
-  OBSERVER          // Interested but not directly affected
+  BENEFICIARY // Directly benefits from the intent
+  OPERATOR // Operates/maintains the capability
+  SPONSOR // Provides resources/budget
+  INFLUENCER // Affects decisions about the intent
+  GATEKEEPER // Must approve before intent can proceed
+  OBSERVER // Interested but not directly affected
 }
 
 enum InfluenceLevel {
@@ -2765,31 +2766,31 @@ enum InfluenceLevel {
 
 // IntentLearning: What we've learned about an intent over time
 model IntentLearning {
-  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  intentId        String          @map("intent_id") @db.Uuid
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  intentId String @map("intent_id") @db.Uuid
 
   // The learning
-  title           String          @db.VarChar(500)
-  description     String          @db.Text
-  learningType    LearningType    @map("learning_type")
+  title        String       @db.VarChar(500)
+  description  String       @db.Text
+  learningType LearningType @map("learning_type")
 
   // Evidence
-  evidence        Json            @default("[]") // What led to this learning
-  confidence      Float           @default(0.5) // 0.0-1.0
+  evidence   Json  @default("[]") // What led to this learning
+  confidence Float @default(0.5) // 0.0-1.0
 
   // Source
-  sourceType      LearningSource  @map("source_type")
-  sourceId        String?         @map("source_id") @db.Uuid // Experiment, Signal, etc.
+  sourceType LearningSource @map("source_type")
+  sourceId   String?        @map("source_id") @db.Uuid // Experiment, Signal, etc.
 
   // Impact
-  impactOnIntent  String?         @map("impact_on_intent") @db.Text // How this changes our understanding
-  appliedAt       DateTime?       @map("applied_at") // When we acted on this learning
+  impactOnIntent String?   @map("impact_on_intent") @db.Text // How this changes our understanding
+  appliedAt      DateTime? @map("applied_at") // When we acted on this learning
 
-  metadata        Json            @default("{}")
-  createdAt       DateTime        @default(now()) @map("created_at")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  intent          Intent          @relation(fields: [intentId], references: [id], onDelete: Cascade)
+  intent Intent @relation(fields: [intentId], references: [id], onDelete: Cascade)
 
   @@index([intentId])
   @@index([learningType])
@@ -2797,13 +2798,13 @@ model IntentLearning {
 }
 
 enum LearningType {
-  VALIDATION        // Confirms the intent matters
-  INVALIDATION      // Questions whether intent matters
-  REFINEMENT        // Clarifies what the intent means
-  APPROACH          // Discovers a better way to fulfill intent
-  OBSTACLE          // Identifies a blocker
-  OPPORTUNITY       // Discovers an unexpected benefit
-  CONSTRAINT        // Discovers a limitation
+  VALIDATION // Confirms the intent matters
+  INVALIDATION // Questions whether intent matters
+  REFINEMENT // Clarifies what the intent means
+  APPROACH // Discovers a better way to fulfill intent
+  OBSTACLE // Identifies a blocker
+  OPPORTUNITY // Discovers an unexpected benefit
+  CONSTRAINT // Discovers a limitation
 }
 
 enum LearningSource {
@@ -2820,20 +2821,20 @@ enum LearningSource {
 // ============================================================================
 
 model AssemblyCache {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId    String   @map("tenant_id") @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
-  queryHash   String   @map("query_hash") @db.VarChar(64)
-  projectId   String?  @map("project_id") @db.Uuid
+  id        String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId  String  @map("tenant_id") @db.Uuid
+  userId    String  @map("user_id") @db.Uuid
+  queryHash String  @map("query_hash") @db.VarChar(64)
+  projectId String? @map("project_id") @db.Uuid
 
   // Assembled context
-  contextXml  String   @map("context_xml") @db.Text
-  tokenCount  Int      @map("token_count")
-  sources     Json     // ContextSource[]
-  relevanceScores Json @map("relevance_scores") // Record<string, number>
+  contextXml      String @map("context_xml") @db.Text
+  tokenCount      Int    @map("token_count")
+  sources         Json // ContextSource[]
+  relevanceScores Json   @map("relevance_scores") // Record<string, number>
 
-  createdAt   DateTime @default(now()) @map("created_at")
-  expiresAt   DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime @map("expires_at")
 
   @@unique([tenantId, userId, queryHash, projectId])
   @@index([tenantId, userId])
@@ -2846,32 +2847,32 @@ model AssemblyCache {
 // ============================================================================
 
 model Workflow {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId    String   @map("tenant_id") @db.Uuid
-  name        String   @db.VarChar(255)
-  description String?  @db.Text
-  isEnabled   Boolean  @default(true) @map("is_enabled")
+  id          String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId    String  @map("tenant_id") @db.Uuid
+  name        String  @db.VarChar(255)
+  description String? @db.Text
+  isEnabled   Boolean @default(true) @map("is_enabled")
 
   // Trigger configuration
-  triggerType   WorkflowTriggerType  @map("trigger_type")
-  triggerConfig Json                 @map("trigger_config")
+  triggerType   WorkflowTriggerType @map("trigger_type")
+  triggerConfig Json                @map("trigger_config")
 
   // Conditions (optional AND/OR logic)
-  conditions    Json?    // Array of condition objects
+  conditions Json? // Array of condition objects
 
   // Actions to execute
-  actions       Json     // Array of action objects with order
+  actions Json // Array of action objects with order
 
   // Metadata
-  createdById String    @map("created_by_id") @db.Uuid
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdById String   @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Stats
-  runCount    Int       @default(0) @map("run_count")
-  lastRunAt   DateTime? @map("last_run_at")
+  runCount  Int       @default(0) @map("run_count")
+  lastRunAt DateTime? @map("last_run_at")
 
-  executions  WorkflowExecution[]
+  executions WorkflowExecution[]
 
   @@index([tenantId])
   @@index([tenantId, isEnabled])
@@ -2880,32 +2881,32 @@ model Workflow {
 }
 
 enum WorkflowTriggerType {
-  EVENT           // ContextEvent-based (entity created, updated, status changed)
-  SIGNAL          // Signal threshold crossed
-  SCHEDULE        // Cron-based
-  MANUAL          // User-triggered
+  EVENT // ContextEvent-based (entity created, updated, status changed)
+  SIGNAL // Signal threshold crossed
+  SCHEDULE // Cron-based
+  MANUAL // User-triggered
 }
 
 model WorkflowExecution {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  workflowId  String   @map("workflow_id") @db.Uuid
-  tenantId    String   @map("tenant_id") @db.Uuid
+  id         String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workflowId String @map("workflow_id") @db.Uuid
+  tenantId   String @map("tenant_id") @db.Uuid
 
-  status      WorkflowExecutionStatus @default(PENDING)
+  status WorkflowExecutionStatus @default(PENDING)
 
   // Trigger context
-  triggerEventId  String?  @map("trigger_event_id")
-  triggerData     Json     @map("trigger_data")
+  triggerEventId String? @map("trigger_event_id")
+  triggerData    Json    @map("trigger_data")
 
   // Execution details
-  startedAt       DateTime? @map("started_at")
-  completedAt     DateTime? @map("completed_at")
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
 
   // Results
-  actionsExecuted Json?     @map("actions_executed")  // Array of action results
-  error           String?   @db.Text
+  actionsExecuted Json?   @map("actions_executed") // Array of action results
+  error           String? @db.Text
 
-  workflow  Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 
   @@index([workflowId])
   @@index([tenantId, status])
@@ -2927,44 +2928,44 @@ enum WorkflowExecutionStatus {
 
 // Repository: Git repos being tracked for code intelligence
 model Repository {
-  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  tenantId     String     @map("tenant_id") @db.Uuid
-  name         String     @db.VarChar(255)
-  description  String?    @db.Text
-  url          String     @db.VarChar(2000) // Git clone URL
-  provider     RepoProvider @default(GITHUB)
-  defaultBranch String    @default("main") @map("default_branch") @db.VarChar(255)
+  id            String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tenantId      String       @map("tenant_id") @db.Uuid
+  name          String       @db.VarChar(255)
+  description   String?      @db.Text
+  url           String       @db.VarChar(2000) // Git clone URL
+  provider      RepoProvider @default(GITHUB)
+  defaultBranch String       @default("main") @map("default_branch") @db.VarChar(255)
 
   // Authentication
-  authType     RepoAuthType @default(NONE) @map("auth_type")
-  authConfig   Json        @default("{}") @map("auth_config") // Encrypted credentials
+  authType   RepoAuthType @default(NONE) @map("auth_type")
+  authConfig Json         @default("{}") @map("auth_config") // Encrypted credentials
 
   // Status
-  status       RepoStatus  @default(PENDING)
-  statusMessage String?    @map("status_message") @db.Text
-  clonedAt     DateTime?   @map("cloned_at")
-  lastSyncAt   DateTime?   @map("last_sync_at")
-  lastSyncCommit String?   @map("last_sync_commit") @db.VarChar(40) // SHA
+  status         RepoStatus @default(PENDING)
+  statusMessage  String?    @map("status_message") @db.Text
+  clonedAt       DateTime?  @map("cloned_at")
+  lastSyncAt     DateTime?  @map("last_sync_at")
+  lastSyncCommit String?    @map("last_sync_commit") @db.VarChar(40) // SHA
 
   // Storage
-  localPath    String?     @map("local_path") @db.VarChar(500) // /data/repos/{tenantId}/{repoId}
+  localPath String? @map("local_path") @db.VarChar(500) // /data/repos/{tenantId}/{repoId}
 
   // Stats
-  fileCount    Int         @default(0) @map("file_count")
-  totalLines   Int         @default(0) @map("total_lines")
-  languages    Json        @default("{}") // { "typescript": 5000, "javascript": 1000 }
+  fileCount  Int  @default(0) @map("file_count")
+  totalLines Int  @default(0) @map("total_lines")
+  languages  Json @default("{}") // { "typescript": 5000, "javascript": 1000 }
 
   // Metadata
-  metadata     Json        @default("{}")
-  createdAt    DateTime    @default(now()) @map("created_at")
-  updatedAt    DateTime    @updatedAt @map("updated_at")
-  createdById  String?     @map("created_by_id") @db.Uuid
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id") @db.Uuid
 
   // Relations
-  branches     CodeBranch[]
-  files        CodeFile[]
-  commits      CodeCommit[]
-  syncJobs     RepoSyncJob[]
+  branches CodeBranch[]
+  files    CodeFile[]
+  commits  CodeCommit[]
+  syncJobs RepoSyncJob[]
 
   @@unique([tenantId, url])
   @@index([tenantId])
@@ -2984,7 +2985,7 @@ enum RepoProvider {
 enum RepoAuthType {
   NONE
   SSH_KEY
-  PAT       // Personal Access Token
+  PAT // Personal Access Token
   GITHUB_APP
   OAUTH
 }
@@ -3000,20 +3001,20 @@ enum RepoStatus {
 
 // CodeBranch: Branches within a repo
 model CodeBranch {
-  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  repositoryId String     @map("repository_id") @db.Uuid
-  name         String     @db.VarChar(255) // e.g., "main", "feature/foo"
-  isDefault    Boolean    @default(false) @map("is_default")
-  isTracked    Boolean    @default(true) @map("is_tracked") // Whether to sync this branch
-  headCommit   String?    @map("head_commit") @db.VarChar(40)
-  aheadOfDefault Int      @default(0) @map("ahead_of_default")
-  behindDefault Int       @default(0) @map("behind_default")
+  id             String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  repositoryId   String  @map("repository_id") @db.Uuid
+  name           String  @db.VarChar(255) // e.g., "main", "feature/foo"
+  isDefault      Boolean @default(false) @map("is_default")
+  isTracked      Boolean @default(true) @map("is_tracked") // Whether to sync this branch
+  headCommit     String? @map("head_commit") @db.VarChar(40)
+  aheadOfDefault Int     @default(0) @map("ahead_of_default")
+  behindDefault  Int     @default(0) @map("behind_default")
 
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
 
   @@unique([repositoryId, name])
   @@index([repositoryId])
@@ -3022,39 +3023,42 @@ model CodeBranch {
 
 // CodeFile: Files tracked in a repository
 model CodeFile {
-  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  repositoryId String     @map("repository_id") @db.Uuid
-  path         String     @db.VarChar(1000) // Relative path from repo root
-  name         String     @db.VarChar(255)  // File name only
-  extension    String?    @db.VarChar(50)   // e.g., "ts", "py"
-  language     String?    @db.VarChar(50)   // Detected language
-  fileType     FileType   @default(SOURCE) @map("file_type")
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  repositoryId String   @map("repository_id") @db.Uuid
+  path         String   @db.VarChar(1000) // Relative path from repo root
+  name         String   @db.VarChar(255) // File name only
+  extension    String?  @db.VarChar(50) // e.g., "ts", "py"
+  language     String?  @db.VarChar(50) // Detected language
+  fileType     FileType @default(SOURCE) @map("file_type")
 
   // Content info
-  contentHash  String     @map("content_hash") @db.VarChar(64) // SHA-256 of content
-  lineCount    Int        @default(0) @map("line_count")
-  byteSize     Int        @default(0) @map("byte_size")
+  contentHash String @map("content_hash") @db.VarChar(64) // SHA-256 of content
+  lineCount   Int    @default(0) @map("line_count")
+  byteSize    Int    @default(0) @map("byte_size")
 
   // Change tracking
-  lastModifiedCommit String? @map("last_modified_commit") @db.VarChar(40)
-  lastModifiedAt DateTime? @map("last_modified_at")
-  changeFrequency Float    @default(0) @map("change_frequency") // Changes per week
+  lastModifiedCommit String?   @map("last_modified_commit") @db.VarChar(40)
+  lastModifiedAt     DateTime? @map("last_modified_at")
+  changeFrequency    Float     @default(0) @map("change_frequency") // Changes per week
 
   // Complexity metrics (computed later)
-  complexity   Json       @default("{}") // { cyclomatic: 5, linesOfCode: 100 }
+  complexity Json @default("{}") // { cyclomatic: 5, linesOfCode: 100 }
 
   // Soft delete
-  deletedAt    DateTime?  @map("deleted_at")
-  deletedInCommit String? @map("deleted_in_commit") @db.VarChar(40)
+  deletedAt       DateTime? @map("deleted_at")
+  deletedInCommit String?   @map("deleted_in_commit") @db.VarChar(40)
 
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  importsFrom  FileImport[] @relation("ImportSource")
-  importsTo    FileImport[] @relation("ImportTarget")
-  changes      FileChange[]
+  repository     Repository        @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  importsFrom    FileImport[]      @relation("ImportSource")
+  importsTo      FileImport[]      @relation("ImportTarget")
+  changes        FileChange[]
+  symbols        CodeSymbol[]
+  refSourceFiles SymbolReference[] @relation("RefSourceFile")
+  refTargetFiles SymbolReference[] @relation("RefTargetFile")
 
   @@unique([repositoryId, path])
   @@index([repositoryId])
@@ -3077,26 +3081,26 @@ enum FileType {
 
 // FileImport: Import relationships between files
 model FileImport {
-  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  repositoryId String     @map("repository_id") @db.Uuid
-  sourceFileId String     @map("source_file_id") @db.Uuid // File containing the import
-  targetFileId String?    @map("target_file_id") @db.Uuid // Resolved file (null if external)
+  id           String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  repositoryId String  @map("repository_id") @db.Uuid
+  sourceFileId String  @map("source_file_id") @db.Uuid // File containing the import
+  targetFileId String? @map("target_file_id") @db.Uuid // Resolved file (null if external)
 
   // Import details
-  importPath   String     @map("import_path") @db.VarChar(1000) // Raw import string
-  importType   ImportType @default(ES_IMPORT) @map("import_type")
-  isResolved   Boolean    @default(false) @map("is_resolved")
-  isExternal   Boolean    @default(false) @map("is_external") // npm package, etc.
+  importPath String     @map("import_path") @db.VarChar(1000) // Raw import string
+  importType ImportType @default(ES_IMPORT) @map("import_type")
+  isResolved Boolean    @default(false) @map("is_resolved")
+  isExternal Boolean    @default(false) @map("is_external") // npm package, etc.
 
   // Extracted symbols (if available)
-  importedSymbols Json    @default("[]") @map("imported_symbols") // ["Component", "default"]
+  importedSymbols Json @default("[]") @map("imported_symbols") // ["Component", "default"]
 
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  sourceFile   CodeFile   @relation("ImportSource", fields: [sourceFileId], references: [id], onDelete: Cascade)
-  targetFile   CodeFile?  @relation("ImportTarget", fields: [targetFileId], references: [id], onDelete: Cascade)
+  sourceFile CodeFile  @relation("ImportSource", fields: [sourceFileId], references: [id], onDelete: Cascade)
+  targetFile CodeFile? @relation("ImportTarget", fields: [targetFileId], references: [id], onDelete: Cascade)
 
   @@index([repositoryId])
   @@index([sourceFileId])
@@ -3106,48 +3110,48 @@ model FileImport {
 }
 
 enum ImportType {
-  ES_IMPORT        // import x from 'y'
-  ES_DYNAMIC       // import('y')
-  ES_REEXPORT      // export * from 'y'
-  COMMONJS         // require('y')
-  TYPESCRIPT_TYPE  // import type { X } from 'y'
-  CSS_IMPORT       // @import 'y'
-  SCSS_IMPORT      // @use 'y', @forward 'y'
+  ES_IMPORT // import x from 'y'
+  ES_DYNAMIC // import('y')
+  ES_REEXPORT // export * from 'y'
+  COMMONJS // require('y')
+  TYPESCRIPT_TYPE // import type { X } from 'y'
+  CSS_IMPORT // @import 'y'
+  SCSS_IMPORT // @use 'y', @forward 'y'
 }
 
 // CodeCommit: Commit history
 model CodeCommit {
-  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  repositoryId String     @map("repository_id") @db.Uuid
-  sha          String     @db.VarChar(40)
-  shortSha     String     @map("short_sha") @db.VarChar(7)
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  repositoryId String @map("repository_id") @db.Uuid
+  sha          String @db.VarChar(40)
+  shortSha     String @map("short_sha") @db.VarChar(7)
 
   // Commit info
-  message      String     @db.Text
-  authorName   String     @map("author_name") @db.VarChar(255)
-  authorEmail  String     @map("author_email") @db.VarChar(255)
-  authoredAt   DateTime   @map("authored_at")
-  committerName String    @map("committer_name") @db.VarChar(255)
+  message        String   @db.Text
+  authorName     String   @map("author_name") @db.VarChar(255)
+  authorEmail    String   @map("author_email") @db.VarChar(255)
+  authoredAt     DateTime @map("authored_at")
+  committerName  String   @map("committer_name") @db.VarChar(255)
   committerEmail String   @map("committer_email") @db.VarChar(255)
-  committedAt  DateTime   @map("committed_at")
+  committedAt    DateTime @map("committed_at")
 
   // Parent commits (for merge detection)
-  parentShas   Json       @default("[]") @map("parent_shas") // Array of parent SHAs
-  isMerge      Boolean    @default(false) @map("is_merge")
+  parentShas Json    @default("[]") @map("parent_shas") // Array of parent SHAs
+  isMerge    Boolean @default(false) @map("is_merge")
 
   // Stats
-  filesChanged Int        @default(0) @map("files_changed")
-  insertions   Int        @default(0)
-  deletions    Int        @default(0)
+  filesChanged Int @default(0) @map("files_changed")
+  insertions   Int @default(0)
+  deletions    Int @default(0)
 
   // Branch info (when synced)
-  branchName   String?    @map("branch_name") @db.VarChar(255)
+  branchName String? @map("branch_name") @db.VarChar(255)
 
-  createdAt    DateTime   @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  fileChanges  FileChange[]
+  repository  Repository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  fileChanges FileChange[]
 
   @@unique([repositoryId, sha])
   @@index([repositoryId])
@@ -3158,28 +3162,28 @@ model CodeCommit {
 
 // FileChange: Per-file changes in each commit
 model FileChange {
-  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  commitId     String     @map("commit_id") @db.Uuid
-  fileId       String?    @map("file_id") @db.Uuid // Null if file was deleted
+  id       String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  commitId String  @map("commit_id") @db.Uuid
+  fileId   String? @map("file_id") @db.Uuid // Null if file was deleted
 
   // Change info
-  changeType   FileChangeType @map("change_type")
-  oldPath      String?    @map("old_path") @db.VarChar(1000) // For renames
-  newPath      String     @map("new_path") @db.VarChar(1000)
+  changeType FileChangeType @map("change_type")
+  oldPath    String?        @map("old_path") @db.VarChar(1000) // For renames
+  newPath    String         @map("new_path") @db.VarChar(1000)
 
   // Stats
-  insertions   Int        @default(0)
-  deletions    Int        @default(0)
+  insertions Int @default(0)
+  deletions  Int @default(0)
 
   // Content hashes (for diffing)
-  oldHash      String?    @map("old_hash") @db.VarChar(64)
-  newHash      String?    @map("new_hash") @db.VarChar(64)
+  oldHash String? @map("old_hash") @db.VarChar(64)
+  newHash String? @map("new_hash") @db.VarChar(64)
 
-  createdAt    DateTime   @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  commit       CodeCommit @relation(fields: [commitId], references: [id], onDelete: Cascade)
-  file         CodeFile?  @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  commit CodeCommit @relation(fields: [commitId], references: [id], onDelete: Cascade)
+  file   CodeFile?  @relation(fields: [fileId], references: [id], onDelete: SetNull)
 
   @@index([commitId])
   @@index([fileId])
@@ -3196,36 +3200,36 @@ enum FileChangeType {
 
 // RepoSyncJob: Background sync job tracking
 model RepoSyncJob {
-  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  repositoryId String     @map("repository_id") @db.Uuid
-  jobType      SyncJobType @map("job_type")
+  id           String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  repositoryId String        @map("repository_id") @db.Uuid
+  jobType      SyncJobType   @map("job_type")
   status       SyncJobStatus @default(PENDING)
 
   // Progress
-  progress     Int        @default(0) // 0-100
+  progress        Int     @default(0) // 0-100
   progressMessage String? @map("progress_message") @db.VarChar(500)
 
   // Commit range (for incremental sync)
-  fromCommit   String?    @map("from_commit") @db.VarChar(40)
-  toCommit     String?    @map("to_commit") @db.VarChar(40)
+  fromCommit String? @map("from_commit") @db.VarChar(40)
+  toCommit   String? @map("to_commit") @db.VarChar(40)
 
   // Stats
-  filesProcessed Int      @default(0) @map("files_processed")
-  commitsProcessed Int    @default(0) @map("commits_processed")
+  filesProcessed   Int @default(0) @map("files_processed")
+  commitsProcessed Int @default(0) @map("commits_processed")
 
   // Timing
-  startedAt    DateTime?  @map("started_at")
-  completedAt  DateTime?  @map("completed_at")
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
 
   // Error tracking
-  error        String?    @db.Text
-  retryCount   Int        @default(0) @map("retry_count")
+  error      String? @db.Text
+  retryCount Int     @default(0) @map("retry_count")
 
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
 
   @@index([repositoryId])
   @@index([repositoryId, status])
@@ -3239,4 +3243,238 @@ enum SyncJobType {
   FULL_RESYNC
   IMPORT_ANALYSIS
   FILE_TRACKING
+  SYMBOL_ANALYSIS
+}
+
+// ============================================================================
+// SYMBOL ANALYSIS ENGINE (Phase 2)
+// ============================================================================
+
+// CodeSymbol: Functions, classes, interfaces, types extracted from code
+model CodeSymbol {
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  repositoryId String @map("repository_id") @db.Uuid
+  fileId       String @map("file_id") @db.Uuid
+
+  // Symbol identification
+  name          String     @db.VarChar(500)
+  kind          SymbolKind
+  signature     String?    @db.Text // Full signature for functions/methods
+  documentation String?    @db.Text // JSDoc/TSDoc content
+
+  // Location in file
+  startLine   Int @map("start_line")
+  startColumn Int @map("start_column")
+  endLine     Int @map("end_line")
+  endColumn   Int @map("end_column")
+
+  // Hierarchy
+  parentSymbolId String? @map("parent_symbol_id") @db.Uuid // For nested symbols
+  containerName  String? @map("container_name") @db.VarChar(500) // Class/module name
+
+  // Visibility
+  visibility SymbolVisibility @default(PUBLIC)
+  isExported Boolean          @default(false) @map("is_exported")
+  isAsync    Boolean          @default(false) @map("is_async")
+  isStatic   Boolean          @default(false) @map("is_static")
+  isAbstract Boolean          @default(false) @map("is_abstract")
+
+  // Complexity metrics
+  cyclomaticComplexity Int @default(0) @map("cyclomatic_complexity")
+  cognitiveComplexity  Int @default(0) @map("cognitive_complexity")
+  lineCount            Int @default(0) @map("line_count")
+  parameterCount       Int @default(0) @map("parameter_count")
+
+  // Type information
+  returnType     String? @map("return_type") @db.VarChar(500)
+  parameters     Json    @default("[]") // [{name, type, optional}]
+  typeParameters Json    @default("[]") @map("type_parameters") // Generics
+
+  // Metadata
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Soft delete (when symbol is removed from code)
+  deletedAt       DateTime? @map("deleted_at")
+  deletedInCommit String?   @map("deleted_in_commit") @db.VarChar(40)
+
+  // Relations
+  file            CodeFile               @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  parentSymbol    CodeSymbol?            @relation("SymbolHierarchy", fields: [parentSymbolId], references: [id])
+  childSymbols    CodeSymbol[]           @relation("SymbolHierarchy")
+  outgoingRefs    SymbolReference[]      @relation("ReferenceSource")
+  incomingRefs    SymbolReference[]      @relation("ReferenceTarget")
+  capabilityLinks SymbolCapabilityLink[]
+
+  @@unique([fileId, name, kind, startLine])
+  @@index([repositoryId])
+  @@index([fileId])
+  @@index([kind])
+  @@index([name])
+  @@index([parentSymbolId])
+  @@index([isExported])
+  @@index([deletedAt])
+  @@map("code_symbols")
+}
+
+enum SymbolKind {
+  FUNCTION
+  METHOD
+  CLASS
+  INTERFACE
+  TYPE_ALIAS
+  ENUM
+  ENUM_MEMBER
+  VARIABLE
+  CONSTANT
+  PROPERTY
+  GETTER
+  SETTER
+  CONSTRUCTOR
+  NAMESPACE
+  MODULE
+  PARAMETER
+  TYPE_PARAMETER
+}
+
+enum SymbolVisibility {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+  INTERNAL
+}
+
+// SymbolReference: Call graph edges showing symbol usage
+model SymbolReference {
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  repositoryId String @map("repository_id") @db.Uuid
+
+  // Source: Where the reference occurs
+  sourceSymbolId String @map("source_symbol_id") @db.Uuid
+  sourceFileId   String @map("source_file_id") @db.Uuid
+  sourceLine     Int    @map("source_line")
+  sourceColumn   Int    @map("source_column")
+
+  // Target: What is being referenced
+  targetSymbolId String? @map("target_symbol_id") @db.Uuid // Null if external
+  targetFileId   String? @map("target_file_id") @db.Uuid
+  targetName     String  @map("target_name") @db.VarChar(500) // For external refs
+
+  // Reference type
+  referenceType ReferenceType @map("reference_type")
+  isTypeOnly    Boolean       @default(false) @map("is_type_only") // Type-only import
+
+  // External reference info
+  isExternal      Boolean @default(false) @map("is_external")
+  externalPackage String? @map("external_package") @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  sourceSymbol CodeSymbol  @relation("ReferenceSource", fields: [sourceSymbolId], references: [id], onDelete: Cascade)
+  targetSymbol CodeSymbol? @relation("ReferenceTarget", fields: [targetSymbolId], references: [id], onDelete: Cascade)
+  sourceFile   CodeFile    @relation("RefSourceFile", fields: [sourceFileId], references: [id], onDelete: Cascade)
+  targetFile   CodeFile?   @relation("RefTargetFile", fields: [targetFileId], references: [id], onDelete: Cascade)
+
+  @@index([repositoryId])
+  @@index([sourceSymbolId])
+  @@index([targetSymbolId])
+  @@index([sourceFileId])
+  @@index([targetFileId])
+  @@index([referenceType])
+  @@index([isExternal])
+  @@map("symbol_references")
+}
+
+enum ReferenceType {
+  CALL // Function/method call
+  INSTANTIATION // new Class()
+  EXTENSION // extends/implements
+  TYPE_REFERENCE // Type usage
+  IMPORT // Import statement
+  PROPERTY_ACCESS // obj.property
+  ASSIGNMENT // Variable assignment
+  PARAMETER // Parameter type
+  RETURN_TYPE // Return type annotation
+  DECORATOR // @decorator usage
+}
+
+// DependencyGraph: Cached graph data for performance
+model DependencyGraph {
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  repositoryId String @map("repository_id") @db.Uuid
+
+  // Graph identification
+  graphType GraphType @map("graph_type")
+  rootId    String?   @map("root_id") @db.Uuid // File or symbol ID
+  rootPath  String?   @map("root_path") @db.VarChar(1000)
+
+  // Cached data
+  graphData Json @map("graph_data") // Serialized graph structure
+  nodeCount Int  @default(0) @map("node_count")
+  edgeCount Int  @default(0) @map("edge_count")
+  maxDepth  Int  @default(0) @map("max_depth")
+
+  // Validity
+  commitSha  String    @map("commit_sha") @db.VarChar(40) // Valid as of this commit
+  isStale    Boolean   @default(false) @map("is_stale")
+  computedAt DateTime  @map("computed_at")
+  expiresAt  DateTime? @map("expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([repositoryId, graphType, rootId])
+  @@index([repositoryId])
+  @@index([graphType])
+  @@index([isStale])
+  @@map("dependency_graphs")
+}
+
+enum GraphType {
+  FILE_IMPORTS // File-level import graph
+  SYMBOL_CALLS // Function call graph
+  CLASS_HIERARCHY // Inheritance graph
+  TYPE_DEPENDENCIES // Type reference graph
+  FULL_DEPENDENCY // Combined dependency graph
+}
+
+// SymbolCapabilityLink: Link symbols to business capabilities (Phase 3 prep)
+model SymbolCapabilityLink {
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  symbolId     String @map("symbol_id") @db.Uuid
+  capabilityId String @map("capability_id") @db.Uuid
+
+  // Link metadata
+  confidence   Float              @default(1.0) // 0-1 confidence score
+  linkType     CapabilityLinkType @map("link_type")
+  isAutoLinked Boolean            @default(false) @map("is_auto_linked") // AI-inferred vs manual
+
+  // Evidence
+  evidence Json     @default("[]") // Reasons for the link
+  linkedBy String?  @map("linked_by") @db.Uuid // User who created link
+  linkedAt DateTime @default(now()) @map("linked_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  symbol     CodeSymbol @relation(fields: [symbolId], references: [id], onDelete: Cascade)
+  capability Capability @relation(fields: [capabilityId], references: [id], onDelete: Cascade)
+
+  @@unique([symbolId, capabilityId])
+  @@index([symbolId])
+  @@index([capabilityId])
+  @@index([linkType])
+  @@index([isAutoLinked])
+  @@map("symbol_capability_links")
+}
+
+enum CapabilityLinkType {
+  IMPLEMENTS // Symbol implements the capability
+  SUPPORTS // Symbol supports/enables the capability
+  TESTS // Symbol tests the capability
+  CONFIGURES // Symbol configures the capability
+  DOCUMENTS // Symbol documents the capability
 }

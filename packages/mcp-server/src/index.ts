@@ -306,9 +306,48 @@ const GetCapabilityCodeSchema = z.object({
 
 const GetCallGraphSchema = z.object({
   repoId: z.string().describe('Repository ID'),
-  fileId: z.string().describe('File ID'),
+  fileId: z.string().optional().describe('File ID (optional if symbolId provided)'),
+  symbolId: z.string().optional().describe('Symbol ID to build graph from'),
   direction: z.enum(['callers', 'callees', 'both']).optional().default('both').describe('Graph direction'),
   depth: z.number().optional().default(2).describe('Maximum depth'),
+});
+
+// Symbol Analysis Schemas (Phase 2)
+const GetSymbolDetailsSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  symbolId: z.string().describe('Symbol ID'),
+});
+
+const GetSymbolReferencesSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  symbolId: z.string().describe('Symbol ID'),
+  direction: z.enum(['incoming', 'outgoing', 'both']).optional().default('both').describe('Reference direction'),
+  referenceType: z.enum(['CALL', 'INSTANTIATION', 'EXTENSION', 'TYPE_REFERENCE', 'IMPORT']).optional().describe('Filter by reference type'),
+  limit: z.number().optional().default(50).describe('Maximum results'),
+});
+
+const GetComplexityReportSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  fileId: z.string().optional().describe('Filter to specific file'),
+  minComplexity: z.number().optional().default(10).describe('Minimum complexity threshold'),
+  limit: z.number().optional().default(20).describe('Maximum results'),
+});
+
+const AnalyzeSymbolsSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  fileIds: z.array(z.string()).optional().describe('Specific files to analyze (or all if not provided)'),
+});
+
+const FindSymbolPathSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  sourceSymbolId: z.string().describe('Source symbol ID'),
+  targetSymbolId: z.string().describe('Target symbol ID'),
+  maxDepth: z.number().optional().default(10).describe('Maximum search depth'),
+});
+
+const DetectCyclesSchema = z.object({
+  repoId: z.string().describe('Repository ID'),
+  startSymbolId: z.string().optional().describe('Start symbol (or search all if not provided)'),
 });
 
 // Server configuration
@@ -1565,16 +1604,103 @@ export function createMcpServer(config: ServerConfig) {
         {
           name: 'get_call_graph',
           description:
-            'Get the call graph for a file showing function calls and dependencies.',
+            'Get the call graph for a symbol showing function calls and dependencies.',
           inputSchema: {
             type: 'object',
             properties: {
               repoId: { type: 'string', description: 'Repository ID' },
-              fileId: { type: 'string', description: 'File ID' },
+              fileId: { type: 'string', description: 'File ID (optional if symbolId provided)' },
+              symbolId: { type: 'string', description: 'Symbol ID to build graph from' },
               direction: { type: 'string', enum: ['callers', 'callees', 'both'], description: 'Graph direction (default: both)' },
               depth: { type: 'number', description: 'Maximum depth (default: 2)' },
             },
-            required: ['repoId', 'fileId'],
+            required: ['repoId'],
+          },
+        },
+        // Symbol Analysis Tools (Phase 2)
+        {
+          name: 'get_symbol_details',
+          description:
+            'Get detailed information about a code symbol including signature, complexity, and location.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              symbolId: { type: 'string', description: 'Symbol ID' },
+            },
+            required: ['repoId', 'symbolId'],
+          },
+        },
+        {
+          name: 'get_symbol_references',
+          description:
+            'Get all references to or from a symbol (callers, callees, type references).',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              symbolId: { type: 'string', description: 'Symbol ID' },
+              direction: { type: 'string', enum: ['incoming', 'outgoing', 'both'], description: 'Reference direction (default: both)' },
+              referenceType: { type: 'string', enum: ['CALL', 'INSTANTIATION', 'EXTENSION', 'TYPE_REFERENCE', 'IMPORT'], description: 'Filter by reference type' },
+              limit: { type: 'number', description: 'Maximum results (default: 50)' },
+            },
+            required: ['repoId', 'symbolId'],
+          },
+        },
+        {
+          name: 'get_complexity_report',
+          description:
+            'Get complexity metrics report for a repository or file, showing high-complexity symbols.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              fileId: { type: 'string', description: 'Filter to specific file' },
+              minComplexity: { type: 'number', description: 'Minimum complexity threshold (default: 10)' },
+              limit: { type: 'number', description: 'Maximum results (default: 20)' },
+            },
+            required: ['repoId'],
+          },
+        },
+        {
+          name: 'analyze_symbols',
+          description:
+            'Trigger symbol analysis for a repository to extract functions, classes, and call references.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              fileIds: { type: 'array', items: { type: 'string' }, description: 'Specific files to analyze' },
+            },
+            required: ['repoId'],
+          },
+        },
+        {
+          name: 'find_symbol_path',
+          description:
+            'Find the shortest call path between two symbols in the codebase.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              sourceSymbolId: { type: 'string', description: 'Source symbol ID' },
+              targetSymbolId: { type: 'string', description: 'Target symbol ID' },
+              maxDepth: { type: 'number', description: 'Maximum search depth (default: 10)' },
+            },
+            required: ['repoId', 'sourceSymbolId', 'targetSymbolId'],
+          },
+        },
+        {
+          name: 'detect_cycles',
+          description:
+            'Detect circular dependencies in the call graph.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repoId: { type: 'string', description: 'Repository ID' },
+              startSymbolId: { type: 'string', description: 'Start symbol (searches all if not provided)' },
+            },
+            required: ['repoId'],
           },
         },
       ],
@@ -2746,16 +2872,133 @@ ${contextResponse.text.substring(0, 300)}...
 
       case 'get_call_graph': {
         const input = GetCallGraphSchema.parse(args);
-        // This would need symbol analysis (Phase 2) to work fully
-        const deps = await apiCall<unknown>(
+        let endpoint = `/api/v1/repositories/${input.repoId}/symbols/call-graph`;
+        const params = new URLSearchParams();
+        if (input.symbolId) params.append('symbolId', input.symbolId);
+        if (input.fileId) params.append('fileId', input.fileId);
+        if (input.direction) params.append('direction', input.direction);
+        if (input.depth) params.append('depth', input.depth.toString());
+
+        const graph = await apiCall<unknown>(
           'GET',
-          `/api/v1/repositories/${input.repoId}/files/${input.fileId}/dependencies?depth=${input.depth || 2}`
+          `${endpoint}?${params.toString()}`
         );
         return {
           content: [
             {
               type: 'text',
-              text: JSON.stringify(deps, null, 2),
+              text: JSON.stringify(graph, null, 2),
+            },
+          ],
+        };
+      }
+
+      // Symbol Analysis Tool Handlers (Phase 2)
+      case 'get_symbol_details': {
+        const input = GetSymbolDetailsSchema.parse(args);
+        const symbol = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/symbols/${input.symbolId}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(symbol, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_symbol_references': {
+        const input = GetSymbolReferencesSchema.parse(args);
+        const params = new URLSearchParams();
+        if (input.direction) params.append('direction', input.direction);
+        if (input.referenceType) params.append('referenceType', input.referenceType);
+        if (input.limit) params.append('limit', input.limit.toString());
+
+        const refs = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/symbols/${input.symbolId}/references?${params.toString()}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(refs, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_complexity_report': {
+        const input = GetComplexityReportSchema.parse(args);
+        const params = new URLSearchParams();
+        if (input.fileId) params.append('fileId', input.fileId);
+        if (input.minComplexity) params.append('minComplexity', input.minComplexity.toString());
+        if (input.limit) params.append('limit', input.limit.toString());
+
+        const report = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/symbols/complexity?${params.toString()}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(report, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'analyze_symbols': {
+        const input = AnalyzeSymbolsSchema.parse(args);
+        const result = await apiCall<unknown>(
+          'POST',
+          `/api/v1/repositories/${input.repoId}/symbols/analyze`,
+          { fileIds: input.fileIds }
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'find_symbol_path': {
+        const input = FindSymbolPathSchema.parse(args);
+        const path = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/symbols/path?source=${input.sourceSymbolId}&target=${input.targetSymbolId}&maxDepth=${input.maxDepth || 10}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: path ? JSON.stringify(path, null, 2) : 'No path found between the symbols.',
+            },
+          ],
+        };
+      }
+
+      case 'detect_cycles': {
+        const input = DetectCyclesSchema.parse(args);
+        const params = new URLSearchParams();
+        if (input.startSymbolId) params.append('startSymbolId', input.startSymbolId);
+
+        const cycles = await apiCall<unknown>(
+          'GET',
+          `/api/v1/repositories/${input.repoId}/symbols/cycles?${params.toString()}`
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(cycles, null, 2),
             },
           ],
         };

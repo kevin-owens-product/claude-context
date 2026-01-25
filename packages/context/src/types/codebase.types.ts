@@ -82,6 +82,67 @@ export enum SyncJobType {
   FULL_RESYNC = 'FULL_RESYNC',
   IMPORT_ANALYSIS = 'IMPORT_ANALYSIS',
   FILE_TRACKING = 'FILE_TRACKING',
+  SYMBOL_ANALYSIS = 'SYMBOL_ANALYSIS',
+}
+
+// ============================================================================
+// SYMBOL ANALYSIS ENUMS
+// ============================================================================
+
+export enum SymbolKind {
+  FUNCTION = 'FUNCTION',
+  METHOD = 'METHOD',
+  CLASS = 'CLASS',
+  INTERFACE = 'INTERFACE',
+  TYPE_ALIAS = 'TYPE_ALIAS',
+  ENUM = 'ENUM',
+  ENUM_MEMBER = 'ENUM_MEMBER',
+  VARIABLE = 'VARIABLE',
+  CONSTANT = 'CONSTANT',
+  PROPERTY = 'PROPERTY',
+  GETTER = 'GETTER',
+  SETTER = 'SETTER',
+  CONSTRUCTOR = 'CONSTRUCTOR',
+  NAMESPACE = 'NAMESPACE',
+  MODULE = 'MODULE',
+  PARAMETER = 'PARAMETER',
+  TYPE_PARAMETER = 'TYPE_PARAMETER',
+}
+
+export enum SymbolVisibility {
+  PUBLIC = 'PUBLIC',
+  PRIVATE = 'PRIVATE',
+  PROTECTED = 'PROTECTED',
+  INTERNAL = 'INTERNAL',
+}
+
+export enum ReferenceType {
+  CALL = 'CALL',
+  INSTANTIATION = 'INSTANTIATION',
+  EXTENSION = 'EXTENSION',
+  TYPE_REFERENCE = 'TYPE_REFERENCE',
+  IMPORT = 'IMPORT',
+  PROPERTY_ACCESS = 'PROPERTY_ACCESS',
+  ASSIGNMENT = 'ASSIGNMENT',
+  PARAMETER = 'PARAMETER',
+  RETURN_TYPE = 'RETURN_TYPE',
+  DECORATOR = 'DECORATOR',
+}
+
+export enum GraphType {
+  FILE_IMPORTS = 'FILE_IMPORTS',
+  SYMBOL_CALLS = 'SYMBOL_CALLS',
+  CLASS_HIERARCHY = 'CLASS_HIERARCHY',
+  TYPE_DEPENDENCIES = 'TYPE_DEPENDENCIES',
+  FULL_DEPENDENCY = 'FULL_DEPENDENCY',
+}
+
+export enum CapabilityLinkType {
+  IMPLEMENTS = 'IMPLEMENTS',
+  SUPPORTS = 'SUPPORTS',
+  TESTS = 'TESTS',
+  CONFIGURES = 'CONFIGURES',
+  DOCUMENTS = 'DOCUMENTS',
 }
 
 export enum SyncJobStatus {
@@ -452,4 +513,264 @@ export interface MCPCommitInfo {
   author: string;
   date: string;
   filesChanged: number;
+}
+
+// ============================================================================
+// SYMBOL ANALYSIS TYPES
+// ============================================================================
+
+export type CodeSymbolId = string & { __brand: 'CodeSymbolId' };
+export type SymbolReferenceId = string & { __brand: 'SymbolReferenceId' };
+export type DependencyGraphId = string & { __brand: 'DependencyGraphId' };
+export type SymbolCapabilityLinkId = string & { __brand: 'SymbolCapabilityLinkId' };
+
+export interface SymbolParameter {
+  name: string;
+  type?: string;
+  optional: boolean;
+  defaultValue?: string;
+}
+
+export interface CodeSymbol {
+  id: CodeSymbolId;
+  repositoryId: RepositoryId;
+  fileId: CodeFileId;
+  name: string;
+  kind: SymbolKind;
+  signature?: string;
+  documentation?: string;
+  startLine: number;
+  startColumn: number;
+  endLine: number;
+  endColumn: number;
+  parentSymbolId?: CodeSymbolId;
+  containerName?: string;
+  visibility: SymbolVisibility;
+  isExported: boolean;
+  isAsync: boolean;
+  isStatic: boolean;
+  isAbstract: boolean;
+  cyclomaticComplexity: number;
+  cognitiveComplexity: number;
+  lineCount: number;
+  parameterCount: number;
+  returnType?: string;
+  parameters: SymbolParameter[];
+  typeParameters: string[];
+  metadata: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date;
+  deletedInCommit?: string;
+}
+
+export interface SymbolReference {
+  id: SymbolReferenceId;
+  repositoryId: RepositoryId;
+  sourceSymbolId: CodeSymbolId;
+  sourceFileId: CodeFileId;
+  sourceLine: number;
+  sourceColumn: number;
+  targetSymbolId?: CodeSymbolId;
+  targetFileId?: CodeFileId;
+  targetName: string;
+  referenceType: ReferenceType;
+  isTypeOnly: boolean;
+  isExternal: boolean;
+  externalPackage?: string;
+  createdAt: Date;
+}
+
+export interface CachedDependencyGraph {
+  id: DependencyGraphId;
+  repositoryId: RepositoryId;
+  graphType: GraphType;
+  rootId?: string;
+  rootPath?: string;
+  graphData: CallGraphData;
+  nodeCount: number;
+  edgeCount: number;
+  maxDepth: number;
+  commitSha: string;
+  isStale: boolean;
+  computedAt: Date;
+  expiresAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SymbolCapabilityLink {
+  id: SymbolCapabilityLinkId;
+  symbolId: CodeSymbolId;
+  capabilityId: string;
+  confidence: number;
+  linkType: CapabilityLinkType;
+  isAutoLinked: boolean;
+  evidence: string[];
+  linkedBy?: string;
+  linkedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================================================
+// SYMBOL ANALYSIS REQUEST/FILTER TYPES
+// ============================================================================
+
+export interface ListSymbolsFilter {
+  fileId?: CodeFileId;
+  kind?: SymbolKind | SymbolKind[];
+  name?: string;
+  isExported?: boolean;
+  visibility?: SymbolVisibility;
+  minComplexity?: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface SearchSymbolsRequest {
+  query: string;
+  kind?: SymbolKind[];
+  filePatterns?: string[];
+  limit?: number;
+}
+
+export interface SymbolSearchResult {
+  symbol: CodeSymbol;
+  file: {
+    id: CodeFileId;
+    path: string;
+  };
+  matchScore: number;
+}
+
+// ============================================================================
+// CALL GRAPH TYPES
+// ============================================================================
+
+export interface CallGraphNode {
+  symbolId: CodeSymbolId;
+  name: string;
+  kind: SymbolKind;
+  filePath: string;
+  fileId: CodeFileId;
+  depth: number;
+  complexity: number;
+  callCount: number; // How many times this is called
+  children: CallGraphNode[];
+}
+
+export interface CallGraphData {
+  root: CallGraphNode;
+  totalNodes: number;
+  maxDepth: number;
+  externalCalls: ExternalCallInfo[];
+  metrics: CallGraphMetrics;
+}
+
+export interface ExternalCallInfo {
+  package: string;
+  symbol: string;
+  callCount: number;
+  calledFrom: string[]; // File paths
+}
+
+export interface CallGraphMetrics {
+  avgFanOut: number; // Average outgoing calls per function
+  avgFanIn: number; // Average incoming calls per function
+  maxFanOut: number;
+  maxFanIn: number;
+  couplingScore: number; // 0-100
+}
+
+// ============================================================================
+// COMPLEXITY METRICS TYPES
+// ============================================================================
+
+export interface SymbolComplexityMetrics {
+  cyclomaticComplexity: number;
+  cognitiveComplexity: number;
+  linesOfCode: number;
+  logicalLinesOfCode: number;
+  parameterCount: number;
+  nestingDepth: number;
+  maintainabilityIndex: number;
+}
+
+export interface FileComplexityReport {
+  fileId: CodeFileId;
+  path: string;
+  totalSymbols: number;
+  avgCyclomaticComplexity: number;
+  avgCognitiveComplexity: number;
+  maxCyclomaticComplexity: number;
+  maxCognitiveComplexity: number;
+  complexSymbols: Array<{
+    symbolId: CodeSymbolId;
+    name: string;
+    kind: SymbolKind;
+    cyclomaticComplexity: number;
+    cognitiveComplexity: number;
+  }>;
+}
+
+export interface RepositoryComplexityReport {
+  repositoryId: RepositoryId;
+  analyzedAt: Date;
+  totalFiles: number;
+  totalSymbols: number;
+  avgFileComplexity: number;
+  avgSymbolComplexity: number;
+  complexityDistribution: {
+    low: number; // 1-10
+    medium: number; // 11-20
+    high: number; // 21-50
+    veryHigh: number; // 50+
+  };
+  topComplexFiles: FileComplexityReport[];
+  topComplexSymbols: Array<{
+    symbolId: CodeSymbolId;
+    name: string;
+    filePath: string;
+    cyclomaticComplexity: number;
+  }>;
+}
+
+// ============================================================================
+// MCP SYMBOL TYPES
+// ============================================================================
+
+export interface MCPSymbolInfo {
+  id: string;
+  name: string;
+  kind: SymbolKind;
+  signature?: string;
+  filePath: string;
+  line: number;
+  isExported: boolean;
+  complexity: number;
+}
+
+export interface MCPCallGraphInfo {
+  rootSymbol: string;
+  rootFile: string;
+  nodeCount: number;
+  maxDepth: number;
+  calls: Array<{
+    from: string;
+    to: string;
+    fromFile: string;
+    toFile: string;
+  }>;
+}
+
+export interface MCPComplexityInfo {
+  filePath: string;
+  avgComplexity: number;
+  maxComplexity: number;
+  complexSymbols: Array<{
+    name: string;
+    complexity: number;
+    line: number;
+  }>;
 }

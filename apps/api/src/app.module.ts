@@ -40,6 +40,7 @@ import { WorkflowsModule } from './workflows/workflows.module';
 
 // Codebase Observation Engine
 import { RepositoriesModule } from './repositories/repositories.module';
+import { SymbolsModule } from './symbols/symbols.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { RepositoriesModule } from './repositories/repositories.module';
     WorkflowsModule,
     // Codebase Observation Engine
     RepositoriesModule,
+    SymbolsModule,
   ],
   providers: [
     {

@@ -334,5 +334,20 @@ export { GitSyncService, type GitAuthConfig, type GitRepoInfo, type GitFileTree 
 export { ImportAnalyzerService, type FileResolver, type LanguageParser } from './services/import-analyzer.service';
 export { FileTrackerService, type FileTrackingResult, type TrackedFile, type FileStats } from './services/file-tracker.service';
 
+// Symbol Analysis Engine
+export {
+  SymbolAnalyzerService,
+  type ExtractedSymbol,
+  type ExtractedReference,
+  type SymbolAnalysisResult,
+} from './services/symbol-analyzer.service';
+
+export {
+  CallGraphService,
+  type CallGraphOptions,
+  type CallGraphEdge,
+  type SymbolNode,
+} from './services/call-graph.service';
+
 // Utilities
 export { countTokens, truncateToTokenBudget, chunkText } from './utils/tokens';
