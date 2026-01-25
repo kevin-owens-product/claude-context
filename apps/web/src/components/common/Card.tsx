@@ -16,8 +16,8 @@ export function Card({ children, className, onClick }: CardProps) {
   return (
     <div
       className={clsx(
-        'bg-white rounded-lg border border-gray-200 shadow-sm',
-        onClick && 'cursor-pointer hover:border-gray-300 hover:shadow-md transition-all',
+        'bg-white dark:bg-claude-neutral-800 rounded-lg border border-gray-200 dark:border-claude-neutral-700 shadow-sm',
+        onClick && 'cursor-pointer hover:border-gray-300 dark:hover:border-claude-neutral-600 hover:shadow-md transition-all',
         className,
       )}
       onClick={onClick}
@@ -34,7 +34,7 @@ interface CardHeaderProps {
 
 export function CardHeader({ children, className }: CardHeaderProps) {
   return (
-    <div className={clsx('px-4 py-3 border-b border-gray-200', className)}>
+    <div className={clsx('px-4 py-3 border-b border-gray-200 dark:border-claude-neutral-700', className)}>
       {children}
     </div>
   );

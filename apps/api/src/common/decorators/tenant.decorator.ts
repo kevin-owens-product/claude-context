@@ -27,16 +27,35 @@ export const CurrentUser = createParamDecorator(
   },
 );
 
+// Demo UUIDs for development without authentication
+const DEMO_TENANT_ID = '00000000-0000-0000-0000-000000000001' as TenantIdType;
+const DEMO_USER_ID = '00000000-0000-0000-0000-000000000001' as UserIdType;
+
 export const TenantId = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): TenantIdType => {
     const request = ctx.switchToHttp().getRequest();
-    return request.user?.tenantId;
+    return request.user?.tenantId || DEMO_TENANT_ID;
   },
 );
 
 export const UserId = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): UserIdType => {
     const request = ctx.switchToHttp().getRequest();
-    return request.user?.id;
+    return request.user?.id || DEMO_USER_ID;
+  },
+);
+
+export interface TenantContextData {
+  tenantId: TenantIdType;
+  userId: UserIdType;
+}
+
+export const TenantContext = createParamDecorator(
+  (_data: unknown, ctx: ExecutionContext): TenantContextData => {
+    const request = ctx.switchToHttp().getRequest();
+    return {
+      tenantId: request.user?.tenantId || DEMO_TENANT_ID,
+      userId: request.user?.id || DEMO_USER_ID,
+    };
   },
 );

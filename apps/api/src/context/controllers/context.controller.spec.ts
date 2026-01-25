@@ -96,15 +96,14 @@ describe('ContextController', () => {
 
         const result = await controller.listGraphs(
           mockTenantId,
-          mockWorkspaceId,
-          { limit: 20, offset: 0 },
+          { workspaceId: mockWorkspaceId, limit: 20, offset: 0 },
         );
 
         expect(result).toEqual(mockResult);
         expect(contextService.listGraphs).toHaveBeenCalledWith(
           mockWorkspaceId,
           mockTenantId,
-          { limit: 20, offset: 0 },
+          { workspaceId: mockWorkspaceId, limit: 20, offset: 0 },
         );
       });
     });
@@ -136,6 +135,7 @@ describe('ContextController', () => {
     describe('createGraph', () => {
       it('should create a new graph', async () => {
         const createDto = {
+          workspaceId: mockWorkspaceId,
           name: 'New Graph',
           description: 'A new graph',
           isDefault: false,
@@ -147,7 +147,6 @@ describe('ContextController', () => {
 
         const result = await controller.createGraph(
           mockTenantId,
-          mockWorkspaceId,
           createDto,
         );
 

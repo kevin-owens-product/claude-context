@@ -7,7 +7,6 @@
 import {
   IsString,
   IsOptional,
-  IsUUID,
   IsInt,
   Min,
   Max,
@@ -15,7 +14,10 @@ import {
   IsEnum,
   IsObject,
   ValidateNested,
+  Matches,
 } from 'class-validator';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ContextLayer, ContextNodeType, Freshness } from '@forge/context';
@@ -25,6 +27,10 @@ import { ContextLayer, ContextNodeType, Freshness } from '@forge/context';
 // ============================================================================
 
 export class CreateGraphDto {
+  @ApiProperty({ description: 'Workspace ID' })
+  @Matches(UUID_REGEX, { message: 'workspaceId must be a valid UUID' })
+  workspaceId!: string;
+
   @ApiProperty({ description: 'Name of the context graph' })
   @IsString()
   name!: string;
@@ -68,7 +74,7 @@ export class GraphResponseDto {
 
 export class CreateNodeDto {
   @ApiProperty({ description: 'Graph to add the node to' })
-  @IsUUID()
+  @Matches(UUID_REGEX, { message: 'graphId must be a valid UUID' })
   graphId!: string;
 
   @ApiProperty({ enum: ContextNodeType, description: 'Type of context node' })
@@ -185,7 +191,7 @@ export class SearchFiltersDto {
 
 export class SearchNodesDto {
   @ApiProperty({ description: 'Graph to search in' })
-  @IsUUID()
+  @Matches(UUID_REGEX, { message: 'graphId must be a valid UUID' })
   graphId!: string;
 
   @ApiProperty({ description: 'Search query' })
@@ -220,12 +226,12 @@ export class SearchResultDto {
 
 export class CompileContextDto {
   @ApiProperty({ description: 'Workspace to compile context for' })
-  @IsUUID()
+  @Matches(UUID_REGEX, { message: 'workspaceId must be a valid UUID' })
   workspaceId!: string;
 
   @ApiPropertyOptional({ description: 'Slice to include context from' })
   @IsOptional()
-  @IsUUID()
+  @Matches(UUID_REGEX, { message: 'sliceId must be a valid UUID' })
   sliceId?: string;
 
   @ApiPropertyOptional({ description: 'Query for semantic search' })
@@ -287,6 +293,12 @@ export class PaginationQueryDto {
   @Min(0)
   @Type(() => Number)
   offset?: number;
+}
+
+export class WorkspacePaginationQueryDto extends PaginationQueryDto {
+  @ApiProperty({ description: 'Workspace ID' })
+  @Matches(UUID_REGEX, { message: 'workspaceId must be a valid UUID' })
+  workspaceId!: string;
 }
 
 export class ListNodesQueryDto extends PaginationQueryDto {

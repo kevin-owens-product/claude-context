@@ -6,6 +6,10 @@
 
 const API_BASE = '/api/v1';
 
+// Demo credentials for local development
+const DEMO_TENANT_ID = '00000000-0000-0000-0000-000000000001';
+const DEMO_USER_ID = '00000000-0000-0000-0000-000000000001';
+
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | undefined>;
 }
@@ -43,6 +47,8 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     ...fetchOptions,
     headers: {
       'Content-Type': 'application/json',
+      'x-tenant-id': DEMO_TENANT_ID,
+      'x-user-id': DEMO_USER_ID,
       ...fetchOptions.headers,
     },
   });

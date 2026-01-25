@@ -62,11 +62,10 @@ export class SliceController {
   @ApiResponse({ status: 200, type: [SliceResponseDto] })
   async list(
     @TenantId() tenantId: TenantIdType,
-    @Query('workspaceId') workspaceId: string,
     @Query() query: ListSlicesQueryDto,
   ): Promise<PaginatedResponseDto<SliceResponseDto>> {
     return this.sliceService.list(
-      workspaceId as WorkspaceId,
+      query.workspaceId as WorkspaceId,
       tenantId,
       {
         limit: query.limit,

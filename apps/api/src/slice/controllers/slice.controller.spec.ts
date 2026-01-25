@@ -93,7 +93,8 @@ describe('SliceController', () => {
         };
         sliceService.list.mockResolvedValue(mockResult);
 
-        const result = await controller.list(mockTenantId, mockWorkspaceId, {
+        const result = await controller.list(mockTenantId, {
+          workspaceId: mockWorkspaceId,
           limit: 20,
           offset: 0,
         });
@@ -115,7 +116,8 @@ describe('SliceController', () => {
         };
         sliceService.list.mockResolvedValue(mockResult);
 
-        await controller.list(mockTenantId, mockWorkspaceId, {
+        await controller.list(mockTenantId, {
+          workspaceId: mockWorkspaceId,
           limit: 20,
           offset: 0,
           status: SliceStatus.ACTIVE,
@@ -137,7 +139,8 @@ describe('SliceController', () => {
         };
         sliceService.list.mockResolvedValue(mockResult);
 
-        await controller.list(mockTenantId, mockWorkspaceId, {
+        await controller.list(mockTenantId, {
+          workspaceId: mockWorkspaceId,
           limit: 20,
           offset: 0,
           ownerId: mockUserId,

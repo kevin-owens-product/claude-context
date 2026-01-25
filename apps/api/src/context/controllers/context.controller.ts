@@ -44,7 +44,7 @@ import {
   SearchResultDto,
   CompileContextDto,
   CompiledContextResponseDto,
-  PaginationQueryDto,
+  WorkspacePaginationQueryDto,
   ListNodesQueryDto,
   PaginatedResponseDto,
 } from '../dto';
@@ -65,11 +65,10 @@ export class ContextController {
   @ApiResponse({ status: 200, type: [GraphResponseDto] })
   async listGraphs(
     @TenantId() tenantId: TenantIdType,
-    @Query('workspaceId') workspaceId: string,
-    @Query() pagination: PaginationQueryDto,
+    @Query() pagination: WorkspacePaginationQueryDto,
   ): Promise<PaginatedResponseDto<GraphResponseDto>> {
     return this.contextService.listGraphs(
-      workspaceId as WorkspaceId,
+      pagination.workspaceId as WorkspaceId,
       tenantId,
       pagination,
     );
@@ -92,10 +91,9 @@ export class ContextController {
   @ApiResponse({ status: 201, type: GraphResponseDto })
   async createGraph(
     @TenantId() tenantId: TenantIdType,
-    @Query('workspaceId') workspaceId: string,
     @Body() dto: CreateGraphDto,
   ): Promise<GraphResponseDto> {
-    return this.contextService.createGraph(workspaceId as WorkspaceId, tenantId, dto);
+    return this.contextService.createGraph(dto.workspaceId as WorkspaceId, tenantId, dto);
   }
 
   // ============================================================================

@@ -7,17 +7,20 @@
 import {
   IsString,
   IsOptional,
-  IsUUID,
   IsArray,
   IsEnum,
   IsIn,
+  IsInt,
+  Min,
   ArrayMinSize,
+  Matches,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SliceStatus, type SliceEvent } from '@forge/context';
 
 const SLICE_EVENTS = ['start', 'submit', 'approve', 'request_changes', 'reopen', 'archive', 'cancel'] as const;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // ============================================================================
 // SLICE DTOs
@@ -25,7 +28,7 @@ const SLICE_EVENTS = ['start', 'submit', 'approve', 'request_changes', 'reopen',
 
 export class CreateSliceDto {
   @ApiProperty({ description: 'Workspace to create the slice in' })
-  @IsUUID()
+  @Matches(UUID_REGEX, { message: 'workspaceId must be a valid UUID' })
   workspaceId!: string;
 
   @ApiProperty({ description: 'Name of the slice' })
@@ -221,6 +224,10 @@ export class AddAcceptanceCriterionDto {
 // ============================================================================
 
 export class ListSlicesQueryDto {
+  @ApiProperty({ description: 'Workspace ID' })
+  @Matches(UUID_REGEX, { message: 'workspaceId must be a valid UUID' })
+  workspaceId!: string;
+
   @ApiPropertyOptional({ default: 20 })
   @IsOptional()
   @Type(() => Number)
@@ -238,6 +245,6 @@ export class ListSlicesQueryDto {
 
   @ApiPropertyOptional({ description: 'Filter by owner' })
   @IsOptional()
-  @IsUUID()
+  @Matches(UUID_REGEX, { message: 'ownerId must be a valid UUID' })
   ownerId?: string;
 }
