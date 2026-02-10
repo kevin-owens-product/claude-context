@@ -109,6 +109,11 @@ dependencies {
     // Biometric Auth
     implementation("androidx.biometric:biometric:1.1.0")
 
+    // Adaptive layout support
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.0")
+    implementation("androidx.window:window:1.2.0")
+    implementation("androidx.window:window-core:1.2.0")
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")

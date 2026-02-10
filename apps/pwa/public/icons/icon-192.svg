@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" fill="none">
+  <rect width="192" height="192" rx="40" fill="#0f172a"/>
+  <rect x="8" y="8" width="176" height="176" rx="34" fill="#1e293b"/>
+  <g transform="translate(40, 40)">
+    <path d="M56 8L8 36V92L56 120L104 92V36L56 8Z" fill="#6366F1" opacity="0.2"/>
+    <path d="M56 16L16 40V88L56 112L96 88V40L56 16Z" stroke="#6366F1" stroke-width="4" fill="none"/>
+    <path d="M56 16V112" stroke="#6366F1" stroke-width="2" opacity="0.5"/>
+    <path d="M16 40L96 88" stroke="#6366F1" stroke-width="2" opacity="0.5"/>
+    <path d="M96 40L16 88" stroke="#6366F1" stroke-width="2" opacity="0.5"/>
+    <circle cx="56" cy="52" r="16" fill="#6366F1"/>
+    <path d="M50 52L54 56L62 48" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="56" y="88" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="bold">CTX</text>
+  </g>
+</svg>
