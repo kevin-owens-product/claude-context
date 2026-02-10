@@ -102,6 +102,13 @@ dependencies {
     // Security (for API key storage)
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
+    // Google Play Billing
+    implementation("com.android.billingclient:billing:6.1.0")
+    implementation("com.android.billingclient:billing-ktx:6.1.0")
+
+    // Biometric Auth
+    implementation("androidx.biometric:biometric:1.1.0")
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")

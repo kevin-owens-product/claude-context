@@ -1,7 +1,11 @@
 package com.claudecontext.localdev.service.claude
 
 import com.claudecontext.localdev.data.models.*
+import com.claudecontext.localdev.service.ai.ModelRouter
+import com.claudecontext.localdev.service.ai.MultiModelService
+import com.claudecontext.localdev.service.ai.RoutingContext
 import com.claudecontext.localdev.service.build.BuildRunner
+import com.claudecontext.localdev.service.context.ContextManager
 import com.claudecontext.localdev.service.git.GitService
 import com.claudecontext.localdev.service.shell.ShellExecutor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +22,9 @@ import javax.inject.Singleton
 @Singleton
 class AgentEngine @Inject constructor(
     private val claudeApi: ClaudeApiService,
+    private val multiModelService: MultiModelService,
+    private val modelRouter: ModelRouter,
+    private val contextManager: ContextManager,
     private val shell: ShellExecutor,
     private val buildRunner: BuildRunner,
     private val gitService: GitService
@@ -100,10 +107,20 @@ Rules:
             _session.value = session
 
             try {
-                val response = claudeApi.sendMessage(
+                // Assemble context and route to best model
+                val assembled = contextManager.assembleContext(
+                    userPrompt = session.messages.lastOrNull { it.role == MessageRole.USER }?.content
+                )
+                val fullSystemPrompt = SYSTEM_PROMPT + "\n\n" + assembled.systemPrompt
+                val routingCtx = RoutingContext(
+                    activeMode = AiMode.AGENT,
+                    currentFile = null,
+                    projectLanguage = projectLanguage
+                )
+                val response = modelRouter.routeAndSend(
                     messages = session.messages,
-                    systemPrompt = SYSTEM_PROMPT,
-                    model = "claude-sonnet-4-20250514"
+                    systemPrompt = fullSystemPrompt,
+                    context = routingCtx
                 )
 
                 session = session.copy(

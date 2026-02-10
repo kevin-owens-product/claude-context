@@ -1,7 +1,10 @@
 package com.claudecontext.localdev.service.claude
 
 import com.claudecontext.localdev.data.models.*
+import com.claudecontext.localdev.service.ai.ModelRouter
+import com.claudecontext.localdev.service.ai.MultiModelService
 import com.claudecontext.localdev.service.build.BuildRunner
+import com.claudecontext.localdev.service.context.ContextManager
 import com.claudecontext.localdev.service.git.GitService
 import com.claudecontext.localdev.service.shell.ShellExecutor
 import kotlinx.coroutines.*
@@ -19,6 +22,9 @@ import javax.inject.Singleton
 @Singleton
 class PromptQueue @Inject constructor(
     private val claudeApi: ClaudeApiService,
+    private val multiModelService: MultiModelService,
+    private val modelRouter: ModelRouter,
+    private val contextManager: ContextManager,
     private val agentEngine: AgentEngine,
     private val debugEngine: DebugEngine,
     private val planEngine: PlanEngine,
@@ -333,7 +339,7 @@ class PromptQueue @Inject constructor(
     }
 
     private suspend fun executeAsAgent(prompt: String): QueuedPromptResult {
-        val engine = AgentEngine(claudeApi, shell, buildRunner, gitService)
+        val engine = AgentEngine(claudeApi, multiModelService, modelRouter, contextManager, shell, buildRunner, gitService)
         engine.configure(projectPath, projectLanguage)
         val session = engine.startTask(prompt)
 

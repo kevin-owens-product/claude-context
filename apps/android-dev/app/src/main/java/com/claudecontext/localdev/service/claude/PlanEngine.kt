@@ -1,6 +1,10 @@
 package com.claudecontext.localdev.service.claude
 
 import com.claudecontext.localdev.data.models.*
+import com.claudecontext.localdev.service.ai.ModelRouter
+import com.claudecontext.localdev.service.ai.MultiModelService
+import com.claudecontext.localdev.service.ai.RoutingContext
+import com.claudecontext.localdev.service.context.ContextManager
 import com.claudecontext.localdev.service.shell.ShellExecutor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +20,9 @@ import javax.inject.Singleton
 @Singleton
 class PlanEngine @Inject constructor(
     private val claudeApi: ClaudeApiService,
+    private val multiModelService: MultiModelService,
+    private val modelRouter: ModelRouter,
+    private val contextManager: ContextManager,
     private val agentEngine: AgentEngine,
     private val shell: ShellExecutor
 ) {
@@ -101,14 +108,17 @@ Rules:
         val updated = session.copy(phase = PlanPhase.CLARIFY)
         _session.value = updated
 
-        val response = claudeApi.sendMessage(
+        val assembled = contextManager.assembleContext(userPrompt = session.goal)
+        val routingCtx = RoutingContext(activeMode = AiMode.PLAN, projectLanguage = projectLanguage)
+        val response = modelRouter.routeAndSend(
             messages = listOf(
                 ClaudeMessage(
                     role = MessageRole.USER,
                     content = "Goal: ${session.goal}\nProject: $projectPath\nLanguage: ${projectLanguage.displayName}"
                 )
             ),
-            systemPrompt = CLARIFY_PROMPT
+            systemPrompt = CLARIFY_PROMPT + "\n\n" + assembled.systemPrompt,
+            context = routingCtx
         )
 
         val questions = parseClarifyingQuestions(response.content)
@@ -162,7 +172,7 @@ Rules:
             .filter { it.answer != null }
             .joinToString("\n") { "Q: ${it.question}\nA: ${it.answer}" }
 
-        val response = claudeApi.sendMessage(
+        val response = modelRouter.routeAndSend(
             messages = listOf(
                 ClaudeMessage(
                     role = MessageRole.USER,
@@ -177,7 +187,8 @@ Rules:
                     }
                 )
             ),
-            systemPrompt = RESEARCH_PROMPT
+            systemPrompt = RESEARCH_PROMPT,
+            context = RoutingContext(activeMode = AiMode.PLAN, projectLanguage = projectLanguage)
         )
 
         val findings = parseResearchFindings(response.content)
@@ -203,7 +214,7 @@ Rules:
             .filter { it.answer != null }
             .joinToString("\n") { "Q: ${it.question}\nA: ${it.answer}" }
 
-        val response = claudeApi.sendMessage(
+        val response = modelRouter.routeAndSend(
             messages = listOf(
                 ClaudeMessage(
                     role = MessageRole.USER,
@@ -217,7 +228,8 @@ Rules:
                     }
                 )
             ),
-            systemPrompt = PLAN_PROMPT
+            systemPrompt = PLAN_PROMPT,
+            context = RoutingContext(activeMode = AiMode.PLAN, projectLanguage = projectLanguage)
         )
 
         val plan = parsePlan(response.content)

@@ -1,7 +1,11 @@
 package com.claudecontext.localdev.service.claude
 
 import com.claudecontext.localdev.data.models.*
+import com.claudecontext.localdev.service.ai.ModelRouter
+import com.claudecontext.localdev.service.ai.MultiModelService
+import com.claudecontext.localdev.service.ai.RoutingContext
 import com.claudecontext.localdev.service.build.BuildRunner
+import com.claudecontext.localdev.service.context.ContextManager
 import com.claudecontext.localdev.service.git.GitService
 import com.claudecontext.localdev.service.shell.ShellExecutor
 import kotlinx.coroutines.*
@@ -18,6 +22,9 @@ import javax.inject.Singleton
 @Singleton
 class SwarmEngine @Inject constructor(
     private val claudeApi: ClaudeApiService,
+    private val multiModelService: MultiModelService,
+    private val modelRouter: ModelRouter,
+    private val contextManager: ContextManager,
     private val shell: ShellExecutor,
     private val buildRunner: BuildRunner,
     private val gitService: GitService
@@ -198,7 +205,7 @@ Respond with JSON:
             updateSubtask(subtask.copy(status = PlanStepStatus.IN_PROGRESS))
 
             try {
-                val agentEngine = AgentEngine(claudeApi, shell, buildRunner, gitService)
+                val agentEngine = AgentEngine(claudeApi, multiModelService, modelRouter, contextManager, shell, buildRunner, gitService)
                 agentEngine.configure(projectPath, projectLanguage)
                 val agentResult = agentEngine.startTask(subtask.description)
 
@@ -267,7 +274,7 @@ Respond with JSON:
             updateSubtask(subtask.copy(status = PlanStepStatus.IN_PROGRESS))
 
             try {
-                val agentEngine = AgentEngine(claudeApi, shell, buildRunner, gitService)
+                val agentEngine = AgentEngine(claudeApi, multiModelService, modelRouter, contextManager, shell, buildRunner, gitService)
                 agentEngine.configure(projectPath, projectLanguage)
                 val result = agentEngine.startTask(enrichedDescription)
 
@@ -332,7 +339,7 @@ Respond with JSON:
         updateWorker(implementer.copy(status = SwarmWorkerStatus.RUNNING, startedAt = System.currentTimeMillis()))
         updateSubtask(implSubtask.copy(status = PlanStepStatus.IN_PROGRESS))
 
-        val implEngine = AgentEngine(claudeApi, shell, buildRunner, gitService)
+        val implEngine = AgentEngine(claudeApi, multiModelService, modelRouter, contextManager, shell, buildRunner, gitService)
         implEngine.configure(projectPath, projectLanguage)
         val implResult = implEngine.startTask(session.goal)
 
@@ -355,7 +362,7 @@ Respond with JSON:
         updateWorker(reviewer1.copy(status = SwarmWorkerStatus.RUNNING, startedAt = System.currentTimeMillis()))
         updateSubtask(review1Subtask.copy(status = PlanStepStatus.IN_PROGRESS))
 
-        val reviewEngine1 = AgentEngine(claudeApi, shell, buildRunner, gitService)
+        val reviewEngine1 = AgentEngine(claudeApi, multiModelService, modelRouter, contextManager, shell, buildRunner, gitService)
         reviewEngine1.configure(projectPath, projectLanguage)
         val reviewResult1 = reviewEngine1.startTask(reviewPrompt)
 
@@ -377,7 +384,7 @@ Respond with JSON:
         updateWorker(reviewer2.copy(status = SwarmWorkerStatus.RUNNING, startedAt = System.currentTimeMillis()))
         updateSubtask(review2Subtask.copy(status = PlanStepStatus.IN_PROGRESS))
 
-        val reviewEngine2 = AgentEngine(claudeApi, shell, buildRunner, gitService)
+        val reviewEngine2 = AgentEngine(claudeApi, multiModelService, modelRouter, contextManager, shell, buildRunner, gitService)
         reviewEngine2.configure(projectPath, projectLanguage)
         val reviewResult2 = reviewEngine2.startTask(finalReviewPrompt)
 
@@ -417,10 +424,10 @@ Respond with JSON:
         )
 
         return try {
-            val response = claudeApi.sendMessage(
+            val response = modelRouter.routeAndSend(
                 messages = listOf(contextMessage),
                 systemPrompt = DECOMPOSE_PROMPT,
-                model = "claude-sonnet-4-20250514"
+                context = RoutingContext(activeMode = AiMode.SWARM, projectLanguage = projectLanguage)
             )
 
             parseSubtasks(response.content)
@@ -529,10 +536,10 @@ Respond with JSON:
                 }
             )
 
-            val reviewResponse = claudeApi.sendMessage(
+            val reviewResponse = modelRouter.routeAndSend(
                 messages = listOf(reviewMessage),
                 systemPrompt = MERGE_REVIEW_PROMPT,
-                model = "claude-sonnet-4-20250514"
+                context = RoutingContext(activeMode = AiMode.SWARM, projectLanguage = projectLanguage)
             )
 
             // Parse conflict response

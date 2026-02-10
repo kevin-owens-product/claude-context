@@ -23,8 +23,13 @@ import com.claudecontext.localdev.ui.projects.ProjectListScreen
 import com.claudecontext.localdev.ui.projects.NewProjectScreen
 import com.claudecontext.localdev.ui.terminal.TerminalScreen
 import com.claudecontext.localdev.ui.settings.SettingsScreen
+import com.claudecontext.localdev.ui.auth.AuthScreen
+import com.claudecontext.localdev.ui.onboarding.OnboardingScreen
+import com.claudecontext.localdev.ui.admin.AdminScreenWrapper
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
+    data object Onboarding : Screen("onboarding", "Welcome", Icons.Default.RocketLaunch)
+    data object Auth : Screen("auth", "Login", Icons.Default.Lock)
     data object Projects : Screen("projects", "Projects", Icons.Default.Folder)
     data object Editor : Screen("editor/{projectId}", "Editor", Icons.Default.Code) {
         fun createRoute(projectId: Long) = "editor/$projectId"
@@ -40,6 +45,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     }
     data object NewProject : Screen("new-project", "New Project", Icons.Default.Add)
     data object Settings : Screen("settings", "Settings", Icons.Default.Settings)
+    data object Admin : Screen("admin", "Admin", Icons.Default.AdminPanelSettings)
 }
 
 val projectScreens = listOf(Screen.Editor, Screen.Terminal, Screen.Files, Screen.Git)
@@ -171,6 +177,35 @@ fun ClaudeLocalDevNavHost() {
 
             composable(Screen.Settings.route) {
                 SettingsScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.Onboarding.route) {
+                OnboardingScreen(
+                    onComplete = {
+                        navController.navigate(Screen.Projects.route) {
+                            popUpTo(Screen.Onboarding.route) { inclusive = true }
+                        }
+                    },
+                    onSetApiKey = { provider, key ->
+                        // Saved via SettingsViewModel
+                    }
+                )
+            }
+
+            composable(Screen.Auth.route) {
+                AuthScreen(
+                    onAuthSuccess = {
+                        navController.navigate(Screen.Projects.route) {
+                            popUpTo(Screen.Auth.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable(Screen.Admin.route) {
+                AdminScreenWrapper(
                     onBack = { navController.popBackStack() }
                 )
             }

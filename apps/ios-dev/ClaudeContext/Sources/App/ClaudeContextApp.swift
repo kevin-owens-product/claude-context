@@ -11,6 +11,9 @@ struct ClaudeContextApp: App {
                 .environmentObject(appState.multiModelService)
                 .environmentObject(appState.modelRouter)
                 .environmentObject(appState.billingService)
+                .environmentObject(appState.sessionManager)
+                .environmentObject(appState.contextManager)
+                .environmentObject(appState.designManager)
                 .preferredColorScheme(appState.settings.darkTheme ? .dark : .light)
                 .task {
                     await appState.initialize()
@@ -29,6 +32,9 @@ class AppState: ObservableObject {
     let modelRouter: ModelRouter
     let billingService = BillingService()
     let shellService = ShellService()
+    let sessionManager = SessionManager()
+    let contextManager = ContextManager()
+    let designManager = DesignManager()
 
     init() {
         modelRouter = ModelRouter(multiModelService: multiModelService)

@@ -13,7 +13,7 @@ struct TerminalView: View {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(viewModel.lines) { line in
-                                TerminalLine(line: line)
+                                TerminalLineView(line: line)
                                     .id(line.id)
                             }
                         }
@@ -90,37 +90,7 @@ struct TerminalLineView: View {
     }
 }
 
-// Use a simpler name to avoid conflicts
-private struct TerminalLine_View: View {
-    let line: TerminalLine
-
-    var body: some View {
-        Text(line.text)
-            .font(.system(size: 13, design: .monospaced))
-            .foregroundColor({
-                switch line.type {
-                case .command: return Color.cyan
-                case .stdout: return Color.white
-                case .stderr: return Color.red
-                case .prompt: return Color.green
-                }
-            }())
-    }
-}
-
-@ViewBuilder
-func TerminalLine(line: TerminalLine) -> some View {
-    Text(line.text)
-        .font(.system(size: 13, design: .monospaced))
-        .foregroundColor({
-            switch line.type {
-            case .command: return Color.cyan
-            case .stdout: return Color.white
-            case .stderr: return Color.red
-            case .prompt: return Color.green
-            }
-        }())
-}
+// Removed duplicate TerminalLine function/struct that caused naming collision
 
 // MARK: - Terminal ViewModel
 

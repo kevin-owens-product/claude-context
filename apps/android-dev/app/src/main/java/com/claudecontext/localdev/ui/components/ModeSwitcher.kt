@@ -2,7 +2,9 @@ package com.claudecontext.localdev.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -28,7 +30,8 @@ fun ModeSwitcher(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            .padding(4.dp),
+            .padding(4.dp)
+            .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         AiMode.entries.forEach { mode ->
@@ -39,6 +42,9 @@ fun ModeSwitcher(
                 AiMode.PLAN -> Icons.Default.Architecture to Color(0xFF10B981)
                 AiMode.SWARM -> Icons.Default.Hub to Color(0xFFF59E0B)
                 AiMode.QUEUE -> Icons.Default.Queue to Color(0xFF8B5CF6)
+                AiMode.SESSION -> Icons.Default.Forum to Color(0xFF06B6D4)
+                AiMode.CONTEXT -> Icons.Default.DataObject to Color(0xFF14B8A6)
+                AiMode.DESIGN -> Icons.Default.Palette to Color(0xFFEC4899)
             }
 
             ModeChip(
@@ -47,7 +53,7 @@ fun ModeSwitcher(
                 color = color,
                 isSelected = isSelected,
                 onClick = { onModeSelected(mode) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
             )
         }
     }

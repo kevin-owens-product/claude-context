@@ -23,6 +23,18 @@ enum class AiMode(val displayName: String, val description: String) {
     QUEUE(
         "Queue",
         "Queue multiple prompts for sequential or parallel execution with priority ordering and dependency tracking"
+    ),
+    SESSION(
+        "Sessions",
+        "Manage conversation sessions with branching, checkpoints, search, and export"
+    ),
+    CONTEXT(
+        "Context",
+        "View and manage the AI context window, token budget, and tracked files"
+    ),
+    DESIGN(
+        "Design",
+        "Customize themes, layout presets, editor settings, and visual configuration"
     )
 }
 
