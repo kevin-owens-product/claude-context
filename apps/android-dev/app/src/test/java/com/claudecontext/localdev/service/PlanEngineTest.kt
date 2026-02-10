@@ -173,6 +173,8 @@ class PlanEngineTest {
         assertEquals("Agent", AiMode.AGENT.displayName)
         assertEquals("Debug", AiMode.DEBUG.displayName)
         assertEquals("Plan", AiMode.PLAN.displayName)
+        assertEquals("Swarm", AiMode.SWARM.displayName)
+        assertEquals("Queue", AiMode.QUEUE.displayName)
     }
 
     @Test

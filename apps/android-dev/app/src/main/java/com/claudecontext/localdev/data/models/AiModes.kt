@@ -1,7 +1,7 @@
 package com.claudecontext.localdev.data.models
 
 /**
- * The three Cursor-style interaction modes for Claude AI.
+ * The five interaction modes for Claude AI.
  */
 enum class AiMode(val displayName: String, val description: String) {
     AGENT(
@@ -15,6 +15,14 @@ enum class AiMode(val displayName: String, val description: String) {
     PLAN(
         "Plan",
         "Strategic planner that researches the codebase, creates a step-by-step plan, then executes it"
+    ),
+    SWARM(
+        "Swarm",
+        "Spawn multiple agents working in parallel on different subtasks with an orchestrator coordinating the work"
+    ),
+    QUEUE(
+        "Queue",
+        "Queue multiple prompts for sequential or parallel execution with priority ordering and dependency tracking"
     )
 }
 
@@ -202,4 +210,163 @@ data class PlanStepProgress(
     val status: PlanStepStatus,
     val output: String = "",
     val filesModified: List<String> = emptyList()
+)
+
+// --- Swarm Mode Models ---
+
+data class SwarmSession(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val goal: String,
+    val strategy: SwarmStrategy = SwarmStrategy.DIVIDE_AND_CONQUER,
+    val workers: List<SwarmWorker> = emptyList(),
+    val status: SwarmStatus = SwarmStatus.PLANNING,
+    val subtasks: List<SwarmSubtask> = emptyList(),
+    val mergeResult: SwarmMergeResult? = null,
+    val startedAt: Long = System.currentTimeMillis(),
+    val maxWorkers: Int = 5,
+    val messages: List<ClaudeMessage> = emptyList()
+)
+
+enum class SwarmStrategy(val displayName: String, val description: String) {
+    DIVIDE_AND_CONQUER(
+        "Divide & Conquer",
+        "Break task into independent subtasks, run in parallel, merge results"
+    ),
+    PIPELINE(
+        "Pipeline",
+        "Each agent's output feeds into the next agent's input sequentially"
+    ),
+    REVIEW_CHAIN(
+        "Review Chain",
+        "One agent implements, others review and iterate until consensus"
+    ),
+    SPECIALIST(
+        "Specialist",
+        "Assign subtasks to agents with different expertise (frontend, backend, tests)"
+    )
+}
+
+enum class SwarmStatus {
+    PLANNING,
+    DECOMPOSING,
+    RUNNING,
+    MERGING,
+    REVIEWING,
+    COMPLETED,
+    FAILED,
+    STOPPED
+}
+
+data class SwarmWorker(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val name: String,
+    val role: String,
+    val subtaskId: String,
+    val status: SwarmWorkerStatus = SwarmWorkerStatus.IDLE,
+    val agentSession: AgentSession? = null,
+    val output: String = "",
+    val filesModified: List<String> = emptyList(),
+    val startedAt: Long? = null,
+    val completedAt: Long? = null
+)
+
+enum class SwarmWorkerStatus {
+    IDLE,
+    RUNNING,
+    COMPLETED,
+    FAILED,
+    BLOCKED
+}
+
+data class SwarmSubtask(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val title: String,
+    val description: String,
+    val assignedWorkerId: String? = null,
+    val dependsOn: List<String> = emptyList(),
+    val status: PlanStepStatus = PlanStepStatus.PENDING,
+    val priority: Int = 0,
+    val files: List<String> = emptyList()
+)
+
+data class SwarmMergeResult(
+    val conflicts: List<SwarmConflict> = emptyList(),
+    val filesModified: List<String> = emptyList(),
+    val summary: String = "",
+    val success: Boolean = true
+)
+
+data class SwarmConflict(
+    val file: String,
+    val workerA: String,
+    val workerB: String,
+    val description: String,
+    val resolved: Boolean = false,
+    val resolution: String? = null
+)
+
+// --- Prompt Queue Models ---
+
+data class PromptQueueState(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val items: List<QueuedPrompt> = emptyList(),
+    val status: QueueStatus = QueueStatus.IDLE,
+    val executionMode: QueueExecutionMode = QueueExecutionMode.SEQUENTIAL,
+    val maxConcurrent: Int = 3,
+    val completedCount: Int = 0,
+    val totalCount: Int = 0
+)
+
+enum class QueueStatus {
+    IDLE,
+    RUNNING,
+    PAUSED,
+    COMPLETED,
+    FAILED
+}
+
+enum class QueueExecutionMode(val displayName: String) {
+    SEQUENTIAL("Sequential"),
+    PARALLEL("Parallel"),
+    SMART("Smart (auto-detect dependencies)")
+}
+
+data class QueuedPrompt(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val prompt: String,
+    val mode: AiMode = AiMode.AGENT,
+    val priority: QueuePriority = QueuePriority.NORMAL,
+    val status: QueuedPromptStatus = QueuedPromptStatus.PENDING,
+    val dependsOn: List<String> = emptyList(),
+    val result: QueuedPromptResult? = null,
+    val addedAt: Long = System.currentTimeMillis(),
+    val startedAt: Long? = null,
+    val completedAt: Long? = null,
+    val retryCount: Int = 0,
+    val maxRetries: Int = 2
+)
+
+enum class QueuePriority(val displayName: String, val weight: Int) {
+    CRITICAL("Critical", 4),
+    HIGH("High", 3),
+    NORMAL("Normal", 2),
+    LOW("Low", 1)
+}
+
+enum class QueuedPromptStatus {
+    PENDING,
+    RUNNING,
+    COMPLETED,
+    FAILED,
+    SKIPPED,
+    BLOCKED,
+    RETRYING
+}
+
+data class QueuedPromptResult(
+    val output: String = "",
+    val filesModified: List<String> = emptyList(),
+    val success: Boolean = true,
+    val error: String? = null,
+    val durationMs: Long = 0
 )

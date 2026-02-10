@@ -37,6 +37,8 @@ fun ModeSwitcher(
                 AiMode.AGENT -> Icons.Default.SmartToy to Color(0xFF6366F1)
                 AiMode.DEBUG -> Icons.Default.BugReport to Color(0xFFEF4444)
                 AiMode.PLAN -> Icons.Default.Architecture to Color(0xFF10B981)
+                AiMode.SWARM -> Icons.Default.Hub to Color(0xFFF59E0B)
+                AiMode.QUEUE -> Icons.Default.Queue to Color(0xFF8B5CF6)
             }
 
             ModeChip(

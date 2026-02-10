@@ -9,6 +9,8 @@ import com.claudecontext.localdev.service.claude.AgentEngine
 import com.claudecontext.localdev.service.claude.ClaudeApiService
 import com.claudecontext.localdev.service.claude.DebugEngine
 import com.claudecontext.localdev.service.claude.PlanEngine
+import com.claudecontext.localdev.service.claude.SwarmEngine
+import com.claudecontext.localdev.service.claude.PromptQueue
 import com.claudecontext.localdev.service.shell.ShellExecutor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +35,8 @@ data class EditorUiState(
     val agentSession: AgentSession? = null,
     val debugSession: DebugSession? = null,
     val planSession: PlanSession? = null,
+    val swarmSession: SwarmSession? = null,
+    val queueState: PromptQueueState? = null,
     val buildOutput: String? = null
 )
 
@@ -44,7 +48,9 @@ class EditorViewModel @Inject constructor(
     private val buildRunner: BuildRunner,
     private val agentEngine: AgentEngine,
     private val debugEngine: DebugEngine,
-    private val planEngine: PlanEngine
+    private val planEngine: PlanEngine,
+    private val swarmEngine: SwarmEngine,
+    private val promptQueue: PromptQueue
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EditorUiState())
@@ -68,6 +74,16 @@ class EditorViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(planSession = session)
             }
         }
+        viewModelScope.launch {
+            swarmEngine.session.collect { session ->
+                _uiState.value = _uiState.value.copy(swarmSession = session)
+            }
+        }
+        viewModelScope.launch {
+            promptQueue.state.collect { state ->
+                _uiState.value = _uiState.value.copy(queueState = state)
+            }
+        }
     }
 
     fun loadProject(projectId: Long) {
@@ -79,6 +95,8 @@ class EditorViewModel @Inject constructor(
             agentEngine.configure(project.path, project.language)
             debugEngine.configure(project.path, project.language)
             planEngine.configure(project.path, project.language)
+            swarmEngine.configure(project.path, project.language)
+            promptQueue.configure(project.path, project.language)
 
             val mainFile = findMainFile(project.path, project.language)
             mainFile?.let { openFile(it) }
@@ -235,6 +253,57 @@ class EditorViewModel @Inject constructor(
             val s = _uiState.value.planSession ?: return@launch
             planEngine.savePlanToFile(s)
         }
+    }
+
+    // --- Swarm Mode ---
+    fun startSwarm(goal: String, strategy: SwarmStrategy) {
+        viewModelScope.launch {
+            swarmEngine.startSwarm(goal, strategy)
+            reloadCurrentFile()
+        }
+    }
+
+    fun stopSwarm() = swarmEngine.stop()
+
+    // --- Queue Mode ---
+    fun queueEnqueue(prompt: String, mode: AiMode, priority: QueuePriority) {
+        promptQueue.enqueue(prompt, mode, priority)
+    }
+
+    fun queueRemove(promptId: String) {
+        promptQueue.remove(promptId)
+    }
+
+    fun queueStartProcessing() {
+        viewModelScope.launch {
+            promptQueue.startProcessing()
+            reloadCurrentFile()
+        }
+    }
+
+    fun queuePause() = promptQueue.pause()
+
+    fun queueResume() {
+        viewModelScope.launch {
+            promptQueue.resume()
+            reloadCurrentFile()
+        }
+    }
+
+    fun queueRetryFailed(promptId: String) {
+        promptQueue.retryFailed(promptId)
+    }
+
+    fun queueRetryAllFailed() {
+        promptQueue.retryAllFailed()
+    }
+
+    fun queueSetExecutionMode(mode: QueueExecutionMode) {
+        promptQueue.setExecutionMode(mode)
+    }
+
+    fun queueSetPriority(promptId: String, priority: QueuePriority) {
+        promptQueue.setPriority(promptId, priority)
     }
 
     // --- Common ---

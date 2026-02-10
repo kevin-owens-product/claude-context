@@ -15,9 +15,11 @@ import com.claudecontext.localdev.ui.components.AgentModePanel
 import com.claudecontext.localdev.ui.components.DebugModePanel
 import com.claudecontext.localdev.ui.components.ModeSwitcher
 import com.claudecontext.localdev.ui.components.PlanModePanel
+import com.claudecontext.localdev.ui.components.SwarmPanel
+import com.claudecontext.localdev.ui.components.PromptQueuePanel
 
 /**
- * Main AI panel with Agent/Debug/Plan mode tabs, mirroring Cursor's three modes.
+ * Main AI panel with Agent/Debug/Plan/Swarm/Queue mode tabs.
  */
 @Composable
 fun AiAssistantPanel(
@@ -42,6 +44,21 @@ fun AiAssistantPanel(
     onPlanExecute: () -> Unit,
     onPlanExecuteStep: (String) -> Unit,
     onPlanSave: () -> Unit,
+    // Swarm mode
+    swarmSession: SwarmSession?,
+    onSwarmStart: (String, SwarmStrategy) -> Unit,
+    onSwarmStop: () -> Unit,
+    // Queue mode
+    queueState: PromptQueueState?,
+    onQueueEnqueue: (String, AiMode, QueuePriority) -> Unit,
+    onQueueRemove: (String) -> Unit,
+    onQueueStartProcessing: () -> Unit,
+    onQueuePause: () -> Unit,
+    onQueueResume: () -> Unit,
+    onQueueRetryFailed: (String) -> Unit,
+    onQueueRetryAllFailed: () -> Unit,
+    onQueueSetExecutionMode: (QueueExecutionMode) -> Unit,
+    onQueueSetPriority: (String, QueuePriority) -> Unit,
     // General
     onDismiss: () -> Unit
 ) {
@@ -107,6 +124,25 @@ fun AiAssistantPanel(
                     onExecutePlan = onPlanExecute,
                     onExecuteStep = onPlanExecuteStep,
                     onSavePlan = onPlanSave,
+                    modifier = Modifier.weight(1f)
+                )
+                AiMode.SWARM -> SwarmPanel(
+                    session = swarmSession,
+                    onStartSwarm = onSwarmStart,
+                    onStop = onSwarmStop,
+                    modifier = Modifier.weight(1f)
+                )
+                AiMode.QUEUE -> PromptQueuePanel(
+                    queueState = queueState,
+                    onEnqueue = onQueueEnqueue,
+                    onRemove = onQueueRemove,
+                    onStartProcessing = onQueueStartProcessing,
+                    onPause = onQueuePause,
+                    onResume = onQueueResume,
+                    onRetryFailed = onQueueRetryFailed,
+                    onRetryAllFailed = onQueueRetryAllFailed,
+                    onSetExecutionMode = onQueueSetExecutionMode,
+                    onSetPriority = onQueueSetPriority,
                     modifier = Modifier.weight(1f)
                 )
             }

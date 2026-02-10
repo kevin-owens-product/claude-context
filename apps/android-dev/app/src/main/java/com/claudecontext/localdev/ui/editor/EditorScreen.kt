@@ -166,7 +166,7 @@ fun EditorScreen(
                 )
             }
 
-            // AI Assistant panel with Agent/Debug/Plan modes
+            // AI Assistant panel with Agent/Debug/Plan/Swarm/Queue modes
             if (uiState.showAiAssistant) {
                 AiAssistantPanel(
                     currentMode = uiState.aiMode,
@@ -190,6 +190,21 @@ fun EditorScreen(
                     onPlanExecute = { viewModel.executePlan() },
                     onPlanExecuteStep = { viewModel.executePlanStep(it) },
                     onPlanSave = { viewModel.savePlan() },
+                    // Swarm mode
+                    swarmSession = uiState.swarmSession,
+                    onSwarmStart = { goal, strategy -> viewModel.startSwarm(goal, strategy) },
+                    onSwarmStop = { viewModel.stopSwarm() },
+                    // Queue mode
+                    queueState = uiState.queueState,
+                    onQueueEnqueue = { prompt, mode, priority -> viewModel.queueEnqueue(prompt, mode, priority) },
+                    onQueueRemove = { viewModel.queueRemove(it) },
+                    onQueueStartProcessing = { viewModel.queueStartProcessing() },
+                    onQueuePause = { viewModel.queuePause() },
+                    onQueueResume = { viewModel.queueResume() },
+                    onQueueRetryFailed = { viewModel.queueRetryFailed(it) },
+                    onQueueRetryAllFailed = { viewModel.queueRetryAllFailed() },
+                    onQueueSetExecutionMode = { viewModel.queueSetExecutionMode(it) },
+                    onQueueSetPriority = { id, priority -> viewModel.queueSetPriority(id, priority) },
                     // General
                     onDismiss = { viewModel.toggleAiAssistant() }
                 )
