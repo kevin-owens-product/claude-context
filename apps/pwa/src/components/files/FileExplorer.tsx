@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import clsx from 'clsx';
 import {
   ChevronRight,
@@ -10,8 +10,6 @@ import {
   FolderClosed,
   FolderOpen,
   Search,
-  Plus,
-  RefreshCw,
 } from 'lucide-react';
 import { useApp, useFiles } from '../../store/AppContext';
 import type { FileNode, OpenFile } from '../../types';

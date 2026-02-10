@@ -1,5 +1,4 @@
-import React, { useCallback } from 'react';
-import clsx from 'clsx';
+import { useCallback } from 'react';
 import {
   FolderOpen,
   Plus,
@@ -7,7 +6,6 @@ import {
   Code2,
   FileCode,
   Star,
-  MoreVertical,
   ArrowRight,
 } from 'lucide-react';
 import { Button } from '../components/common/Button';

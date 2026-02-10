@@ -141,11 +141,11 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 });
 
 // Background sync for queued AI requests
-self.addEventListener('sync', (event: ExtendableEvent & { tag?: string }) => {
+self.addEventListener('sync' as never, ((event: ExtendableEvent & { tag?: string }) => {
   if (event.tag === 'ai-request-sync') {
     event.waitUntil(syncQueuedRequests());
   }
-});
+}) as EventListener);
 
 // Push notification handler
 self.addEventListener('push', (event: PushEvent) => {

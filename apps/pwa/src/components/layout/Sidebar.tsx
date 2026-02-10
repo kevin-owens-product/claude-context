@@ -7,7 +7,6 @@ import {
   PanelLeftClose,
   FolderTree,
   Terminal,
-  MessageSquare,
   Sparkles,
 } from 'lucide-react';
 import { useApp } from '../../store/AppContext';

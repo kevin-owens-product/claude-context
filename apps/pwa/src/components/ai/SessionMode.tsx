@@ -5,9 +5,6 @@ import {
   GitCommit,
   Plus,
   Trash2,
-  ArrowRight,
-  Clock,
-  MessageSquare,
   Bookmark,
 } from 'lucide-react';
 import { Button } from '../common/Button';

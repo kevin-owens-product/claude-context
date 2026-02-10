@@ -2,14 +2,12 @@ import React, { useState, useCallback } from 'react';
 import clsx from 'clsx';
 import {
   Users,
-  Play,
   Square,
   CheckCircle2,
   Loader2,
   Clock,
   XCircle,
   Pause,
-  Zap,
 } from 'lucide-react';
 import { Button } from '../common/Button';
 import { TextArea } from '../common/Input';

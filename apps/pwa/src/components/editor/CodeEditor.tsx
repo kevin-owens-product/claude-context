@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import Editor, { type OnMount, type OnChange } from '@monaco-editor/react';
 import { useApp, useFiles } from '../../store/AppContext';
 import { FileTab } from './FileTab';

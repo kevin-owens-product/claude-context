@@ -1,12 +1,9 @@
 import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import {
-  PanelLeftClose,
   PanelLeftOpen,
-  MessageSquare,
   Terminal as TerminalIcon,
   FolderTree,
-  Menu,
   Code2,
   Bot,
   Settings,

@@ -1,4 +1,3 @@
-import React from 'react';
 import clsx from 'clsx';
 import { X, FileCode, FileJson, FileText, File as FileIcon } from 'lucide-react';
 import type { OpenFile } from '../../types';

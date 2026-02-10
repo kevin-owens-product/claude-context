@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import clsx from 'clsx';
 import {
   Play,
   Square,

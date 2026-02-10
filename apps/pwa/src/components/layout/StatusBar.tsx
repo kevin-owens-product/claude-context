@@ -1,9 +1,7 @@
 import React from 'react';
-import clsx from 'clsx';
 import {
   Wifi,
   WifiOff,
-  Battery,
   GitBranch,
   Circle,
   Settings,
@@ -16,8 +14,8 @@ interface StatusBarProps {
   currentPage: string;
 }
 
-export function StatusBar({ onNavigate, currentPage }: StatusBarProps) {
-  const { state, actions } = useApp();
+export function StatusBar({ onNavigate }: StatusBarProps) {
+  const { state } = useApp();
   const [isOnline, setIsOnline] = React.useState(navigator.onLine);
 
   React.useEffect(() => {

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import clsx from 'clsx';
-import { TerminalSquare, X, Minus, Maximize2 } from 'lucide-react';
+import { TerminalSquare, X, Minus } from 'lucide-react';
 import { useApp } from '../../store/AppContext';
 
 interface TerminalLine {

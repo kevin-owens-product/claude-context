@@ -1,4 +1,3 @@
-import React from 'react';
 import { AppShell } from '../components/layout/AppShell';
 import { CodeEditor } from '../components/editor/CodeEditor';
 import { AiPanel } from '../components/ai/AiPanel';

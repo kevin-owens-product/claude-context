@@ -10,8 +10,6 @@ import {
   XCircle,
   Loader2,
   Clock,
-  ArrowUp,
-  ArrowDown,
   SkipForward,
 } from 'lucide-react';
 import { Button } from '../common/Button';
@@ -19,7 +17,6 @@ import { TextArea } from '../common/Input';
 import { Badge } from '../common/Badge';
 import { useApp } from '../../store/AppContext';
 import type { QueuedPrompt, QueuePriority, QueuedPromptStatus } from '../../types';
-import { AiMode } from '../../types';
 
 const PRIORITY_STYLES: Record<QueuePriority, { label: string; variant: 'danger' | 'warning' | 'default' | 'info' }> = {
   critical: { label: 'Critical', variant: 'danger' },
