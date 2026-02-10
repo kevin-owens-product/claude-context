@@ -166,13 +166,31 @@ fun EditorScreen(
                 )
             }
 
-            // AI Assistant panel
+            // AI Assistant panel with Agent/Debug/Plan modes
             if (uiState.showAiAssistant) {
                 AiAssistantPanel(
-                    messages = uiState.aiMessages,
-                    isLoading = uiState.aiLoading,
-                    onSend = { viewModel.sendToAi(it) },
-                    onApplyCode = { viewModel.applyCodeFromAi(it) },
+                    currentMode = uiState.aiMode,
+                    onModeChanged = { viewModel.setAiMode(it) },
+                    // Agent mode
+                    agentSession = uiState.agentSession,
+                    onAgentStart = { viewModel.startAgentTask(it) },
+                    onAgentStop = { viewModel.stopAgent() },
+                    onAgentApprove = { viewModel.approveAgentAction() },
+                    // Debug mode
+                    debugSession = uiState.debugSession,
+                    onDebugStart = { viewModel.startDebug(it) },
+                    onDebugInstrument = { viewModel.instrumentCode() },
+                    onDebugSubmitLogs = { viewModel.submitDebugLogs(it) },
+                    onDebugApplyFix = { viewModel.applyDebugFix() },
+                    onDebugVerify = { viewModel.verifyDebugFix(it) },
+                    // Plan mode
+                    planSession = uiState.planSession,
+                    onPlanStart = { viewModel.startPlan(it) },
+                    onPlanAnswerQuestions = { viewModel.answerPlanQuestions(it) },
+                    onPlanExecute = { viewModel.executePlan() },
+                    onPlanExecuteStep = { viewModel.executePlanStep(it) },
+                    onPlanSave = { viewModel.savePlan() },
+                    // General
                     onDismiss = { viewModel.toggleAiAssistant() }
                 )
             }

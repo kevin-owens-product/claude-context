@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.claudecontext.localdev.data.models.*
 import com.claudecontext.localdev.data.repository.ProjectRepository
 import com.claudecontext.localdev.service.build.BuildRunner
+import com.claudecontext.localdev.service.claude.AgentEngine
 import com.claudecontext.localdev.service.claude.ClaudeApiService
+import com.claudecontext.localdev.service.claude.DebugEngine
+import com.claudecontext.localdev.service.claude.PlanEngine
 import com.claudecontext.localdev.service.shell.ShellExecutor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,8 +29,10 @@ data class EditorUiState(
     val cursorLine: Int = 1,
     val cursorColumn: Int = 1,
     val showAiAssistant: Boolean = false,
-    val aiMessages: List<ClaudeMessage> = emptyList(),
-    val aiLoading: Boolean = false,
+    val aiMode: AiMode = AiMode.AGENT,
+    val agentSession: AgentSession? = null,
+    val debugSession: DebugSession? = null,
+    val planSession: PlanSession? = null,
     val buildOutput: String? = null
 )
 
@@ -36,7 +41,10 @@ class EditorViewModel @Inject constructor(
     private val projectRepository: ProjectRepository,
     private val claudeApi: ClaudeApiService,
     private val shell: ShellExecutor,
-    private val buildRunner: BuildRunner
+    private val buildRunner: BuildRunner,
+    private val agentEngine: AgentEngine,
+    private val debugEngine: DebugEngine,
+    private val planEngine: PlanEngine
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EditorUiState())
@@ -44,11 +52,33 @@ class EditorViewModel @Inject constructor(
 
     private var originalContent = ""
 
+    init {
+        viewModelScope.launch {
+            agentEngine.session.collect { session ->
+                _uiState.value = _uiState.value.copy(agentSession = session)
+            }
+        }
+        viewModelScope.launch {
+            debugEngine.session.collect { session ->
+                _uiState.value = _uiState.value.copy(debugSession = session)
+            }
+        }
+        viewModelScope.launch {
+            planEngine.session.collect { session ->
+                _uiState.value = _uiState.value.copy(planSession = session)
+            }
+        }
+    }
+
     fun loadProject(projectId: Long) {
         viewModelScope.launch {
             val project = projectRepository.getProject(projectId) ?: return@launch
             projectRepository.markOpened(projectId)
             _uiState.value = _uiState.value.copy(project = project)
+
+            agentEngine.configure(project.path, project.language)
+            debugEngine.configure(project.path, project.language)
+            planEngine.configure(project.path, project.language)
 
             val mainFile = findMainFile(project.path, project.language)
             mainFile?.let { openFile(it) }
@@ -64,9 +94,7 @@ class EditorViewModel @Inject constructor(
             originalContent = content
 
             val openFiles = _uiState.value.openFiles.toMutableList()
-            if (path !in openFiles) {
-                openFiles.add(path)
-            }
+            if (path !in openFiles) openFiles.add(path)
 
             _uiState.value = _uiState.value.copy(
                 content = content,
@@ -89,11 +117,8 @@ class EditorViewModel @Inject constructor(
                 openFile(nextFile)
             } else {
                 _uiState.value = _uiState.value.copy(
-                    content = "",
-                    currentFilePath = null,
-                    currentFileName = null,
-                    openFiles = openFiles,
-                    isModified = false
+                    content = "", currentFilePath = null, currentFileName = null,
+                    openFiles = openFiles, isModified = false
                 )
             }
         } else {
@@ -103,8 +128,7 @@ class EditorViewModel @Inject constructor(
 
     fun updateContent(newContent: String) {
         _uiState.value = _uiState.value.copy(
-            content = newContent,
-            isModified = newContent != originalContent
+            content = newContent, isModified = newContent != originalContent
         )
     }
 
@@ -118,64 +142,118 @@ class EditorViewModel @Inject constructor(
     }
 
     fun toggleAiAssistant() {
-        _uiState.value = _uiState.value.copy(
-            showAiAssistant = !_uiState.value.showAiAssistant
-        )
+        _uiState.value = _uiState.value.copy(showAiAssistant = !_uiState.value.showAiAssistant)
     }
 
-    fun sendToAi(message: String) {
+    fun setAiMode(mode: AiMode) {
+        _uiState.value = _uiState.value.copy(aiMode = mode)
+    }
+
+    // --- Agent Mode ---
+    fun startAgentTask(task: String) {
         viewModelScope.launch {
-            val userMessage = ClaudeMessage(
-                role = MessageRole.USER,
-                content = message
-            )
-
-            val messages = _uiState.value.aiMessages + userMessage
-            _uiState.value = _uiState.value.copy(
-                aiMessages = messages,
-                aiLoading = true
-            )
-
-            try {
-                val response = claudeApi.getCodeAssistance(
-                    code = _uiState.value.content,
-                    filePath = _uiState.value.currentFilePath ?: "untitled",
-                    instruction = message,
-                    projectContext = "Language: ${_uiState.value.currentLanguage?.displayName}"
-                )
-
-                _uiState.value = _uiState.value.copy(
-                    aiMessages = messages + response,
-                    aiLoading = false
-                )
-            } catch (e: Exception) {
-                val errorMessage = ClaudeMessage(
-                    role = MessageRole.SYSTEM,
-                    content = "Error: ${e.message}"
-                )
-                _uiState.value = _uiState.value.copy(
-                    aiMessages = messages + errorMessage,
-                    aiLoading = false
-                )
-            }
+            agentEngine.startTask(task)
+            reloadCurrentFile()
         }
     }
 
-    fun applyCodeFromAi(codeBlock: CodeBlock) {
-        _uiState.value = _uiState.value.copy(
-            content = codeBlock.code,
-            isModified = true
-        )
+    fun stopAgent() = agentEngine.stop()
+
+    fun approveAgentAction() {
+        viewModelScope.launch {
+            agentEngine.continueAfterApproval()
+            reloadCurrentFile()
+        }
     }
 
+    // --- Debug Mode ---
+    fun startDebug(bugDescription: String) {
+        viewModelScope.launch { debugEngine.startDebug(bugDescription) }
+    }
+
+    fun instrumentCode() {
+        viewModelScope.launch {
+            val s = _uiState.value.debugSession ?: return@launch
+            debugEngine.instrumentCode(s)
+            reloadCurrentFile()
+        }
+    }
+
+    fun submitDebugLogs(logs: String) {
+        viewModelScope.launch {
+            val s = _uiState.value.debugSession ?: return@launch
+            debugEngine.submitRuntimeLogs(s, logs)
+        }
+    }
+
+    fun applyDebugFix() {
+        viewModelScope.launch {
+            val s = _uiState.value.debugSession ?: return@launch
+            debugEngine.applyFix(s)
+            reloadCurrentFile()
+        }
+    }
+
+    fun verifyDebugFix(fixed: Boolean) {
+        viewModelScope.launch {
+            val s = _uiState.value.debugSession ?: return@launch
+            debugEngine.verifyAndClean(s, fixed)
+            reloadCurrentFile()
+        }
+    }
+
+    // --- Plan Mode ---
+    fun startPlan(goal: String) {
+        viewModelScope.launch { planEngine.startPlan(goal) }
+    }
+
+    fun answerPlanQuestions(answers: Map<String, String>) {
+        viewModelScope.launch {
+            val s = _uiState.value.planSession ?: return@launch
+            planEngine.answerQuestions(s, answers)
+        }
+    }
+
+    fun executePlan() {
+        viewModelScope.launch {
+            val s = _uiState.value.planSession ?: return@launch
+            planEngine.executePlan(s)
+            reloadCurrentFile()
+        }
+    }
+
+    fun executePlanStep(stepId: String) {
+        viewModelScope.launch {
+            val s = _uiState.value.planSession ?: return@launch
+            planEngine.executeSingleStep(s, stepId)
+            reloadCurrentFile()
+        }
+    }
+
+    fun savePlan() {
+        viewModelScope.launch {
+            val s = _uiState.value.planSession ?: return@launch
+            planEngine.savePlanToFile(s)
+        }
+    }
+
+    // --- Common ---
     fun runCurrentFile() {
         viewModelScope.launch {
             val project = _uiState.value.project ?: return@launch
             val config = buildRunner.detectBuildConfig(project.path, project.language)
             val result = buildRunner.build(project.path, config)
-            _uiState.value = _uiState.value.copy(
-                buildOutput = result.output
-            )
+            _uiState.value = _uiState.value.copy(buildOutput = result.output)
+        }
+    }
+
+    private fun reloadCurrentFile() {
+        val path = _uiState.value.currentFilePath ?: return
+        val file = File(path)
+        if (file.exists()) {
+            val content = file.readText()
+            originalContent = content
+            _uiState.value = _uiState.value.copy(content = content, isModified = false)
         }
     }
 
@@ -204,7 +282,6 @@ class EditorViewModel @Inject constructor(
 
         return dir.listFiles()
             ?.filter { it.isFile && it.extension in (language.extensions) }
-            ?.firstOrNull()
-            ?.absolutePath
+            ?.firstOrNull()?.absolutePath
     }
 }
