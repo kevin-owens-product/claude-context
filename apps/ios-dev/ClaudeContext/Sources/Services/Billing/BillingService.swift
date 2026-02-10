@@ -213,9 +213,9 @@ class BillingService: ObservableObject {
     }
 
     private func listenForTransactions() -> Task<Void, Error> {
-        Task.detached { [weak self] in
+        Task { [weak self] in
             for await result in Transaction.updates {
-                if let transaction = try? self?.checkVerified(result) {
+                if let transaction = try? await self?.checkVerified(result) {
                     await self?.handleTransaction(transaction)
                     await transaction.finish()
                 }
@@ -223,7 +223,7 @@ class BillingService: ObservableObject {
         }
     }
 
-    private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
+    private func checkVerified<T>(_ result: StoreKit.VerificationResult<T>) throws -> T {
         switch result {
         case .unverified:
             throw BillingError.verificationFailed

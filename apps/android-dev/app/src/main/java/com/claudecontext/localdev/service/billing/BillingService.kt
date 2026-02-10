@@ -61,6 +61,8 @@ class BillingService @Inject constructor(
         const val ANNUAL_PRICE = "$49.99"
     }
 
+    fun isSubscribed(): Boolean = subscriptionState.value.isActive
+
     fun initialize() {
         billingClient = BillingClient.newBuilder(context)
             .setListener(this)

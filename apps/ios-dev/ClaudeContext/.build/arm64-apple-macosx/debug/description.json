@@ -1,0 +1,1113 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.xctest/Contents/MacOS/ClaudeContextPackageTests",
+      "packagePath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext",
+      "productName" : "ClaudeContextPackageTests"
+    }
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.ClaudeContext-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/sources",
+      "importPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ClaudeContextApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveLayout.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveSidebar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/AiModes.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/ModelProvider.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/Project.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/ModelRouter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/MultiModelService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Admin/AdminManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Auth/AuthManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Billing/BillingService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Context/ContextManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Design/DesignManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Security/SecurityManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Session/SessionManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Shell/ShellService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Chat/ChatView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Components/AiAssistantPanel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Editor/EditorView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Onboarding/OnboardingView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Settings/SettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Terminal/TerminalView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "ClaudeContext",
+      "moduleOutputPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules/ClaudeContext.swiftmodule",
+      "objects" : [
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ClaudeContextApp.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContentView.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveLayout.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveSidebar.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiModes.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelProvider.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/Project.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelRouter.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/MultiModelService.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdminManager.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AuthManager.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/BillingService.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContextManager.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/DesignManager.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SecurityManager.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SessionManager.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ShellService.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ChatView.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiAssistantPanel.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/EditorView.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/OnboardingView.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SettingsView.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/TerminalView.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/include/ClaudeContext-Swift.h",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "claudecontext"
+      ],
+      "outputFileMapPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ClaudeContextApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveLayout.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveSidebar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiModes.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelProvider.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/Project.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelRouter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/MultiModelService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdminManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AuthManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/BillingService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContextManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/DesignManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SecurityManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SessionManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ShellService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ChatView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiAssistantPanel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/EditorView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/OnboardingView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/TerminalView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules/ClaudeContext.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ClaudeContextApp.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ContentView.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveLayout.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveSidebar.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/AiModes.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/ModelProvider.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/Project.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/ModelRouter.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/MultiModelService.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Admin/AdminManager.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Auth/AuthManager.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Billing/BillingService.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Context/ContextManager.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Design/DesignManager.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Security/SecurityManager.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Session/SessionManager.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Shell/ShellService.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Chat/ChatView.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Components/AiAssistantPanel.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Editor/EditorView.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Onboarding/OnboardingView.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Settings/SettingsView.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Terminal/TerminalView.swift"
+      ],
+      "tempsPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.ClaudeContextPackageTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/sources",
+      "importPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules/ClaudeContextTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "ClaudeContextPackageTests",
+      "moduleOutputPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules/ClaudeContextPackageTests.swiftmodule",
+      "objects" : [
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/include/ClaudeContextPackageTests-Swift.h",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "claudecontext"
+      ],
+      "outputFileMapPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules/ClaudeContextPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.ClaudeContextTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/sources",
+      "importPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AdaptiveLayoutTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AuthManagerTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/ModelProviderTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/SecurityManagerTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules/ClaudeContext.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "ClaudeContextTests",
+      "moduleOutputPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules/ClaudeContextTests.swiftmodule",
+      "objects" : [
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AdaptiveLayoutTests.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AuthManagerTests.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/ModelProviderTests.swift.o",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/SecurityManagerTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "claudecontext"
+      ],
+      "outputFileMapPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AdaptiveLayoutTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AuthManagerTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/ModelProviderTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/SecurityManagerTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules/ClaudeContextTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AdaptiveLayoutTests.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AuthManagerTests.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/ModelProviderTests.swift",
+        "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/SecurityManagerTests.swift"
+      ],
+      "tempsPath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "ClaudeContext" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "ClaudeContext",
+      "-package-name",
+      "claudecontext",
+      "-c",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ClaudeContextApp.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ContentView.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveLayout.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveSidebar.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/AiModes.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/ModelProvider.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/Project.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/ModelRouter.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/MultiModelService.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Admin/AdminManager.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Auth/AuthManager.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Billing/BillingService.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Context/ContextManager.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Design/DesignManager.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Security/SecurityManager.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Session/SessionManager.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Shell/ShellService.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Chat/ChatView.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Components/AiAssistantPanel.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Editor/EditorView.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Onboarding/OnboardingView.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Settings/SettingsView.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Terminal/TerminalView.swift",
+      "-I",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/include/ClaudeContext-Swift.h",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "claudecontext",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "ClaudeContextPackageTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "ClaudeContextPackageTests",
+      "-package-name",
+      "claudecontext",
+      "-c",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.derived/runner.swift",
+      "-I",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/include/ClaudeContextPackageTests-Swift.h",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "claudecontext",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "ClaudeContextTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "ClaudeContextTests",
+      "-package-name",
+      "claudecontext",
+      "-c",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AdaptiveLayoutTests.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AuthManagerTests.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/ModelProviderTests.swift",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/SecurityManagerTests.swift",
+      "-I",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "claudecontext",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "ClaudeContext" : [
+
+    ],
+    "ClaudeContextPackageTests" : [
+      "ClaudeContextTests",
+      "ClaudeContext"
+    ],
+    "ClaudeContextTests" : [
+      "ClaudeContext"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ClaudeContextApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveLayout.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveSidebar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/AiModes.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/ModelProvider.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/Project.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/ModelRouter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/MultiModelService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Admin/AdminManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Auth/AuthManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Billing/BillingService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Context/ContextManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Design/DesignManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Security/SecurityManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Session/SessionManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Shell/ShellService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Chat/ChatView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Components/AiAssistantPanel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Editor/EditorView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Onboarding/OnboardingView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Settings/SettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Terminal/TerminalView.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/sources"
+    },
+    "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/sources"
+    },
+    "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveLayout.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveSidebar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdminManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiAssistantPanel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiModes.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AuthManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/BillingService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ChatView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ClaudeContextApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContextManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/DesignManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/EditorView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelProvider.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelRouter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/MultiModelService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/OnboardingView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/Project.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SecurityManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SessionManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ShellService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/TerminalView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AdaptiveLayoutTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AuthManagerTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/ModelProviderTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/SecurityManagerTests.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.product/Objects.LinkFileList"
+    },
+    "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AdaptiveLayoutTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AuthManagerTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/ModelProviderTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/SecurityManagerTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/sources"
+    },
+    "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

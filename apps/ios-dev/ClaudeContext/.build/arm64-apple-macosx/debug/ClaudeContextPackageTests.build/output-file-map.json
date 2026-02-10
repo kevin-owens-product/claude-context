@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/master.swiftdeps"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.derived/runner.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/runner.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextPackageTests.build/runner.dia"
+  }
+}

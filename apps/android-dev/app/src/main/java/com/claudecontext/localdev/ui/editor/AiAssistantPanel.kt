@@ -86,6 +86,7 @@ fun AiAssistantPanel(
     onExportSession: (String) -> Unit = {},
     // Context mode
     contextManagerState: ContextManagerState = ContextManagerState(),
+    onAddContextFile: (String) -> Unit = {},
     onAddContextNote: (String, String) -> Unit = { _, _ -> },
     onRemoveContextEntry: (String) -> Unit = {},
     onPinContextEntry: (String, Boolean) -> Unit = { _, _ -> },
@@ -213,6 +214,7 @@ fun AiAssistantPanel(
                 )
                 AiMode.CONTEXT -> ContextPanel(
                     state = contextManagerState,
+                    onAddFile = onAddContextFile,
                     onAddNote = onAddContextNote,
                     onRemoveEntry = onRemoveContextEntry,
                     onPinEntry = onPinContextEntry,

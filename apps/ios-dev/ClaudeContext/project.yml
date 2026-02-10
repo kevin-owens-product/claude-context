@@ -1,0 +1,35 @@
+name: ClaudeContext
+options:
+  deploymentTarget:
+    iOS: "17.0"
+targets:
+  ClaudeContext:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.claudecontext.localdev
+        PRODUCT_NAME: "Claude Context"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: "Claude Context"
+        IPHONEOS_DEPLOYMENT_TARGET: 17.0
+        SWIFT_VERSION: 5.9
+    scheme:
+      testTargets:
+        - ClaudeContextTests
+  ClaudeContextTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: ClaudeContext
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.claudecontext.localdev.tests
+        IPHONEOS_DEPLOYMENT_TARGET: 17.0
+        SWIFT_VERSION: 5.9

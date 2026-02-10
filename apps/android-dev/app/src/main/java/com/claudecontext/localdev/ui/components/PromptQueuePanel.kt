@@ -108,7 +108,7 @@ fun PromptQueuePanel(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             when (state.status) {
-                QueueStatus.IDLE, QueueStatus.COMPLETED, QueueStatus.FAILED -> {
+                QueueStatus.IDLE, QueueStatus.COMPLETED, QueueStatus.FAILED, QueueStatus.STOPPED -> {
                     if (hasPendingItems) {
                         Button(
                             onClick = onStartProcessing,
@@ -261,6 +261,7 @@ private fun QueueStatusBar(
         QueueStatus.IDLE -> "Idle" to MaterialTheme.colorScheme.onSurfaceVariant
         QueueStatus.RUNNING -> "Processing..." to Color(0xFF8B5CF6)
         QueueStatus.PAUSED -> "Paused" to Color(0xFFD97706)
+        QueueStatus.STOPPED -> "Stopped" to Color(0xFF8B949E)
         QueueStatus.COMPLETED -> "All done" to Color(0xFF10B981)
         QueueStatus.FAILED -> "Some failed" to Color(0xFFEF4444)
     }

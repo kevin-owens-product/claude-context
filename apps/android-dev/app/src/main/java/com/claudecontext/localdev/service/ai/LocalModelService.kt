@@ -222,7 +222,7 @@ class LocalModelService @Inject constructor(
         }
     }
 
-    private fun findLlamaServer(): String? {
+    private suspend fun findLlamaServer(): String? {
         val paths = listOf(
             "/data/local/tmp/llama-server",
             "/data/data/com.claudecontext.localdev/files/llama-server",

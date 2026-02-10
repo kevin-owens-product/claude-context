@@ -231,10 +231,10 @@ data class IconPack(
 // --- Manager State ---
 
 data class DesignManagerState(
-    val activeTheme: DesignTheme = builtInThemes.first(),
-    val themes: List<DesignTheme> = builtInThemes,
-    val activeLayout: LayoutPreset = defaultLayouts.first(),
-    val layouts: List<LayoutPreset> = defaultLayouts,
+    val activeTheme: DesignTheme = DesignManager.builtInThemes.first(),
+    val themes: List<DesignTheme> = DesignManager.builtInThemes,
+    val activeLayout: LayoutPreset = DesignManager.defaultLayouts.first(),
+    val layouts: List<LayoutPreset> = DesignManager.defaultLayouts,
     val componentStyles: List<ComponentStyle> = emptyList(),
     val iconPack: IconPack = IconPack(name = "Default"),
     val showMinimap: Boolean = true,

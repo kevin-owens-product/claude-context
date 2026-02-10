@@ -10,6 +10,12 @@ class ShellService {
         var isSuccess: Bool { exitCode == 0 }
     }
 
+    #if os(iOS)
+    func execute(_ command: String, workingDirectory: String? = nil) async -> CommandResult {
+        // iOS does not allow launching arbitrary shell processes.
+        return CommandResult(stdout: "", stderr: "Shell execution unavailable on iOS", exitCode: -1)
+    }
+    #else
     func execute(_ command: String, workingDirectory: String? = nil) async -> CommandResult {
         await withCheckedContinuation { continuation in
             let process = Process()
@@ -46,6 +52,7 @@ class ShellService {
             }
         }
     }
+    #endif
 
     func isCommandAvailable(_ command: String) async -> Bool {
         let result = await execute("which \(command)")

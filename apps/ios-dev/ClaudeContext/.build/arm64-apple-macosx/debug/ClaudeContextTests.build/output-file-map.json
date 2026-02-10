@@ -1,0 +1,33 @@
+{
+  "": {
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/master.swiftdeps"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AdaptiveLayoutTests.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AdaptiveLayoutTests.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AdaptiveLayoutTests.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AdaptiveLayoutTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AdaptiveLayoutTests.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AdaptiveLayoutTests.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/AuthManagerTests.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AuthManagerTests.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AuthManagerTests.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AuthManagerTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AuthManagerTests.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/AuthManagerTests.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/ModelProviderTests.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/ModelProviderTests.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/ModelProviderTests.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/ModelProviderTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/ModelProviderTests.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/ModelProviderTests.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Tests/SecurityManagerTests.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/SecurityManagerTests.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/SecurityManagerTests.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/SecurityManagerTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/SecurityManagerTests.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContextTests.build/SecurityManagerTests.dia"
+  }
+}

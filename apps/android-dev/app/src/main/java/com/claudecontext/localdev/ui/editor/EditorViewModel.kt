@@ -360,6 +360,7 @@ class EditorViewModel @Inject constructor(
     fun exportSession(sessionId: String) { viewModelScope.launch { sessionManager.exportSession(sessionId) } }
 
     // --- Context Manager ---
+    fun addContextFile(path: String) = contextManager.addFileContext(path)
     fun addContextNote(note: String, title: String) = contextManager.addUserNote(note, title)
     fun removeContextEntry(entryId: String) = contextManager.removeEntry(entryId)
     fun pinContextEntry(entryId: String, pinned: Boolean) = contextManager.pinEntry(entryId, pinned)
@@ -370,6 +371,10 @@ class EditorViewModel @Inject constructor(
     fun clearContextByType(type: ContextType) = contextManager.clearByType(type)
 
     // --- Design Manager ---
+    fun setDesignTheme(themeId: String) = designManager.setTheme(themeId)
+    fun createDesignTheme(name: String) = designManager.createTheme(name)
+    fun deleteDesignTheme(themeId: String) = designManager.deleteTheme(themeId)
+    fun setDesignLayout(layoutId: String) = designManager.setLayout(layoutId)
     fun setTheme(themeId: String) = designManager.setTheme(themeId)
     fun createTheme(name: String) = designManager.createTheme(name)
     fun deleteTheme(themeId: String) = designManager.deleteTheme(themeId)

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.claudecontext.localdev.ui.settings
 
 import androidx.compose.foundation.layout.*

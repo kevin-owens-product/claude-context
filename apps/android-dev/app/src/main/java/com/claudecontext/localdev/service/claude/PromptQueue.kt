@@ -295,7 +295,8 @@ class PromptQueue @Inject constructor(
                 AiMode.AGENT -> executeAsAgent(item.prompt)
                 AiMode.DEBUG -> executeAsDebug(item.prompt)
                 AiMode.PLAN -> executeAsPlan(item.prompt)
-                AiMode.SWARM, AiMode.QUEUE -> executeAsAgent(item.prompt) // fallback to agent
+                AiMode.SWARM, AiMode.QUEUE, AiMode.SESSION, AiMode.CONTEXT, AiMode.DESIGN ->
+                    executeAsAgent(item.prompt) // fallback to agent
             }
 
             val duration = System.currentTimeMillis() - startTime

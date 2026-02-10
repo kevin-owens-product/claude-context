@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - AI Modes
 
-enum AiMode: String, CaseIterable, Identifiable {
+enum AiMode: String, CaseIterable, Identifiable, Codable {
     case agent
     case debug
     case plan

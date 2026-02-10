@@ -333,6 +333,7 @@ enum class QueueStatus {
     IDLE,
     RUNNING,
     PAUSED,
+    STOPPED,
     COMPLETED,
     FAILED
 }

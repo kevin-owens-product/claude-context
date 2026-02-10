@@ -220,6 +220,7 @@ fun EditorScreen(
                     onExportSession = { viewModel.exportSession(it) },
                     // Context mode
                     contextManagerState = uiState.contextManagerState,
+                    onAddContextFile = { viewModel.addContextFile(it) },
                     onAddContextNote = { note, title -> viewModel.addContextNote(note, title) },
                     onRemoveContextEntry = { viewModel.removeContextEntry(it) },
                     onPinContextEntry = { id, pinned -> viewModel.pinContextEntry(id, pinned) },

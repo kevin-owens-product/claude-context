@@ -36,8 +36,7 @@ class ContextManager: ObservableObject {
     }
 
     func addFileContext(_ filePath: String, content: String? = nil) {
-        let fileContent = content ?? readFile(filePath) ?? { return }()
-        guard let text = fileContent as? String else { return }
+        guard let text = content ?? readFile(filePath) else { return }
         let tokens = estimateTokens(text)
 
         addEntry(ContextEntry(

@@ -1,6 +1,6 @@
 import Foundation
 
-struct Project: Identifiable, Codable {
+struct Project: Identifiable, Codable, Hashable {
     let id: UUID
     var name: String
     var path: String
@@ -18,7 +18,7 @@ struct Project: Identifiable, Codable {
     }
 }
 
-enum ProjectLanguage: String, Codable, CaseIterable {
+enum ProjectLanguage: String, Codable, CaseIterable, Hashable {
     case swift
     case kotlin
     case python

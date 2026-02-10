@@ -1,0 +1,166 @@
+{
+  "": {
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/master.swiftdeps"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ClaudeContextApp.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ClaudeContextApp.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ClaudeContextApp.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ClaudeContextApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ClaudeContextApp.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ClaudeContextApp.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/App/ContentView.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContentView.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContentView.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContentView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContentView.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContentView.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveLayout.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveLayout.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveLayout.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveLayout~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveLayout.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveLayout.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Layout/AdaptiveSidebar.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveSidebar.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveSidebar.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveSidebar~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveSidebar.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdaptiveSidebar.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/AiModes.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiModes.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiModes.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiModes~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiModes.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiModes.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/ModelProvider.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelProvider.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelProvider.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelProvider~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelProvider.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelProvider.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Models/Project.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/Project.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/Project.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/Project~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/Project.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/Project.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/ModelRouter.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelRouter.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelRouter.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelRouter~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelRouter.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ModelRouter.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/AI/MultiModelService.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/MultiModelService.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/MultiModelService.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/MultiModelService~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/MultiModelService.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/MultiModelService.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Admin/AdminManager.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdminManager.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdminManager.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdminManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdminManager.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AdminManager.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Auth/AuthManager.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AuthManager.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AuthManager.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AuthManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AuthManager.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AuthManager.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Billing/BillingService.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/BillingService.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/BillingService.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/BillingService~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/BillingService.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/BillingService.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Context/ContextManager.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContextManager.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContextManager.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContextManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContextManager.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ContextManager.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Design/DesignManager.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/DesignManager.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/DesignManager.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/DesignManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/DesignManager.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/DesignManager.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Security/SecurityManager.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SecurityManager.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SecurityManager.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SecurityManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SecurityManager.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SecurityManager.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Session/SessionManager.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SessionManager.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SessionManager.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SessionManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SessionManager.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SessionManager.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Services/Shell/ShellService.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ShellService.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ShellService.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ShellService~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ShellService.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ShellService.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Chat/ChatView.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ChatView.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ChatView.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ChatView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ChatView.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/ChatView.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Components/AiAssistantPanel.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiAssistantPanel.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiAssistantPanel.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiAssistantPanel~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiAssistantPanel.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/AiAssistantPanel.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Editor/EditorView.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/EditorView.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/EditorView.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/EditorView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/EditorView.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/EditorView.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Onboarding/OnboardingView.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/OnboardingView.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/OnboardingView.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/OnboardingView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/OnboardingView.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/OnboardingView.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Settings/SettingsView.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SettingsView.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SettingsView.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SettingsView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SettingsView.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/SettingsView.dia"
+  },
+  "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/Sources/Views/Terminal/TerminalView.swift": {
+    "dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/TerminalView.d",
+    "object": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/TerminalView.swift.o",
+    "swiftmodule": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/TerminalView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/TerminalView.swiftdeps",
+    "diagnostics": "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/TerminalView.dia"
+  }
+}

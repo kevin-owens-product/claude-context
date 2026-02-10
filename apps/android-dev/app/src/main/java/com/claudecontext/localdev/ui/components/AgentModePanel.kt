@@ -2,6 +2,7 @@ package com.claudecontext.localdev.ui.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -294,13 +295,4 @@ private fun AgentActionItem(action: AgentAction) {
             }
         }
     }
-}
-
-@Composable
-private fun Modifier.clickable(onClick: () -> Unit): Modifier {
-    return this.then(
-        Modifier.clip(RoundedCornerShape(4.dp))
-    ).then(
-        androidx.compose.foundation.clickable(onClick = onClick).let { Modifier }
-    )
 }

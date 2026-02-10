@@ -1,0 +1,3 @@
+module ClaudeContext {
+    header "/Users/kevinowens/Documents/claude-context/apps/ios-dev/ClaudeContext/.build/arm64-apple-macosx/debug/ClaudeContext.build/include/ClaudeContext-Swift.h"
+}
