@@ -11,6 +11,18 @@ import com.claudecontext.localdev.service.claude.DebugEngine
 import com.claudecontext.localdev.service.claude.PlanEngine
 import com.claudecontext.localdev.service.claude.SwarmEngine
 import com.claudecontext.localdev.service.claude.PromptQueue
+import com.claudecontext.localdev.service.session.SessionManager
+import com.claudecontext.localdev.service.session.SessionManagerState
+import com.claudecontext.localdev.service.context.ContextManager
+import com.claudecontext.localdev.service.context.ContextManagerState
+import com.claudecontext.localdev.service.context.ContextPriority
+import com.claudecontext.localdev.service.context.ContextStrategy
+import com.claudecontext.localdev.service.context.ContextType
+import com.claudecontext.localdev.service.design.DesignManager
+import com.claudecontext.localdev.service.design.DesignManagerState
+import com.claudecontext.localdev.service.design.CursorStyle
+import com.claudecontext.localdev.service.design.CursorBlinking
+import com.claudecontext.localdev.service.design.WhitespaceRender
 import com.claudecontext.localdev.service.shell.ShellExecutor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +49,11 @@ data class EditorUiState(
     val planSession: PlanSession? = null,
     val swarmSession: SwarmSession? = null,
     val queueState: PromptQueueState? = null,
-    val buildOutput: String? = null
+    val buildOutput: String? = null,
+    // Managers
+    val sessionManagerState: SessionManagerState = SessionManagerState(),
+    val contextManagerState: ContextManagerState = ContextManagerState(),
+    val designManagerState: DesignManagerState? = null
 )
 
 @HiltViewModel
@@ -50,7 +66,10 @@ class EditorViewModel @Inject constructor(
     private val debugEngine: DebugEngine,
     private val planEngine: PlanEngine,
     private val swarmEngine: SwarmEngine,
-    private val promptQueue: PromptQueue
+    private val promptQueue: PromptQueue,
+    val sessionManager: SessionManager,
+    val contextManager: ContextManager,
+    val designManager: DesignManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EditorUiState())
@@ -84,6 +103,21 @@ class EditorViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(queueState = state)
             }
         }
+        viewModelScope.launch {
+            sessionManager.state.collect { state ->
+                _uiState.value = _uiState.value.copy(sessionManagerState = state)
+            }
+        }
+        viewModelScope.launch {
+            contextManager.state.collect { state ->
+                _uiState.value = _uiState.value.copy(contextManagerState = state)
+            }
+        }
+        viewModelScope.launch {
+            designManager.state.collect { state ->
+                _uiState.value = _uiState.value.copy(designManagerState = state)
+            }
+        }
     }
 
     fun loadProject(projectId: Long) {
@@ -97,6 +131,9 @@ class EditorViewModel @Inject constructor(
             planEngine.configure(project.path, project.language)
             swarmEngine.configure(project.path, project.language)
             promptQueue.configure(project.path, project.language)
+            sessionManager.configure(project.path)
+            contextManager.configure(project.path, project.language)
+            contextManager.addDirectoryTree()
 
             val mainFile = findMainFile(project.path, project.language)
             mainFile?.let { openFile(it) }
@@ -122,6 +159,8 @@ class EditorViewModel @Inject constructor(
                 openFiles = openFiles,
                 isModified = false
             )
+
+            contextManager.onFileOpened(path)
         }
     }
 
@@ -156,6 +195,7 @@ class EditorViewModel @Inject constructor(
             File(path).writeText(_uiState.value.content)
             originalContent = _uiState.value.content
             _uiState.value = _uiState.value.copy(isModified = false)
+            contextManager.onFileSaved(path)
         }
     }
 
@@ -305,6 +345,45 @@ class EditorViewModel @Inject constructor(
     fun queueSetPriority(promptId: String, priority: QueuePriority) {
         promptQueue.setPriority(promptId, priority)
     }
+
+    // --- Session Manager ---
+    fun createSession(title: String) = sessionManager.createSession(title = title, mode = _uiState.value.aiMode, projectId = _uiState.value.project?.id)
+    fun switchSession(sessionId: String) = sessionManager.switchSession(sessionId)
+    fun deleteSession(sessionId: String) = sessionManager.deleteSession(sessionId)
+    fun archiveSession(sessionId: String) = sessionManager.archiveSession(sessionId)
+    fun duplicateSession(sessionId: String) = sessionManager.duplicateSession(sessionId)
+    fun searchSessions(query: String) = sessionManager.searchSessions(query)
+    fun createBranch(sessionId: String, name: String) = sessionManager.createBranch(sessionId, name)
+    fun switchBranch(sessionId: String, branchId: String?) = sessionManager.switchBranch(sessionId, branchId)
+    fun createCheckpoint(sessionId: String, name: String) = sessionManager.createCheckpoint(sessionId, name)
+    fun restoreCheckpoint(sessionId: String, checkpointId: String) = sessionManager.restoreCheckpoint(sessionId, checkpointId)
+    fun exportSession(sessionId: String) { viewModelScope.launch { sessionManager.exportSession(sessionId) } }
+
+    // --- Context Manager ---
+    fun addContextNote(note: String, title: String) = contextManager.addUserNote(note, title)
+    fun removeContextEntry(entryId: String) = contextManager.removeEntry(entryId)
+    fun pinContextEntry(entryId: String, pinned: Boolean) = contextManager.pinEntry(entryId, pinned)
+    fun setContextPriority(entryId: String, priority: ContextPriority) = contextManager.setPriority(entryId, priority)
+    fun setContextStrategy(strategy: ContextStrategy) = contextManager.setStrategy(strategy)
+    fun setContextMaxBudget(maxTokens: Int) = contextManager.setMaxTokenBudget(maxTokens)
+    fun clearAllContext() = contextManager.clearAll()
+    fun clearContextByType(type: ContextType) = contextManager.clearByType(type)
+
+    // --- Design Manager ---
+    fun setTheme(themeId: String) = designManager.setTheme(themeId)
+    fun createTheme(name: String) = designManager.createTheme(name)
+    fun deleteTheme(themeId: String) = designManager.deleteTheme(themeId)
+    fun setLayout(layoutId: String) = designManager.setLayout(layoutId)
+    fun toggleDesignPanel(panelId: String) = designManager.togglePanel(panelId)
+    fun setEditorFontSize(size: Int) = designManager.setEditorFontSize(size)
+    fun setTabSize(size: Int) = designManager.setTabSize(size)
+    fun setShowMinimap(show: Boolean) = designManager.setShowMinimap(show)
+    fun setShowBreadcrumbs(show: Boolean) = designManager.setShowBreadcrumbs(show)
+    fun setShowIndentGuides(show: Boolean) = designManager.setShowIndentGuides(show)
+    fun setBracketPairColorization(enabled: Boolean) = designManager.setBracketPairColorization(enabled)
+    fun setCursorStyle(style: CursorStyle) = designManager.setCursorStyle(style)
+    fun setCursorBlinking(blinking: CursorBlinking) = designManager.setCursorBlinking(blinking)
+    fun setRenderWhitespace(render: WhitespaceRender) = designManager.setRenderWhitespace(render)
 
     // --- Common ---
     fun runCurrentFile() {
