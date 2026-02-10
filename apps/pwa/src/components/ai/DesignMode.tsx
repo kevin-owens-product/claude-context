@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import clsx from 'clsx';
 import {
   Palette,
@@ -6,11 +6,10 @@ import {
   Moon,
   Monitor,
   Type,
-  Maximize2,
   Layout,
   Check,
 } from 'lucide-react';
-import { Button } from '../common/Button';
+import { Badge } from '../common/Badge';
 import { useApp } from '../../store/AppContext';
 import type { ThemeVariant, LayoutPreset } from '../../types';
 
@@ -89,10 +88,8 @@ export function DesignMode() {
   const applyPreset = useCallback(
     (preset: LayoutPreset) => {
       actions.updateDesign({ activePreset: preset.id });
-      // Apply layout changes
-      const { dispatch } = state as unknown as { dispatch: never };
     },
-    [actions, state]
+    [actions]
   );
 
   return (

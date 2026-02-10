@@ -1,12 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import clsx from 'clsx';
 import {
-  Database,
   Plus,
   Trash2,
   Pin,
   PinOff,
-  ArrowUpDown,
   FileText,
   MessageSquare,
   Cpu,
@@ -15,7 +13,6 @@ import {
 } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Input, TextArea } from '../common/Input';
-import { Badge } from '../common/Badge';
 import { useApp } from '../../store/AppContext';
 import type { ContextEntry, ContextEntryType, ContextStrategy } from '../../types';
 

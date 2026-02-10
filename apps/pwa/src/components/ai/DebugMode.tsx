@@ -1,29 +1,19 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import clsx from 'clsx';
 import {
   Bug,
-  Search,
   CheckCircle2,
   XCircle,
-  AlertTriangle,
   FlaskConical,
   Wrench,
   Lightbulb,
 } from 'lucide-react';
 import { Button } from '../common/Button';
 import { TextArea } from '../common/Input';
-import { Input } from '../common/Input';
 import { Badge } from '../common/Badge';
 import { useApp } from '../../store/AppContext';
 import type { DebugSession, DebugHypothesis, DebugSeverity } from '../../types';
 import { AiMode } from '../../types';
-
-const SEVERITY_COLORS: Record<DebugSeverity, string> = {
-  critical: 'danger',
-  high: 'warning',
-  medium: 'info',
-  low: 'default',
-};
 
 export function DebugMode() {
   const { state, dispatch, actions: appActions } = useApp();

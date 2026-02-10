@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import clsx from 'clsx';
 import {
   Play,
@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Loader2,
   ThumbsUp,
+  Bot,
 } from 'lucide-react';
 import { Button } from '../common/Button';
 import { TextArea } from '../common/Input';
